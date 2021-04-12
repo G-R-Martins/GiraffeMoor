@@ -1,0 +1,127 @@
+#include "PCH.h"
+#include "BoolTable.h"
+#include <stdarg.h>
+
+
+BoolTable::BoolTable()
+{
+	data_table.clear();
+}
+
+BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps)
+{
+	data_table.clear();
+	data_table.reserve(bool_init_steps);
+
+	//"Bool_init_steps" with "bool_init"
+	for (int i = 0; i < bool_init_steps; i++)
+		data_table.emplace_back(bool_init);
+
+	//Last element of the booltable if the opposite
+	bool opposite = bool_init == true ? false : true;
+	data_table.emplace_back(opposite);
+	
+}
+
+BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bool& generate_opposite)
+{
+	data_table.clear();
+	data_table.reserve(bool_init_steps);
+
+	//"Bool_init_steps" with "bool_init"
+	for (int i = 0; i < bool_init_steps; i++)
+		data_table.emplace_back(bool_init);
+
+	//Last element of the booltable if the opposite
+	if (generate_opposite)
+	{
+		bool opposite = bool_init == true ? false : true;
+		data_table.emplace_back(opposite);
+	}
+}
+
+BoolTable::BoolTable(BoolTable &copied)
+{
+	data_table.clear();
+	data_table.resize(copied.data_table.size());
+	for (int i = 0; i < copied.data_table.size(); i++)
+		data_table[i] = copied.data_table[i];
+}
+
+//Writes output file
+void BoolTable::Write(FILE *f) const
+{
+	fprintf(f, "BoolTable ");
+	for (int i = 0; i < data_table.size(); i++)
+		fprintf(f, "%d ",(int)data_table[i]);
+	fprintf(f, "\n");
+}
+
+//Print output file
+void BoolTable::Print() const
+{
+	printf("BoolTable ");
+	for (int i = 0; i < data_table.size(); i++)
+		printf("%d ", (int)data_table[i]);
+	printf("\n");
+}
+
+BoolTable::~BoolTable()
+{
+	data_table.clear();
+}
+
+//Atribui valor value ao fim da tabela
+void BoolTable::Set(int nargs, ...)
+{
+	data_table.clear();
+	data_table.reserve(nargs);
+
+	va_list valist;
+	/* initialize valist for num number of arguments */
+	va_start(valist, nargs);
+	/* access all the arguments assigned to valist */
+	for (int i = 0; i < nargs; i++)
+	{
+		bool bcopy = va_arg(valist, bool);
+		//printf("%d\t", bcopy);
+		data_table.push_back(bcopy);
+	}
+
+		
+	/* clean memory reserved for valist */
+	va_end(valist);
+	//Print();
+}
+
+//Seta a tabela de dados booleanos
+void BoolTable::Clear()
+{
+	data_table.clear();
+}
+
+void BoolTable::Push_Back(const bool& bool_value)
+{
+	data_table.push_back(bool_value);
+}
+
+void BoolTable::Multiple_Push_Back(const BoolTable& bt)
+{
+	this->data_table.insert(this->data_table.end(), bt.data_table.begin(), bt.data_table.end());
+}
+
+void BoolTable::Multiple_Push_Back(const std::list <bool>& list)
+{
+	for (bool b : list)
+		data_table.push_back(b);
+}
+
+void BoolTable::Pop_Back()
+{
+	data_table.pop_back();
+}
+
+int BoolTable::Size()
+{
+	return (int)data_table.size();
+}
