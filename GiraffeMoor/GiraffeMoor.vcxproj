@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -17,12 +17,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1817f88f-3aa3-4fac-8b88-6f6cacf5e2e7}</ProjectGuid>
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{FAE187BD-413D-4908-9CB9-99EE0EC7568C}</ProjectGuid>
     <RootNamespace>GiraffeMoor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -31,119 +29,295 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseILP64Interfaces1A>false</UseILP64Interfaces1A>
+    <UseInteloneMKL>Parallel</UseInteloneMKL>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseILP64Interfaces1A>false</UseILP64Interfaces1A>
+    <UseInteloneMKL>Parallel</UseInteloneMKL>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" >
+  <ImportGroup Label="Shared">
   </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\mkl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\mkl\lib\ia32_win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libiomp5md.lib;mkl_core_dll.lib;mkl_sequential.lib;mkl_intel_thread_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SolutionStep.cpp" />
+    <ClCompile Include="src\MoorConstraint.cpp" />
+    <ClCompile Include="src\MoorLoad.cpp" />
+    <ClCompile Include="src\Force.cpp" />
+    <ClCompile Include="src\NodalForce.cpp" />
+    <ClCompile Include="src\ConcentratedMass.cpp" />
+    <ClCompile Include="src\Connectivity.cpp" />
+    <ClCompile Include="src\Cylinder.cpp" />
+    <ClCompile Include="src\IO.cpp" />
+    <ClCompile Include="src\Platform.cpp" />
+    <ClCompile Include="src\SineWaveDisplacement.cpp" />
+    <ClCompile Include="src\AnchorConstraint.cpp" />
+    <ClCompile Include="src\BoolTable.cpp" />
+    <ClCompile Include="src\Constraint.cpp" />
+    <ClCompile Include="src\Contact.cpp" />
+    <ClCompile Include="src\ConvergenceCriteria.cpp" />
+    <ClCompile Include="src\CoordinateSystem.cpp" />
+    <ClCompile Include="src\Displacement.cpp" />
+    <ClCompile Include="src\DisplacementField.cpp" />
+    <ClCompile Include="src\Dynamic.cpp" />
+    <ClCompile Include="src\Element.cpp" />
+    <ClCompile Include="src\Environment.cpp" />
+    <ClCompile Include="src\GiraffeModel.cpp" />
+    <ClCompile Include="src\Keypoint.cpp" />
+    <ClCompile Include="src\LineSegment.cpp" />
+    <ClCompile Include="src\MathCode.cpp" />
+    <ClCompile Include="src\Matrix.cpp" />
+    <ClCompile Include="src\Monitor.cpp" />
+    <ClCompile Include="src\MoorEnvironment.cpp" />
+    <ClCompile Include="src\Line.cpp" />
+    <ClCompile Include="src\MooringModel.cpp" />
+    <ClCompile Include="src\MoorPost.cpp" />
+    <ClCompile Include="src\MoorSolution.cpp" />
+    <ClCompile Include="src\NodalConstraint.cpp" />
+    <ClCompile Include="src\NodalDisplacement.cpp" />
+    <ClCompile Include="src\Node.cpp" />
+    <ClCompile Include="src\NodeSet.cpp" />
+    <ClCompile Include="src\NSSS.cpp" />
+    <ClCompile Include="src\OscillatorySurf.cpp" />
+    <ClCompile Include="src\PCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PCH.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="src\Pipe.cpp" />
+    <ClCompile Include="src\PipeSection.cpp" />
+    <ClCompile Include="src\Point.cpp" />
+    <ClCompile Include="src\Post.cpp" />
+    <ClCompile Include="src\RigidBody.cpp" />
+    <ClCompile Include="src\RigidBodyData.cpp" />
+    <ClCompile Include="src\RigidNodeSet.cpp" />
+    <ClCompile Include="src\SameDisplacement.cpp" />
+    <ClCompile Include="src\SameRotation.cpp" />
+    <ClCompile Include="src\Seabed.cpp" />
+    <ClCompile Include="src\SeaCurrent.cpp" />
+    <ClCompile Include="src\SegmentProperty.cpp" />
+    <ClCompile Include="src\Solution.cpp" />
+    <ClCompile Include="src\SpecialConstraint.cpp" />
+    <ClCompile Include="src\Static.cpp" />
+    <ClCompile Include="src\StiffnessMatrix.cpp" />
+    <ClCompile Include="src\SurfaceSet.cpp" />
+    <ClCompile Include="src\Table.cpp" />
+    <ClCompile Include="src\TriangleSurf.cpp" />
+    <ClCompile Include="src\Truss.cpp" />
+    <ClCompile Include="src\Vessel.cpp" />
+    <ClCompile Include="src\VesselConstraint.cpp" />
+    <ClCompile Include="src\TouchdownZone.cpp" />
+    <ClCompile Include="src\VesselDisplacement.cpp" />
+    <ClCompile Include="src\Summary.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Log.h" />
+    <ClInclude Include="src\TemplateReading.h" />
+    <ClInclude Include="src\SolutionStep.h" />
+    <ClInclude Include="src\MoorConstraint.h" />
+    <ClInclude Include="src\MoorLoad.h" />
+    <ClInclude Include="src\Force.h" />
+    <ClInclude Include="src\NodalForce.h" />
+    <ClInclude Include="src\ConcentratedMass.h" />
+    <ClInclude Include="src\Connectivity.h" />
+    <ClInclude Include="src\Cylinder.h" />
+    <ClInclude Include="src\IO.h" />
+    <ClInclude Include="src\Platform.h" />
+    <ClInclude Include="src\SineWaveDisplacement.h" />
+    <ClInclude Include="src\AnchorConstraint.h" />
+    <ClInclude Include="src\BoolTable.h" />
+    <ClInclude Include="src\Constraint.h" />
+    <ClInclude Include="src\Contact.h" />
+    <ClInclude Include="src\ConvergenceCriteria.h" />
+    <ClInclude Include="src\CoordinateSystem.h" />
+    <ClInclude Include="src\Displacement.h" />
+    <ClInclude Include="src\DisplacementField.h" />
+    <ClInclude Include="src\Dynamic.h" />
+    <ClInclude Include="src\Element.h" />
+    <ClInclude Include="src\Environment.h" />
+    <ClInclude Include="src\GiraffeModel.h" />
+    <ClInclude Include="src\Keypoint.h" />
+    <ClInclude Include="src\LineSegment.h" />
+    <ClInclude Include="src\MathCode.h" />
+    <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\Monitor.h" />
+    <ClInclude Include="src\MoorEnvironment.h" />
+    <ClInclude Include="src\Line.h" />
+    <ClInclude Include="src\MooringModel.h" />
+    <ClInclude Include="src\MoorPost.h" />
+    <ClInclude Include="src\MoorSolution.h" />
+    <ClInclude Include="src\NodalConstraint.h" />
+    <ClInclude Include="src\NodalDisplacement.h" />
+    <ClInclude Include="src\Node.h" />
+    <ClInclude Include="src\NodeSet.h" />
+    <ClInclude Include="src\NSSS.h" />
+    <ClInclude Include="src\OscillatorySurf.h" />
+    <ClInclude Include="src\PCH.h" />
+    <ClInclude Include="src\Pipe.h" />
+    <ClInclude Include="src\PipeSection.h" />
+    <ClInclude Include="src\Point.h" />
+    <ClInclude Include="src\Post.h" />
+    <ClInclude Include="src\RigidBody.h" />
+    <ClInclude Include="src\RigidBodyData.h" />
+    <ClInclude Include="src\RigidNodeSet.h" />
+    <ClInclude Include="src\SameDisplacement.h" />
+    <ClInclude Include="src\SameRotation.h" />
+    <ClInclude Include="src\Seabed.h" />
+    <ClInclude Include="src\SeaCurrent.h" />
+    <ClInclude Include="src\SegmentProperty.h" />
+    <ClInclude Include="src\Solution.h" />
+    <ClInclude Include="src\SpecialConstraint.h" />
+    <ClInclude Include="src\Static.h" />
+    <ClInclude Include="src\StiffnessMatrix.h" />
+    <ClInclude Include="src\SurfaceSet.h" />
+    <ClInclude Include="src\Table.h" />
+    <ClInclude Include="src\ReadingAuxiliaryFunctions.h" />
+    <ClInclude Include="src\TriangleSurf.h" />
+    <ClInclude Include="src\Truss.h" />
+    <ClInclude Include="src\Vessel.h" />
+    <ClInclude Include="src\VesselConstraint.h" />
+    <ClInclude Include="src\TouchdownZone.h" />
+    <ClInclude Include="src\VesselDisplacement.h" />
+    <ClInclude Include="src\Summary.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

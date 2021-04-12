@@ -112,6 +112,6 @@ std::tuple<bool, std::string> MoorPost::GetName(size_t plat_num)
 	}
 	//Key not founded (invalid value)
 	else
-		return std::make_tuple(false, "");
+		return std::make_tuple(false, std::string(""));
 }
 

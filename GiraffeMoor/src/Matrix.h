@@ -15,7 +15,7 @@ public:
 	Matrix(long lines);												//Construtor de matriz coluna
 	Matrix(long lines, long columns);								//Construtor Paramétrico
 	Matrix(Matrix const &copied);									//Construtor de cópia
-	Matrix(Matrix&& copied) noexcept;								//Move semantics
+	//Matrix(Matrix&& copied) noexcept;								//Move semantics
 	~Matrix(void);													//Destrutor Padrão
 
 	//Gets and Sets
@@ -41,11 +41,9 @@ public:
 	friend Matrix operator * (Matrix &matrix1, Matrix &matrix2);	//Operador Multiplicacao de matrizes
 	friend Matrix operator * (double escalar, Matrix &matrix1);		//Operador Multiplicacao por escalar
 	friend Matrix operator * (Matrix &matrix1, double escalar);		//Operador Multiplicacao por escalar
-	template <typename Array>
-	friend Matrix operator* (Matrix& matrix, Array& arr);	
 	double &operator() (long line, long column);					//Retorno do valor na posição especificada
 	Matrix& operator=(Matrix const &matrix1);						//Operador de Atribuição
-	Matrix& operator=(Matrix&& matrix1) noexcept;						//Operador de Atribuição
+	//Matrix& operator=(Matrix&& matrix1) noexcept;						//Operador de Atribuição
 
 	friend bool operator == (Matrix &matrix1, Matrix &matrix2);		//Verificação de igualdade
 	friend bool operator != (Matrix &matrix1, Matrix &matrix2);		//Verificação de inegualdade

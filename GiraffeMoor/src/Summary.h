@@ -68,6 +68,7 @@ public:
 		return summary;
 	}
 
+
 	static void AddLine( const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
 						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
 						 const unsigned int& number, const std::string_view& configuration,

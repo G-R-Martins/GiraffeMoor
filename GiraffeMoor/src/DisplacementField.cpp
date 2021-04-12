@@ -50,8 +50,8 @@ void DisplacementField::InsertDisplacement(const int &node, Matrix &e_disp, Matr
 	temp.node = node;
 	for (int i = 0; i < 3; i++)
 		temp.disp[i] = e_disp(i, 0);
-	for (size_t i = 0; i < 3; i++)
-		temp.disp[i + 3] = e_rot(i, 0);
+	for (long i = 0; i < 3; i++)
+		temp.disp[( size_t )i + 3] = e_rot(i, 0);
 	disp_data.push_back(temp);
 }
 
@@ -61,8 +61,8 @@ void DisplacementField::InsertDisplacement(const unsigned int&node, Matrix &e_di
 	temp.node = node;
 	for (int i = 0; i < 3; i++)
 		temp.disp[i] = e_disp(i, 0);
-	for (size_t i = 0; i < 3; i++)
-		temp.disp[i + 3] = e_rot(i, 0);
+	for (long i = 0; i < 3; i++)
+		temp.disp[(size_t)i + 3] = e_rot(i, 0);
 	disp_data.push_back(temp);
 }
 

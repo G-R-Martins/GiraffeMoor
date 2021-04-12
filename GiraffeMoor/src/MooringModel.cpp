@@ -3,7 +3,6 @@
 #include "Summary.h"
 #include "Log.h"
 
-
 //Global object
 extern GiraffeModel gm;
  
@@ -897,7 +896,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F)
 
 	E3.clear();
 	E1.clear();
-	E3 = 1.0 / norm(F - A)*(F - A);
+	E3 = 1.0 / norm(F - A) * (F - A);
 	E1(0, 0) = 0.0;
 	E1(1, 0) = 0.0;
 	E1(2, 0) = 1.0;

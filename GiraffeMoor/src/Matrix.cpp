@@ -56,13 +56,13 @@ Matrix::Matrix(Matrix const &copied)
 	for (long i = 0; i < copied.m_alloced_lines; i++)
 		m_matrix[i] = copied.m_matrix[i];
 }
-//Move semantics
-Matrix::Matrix(Matrix&& copied) noexcept
-	: m_matrix(std::move(copied.m_matrix)), m_lines(std::move(copied.m_lines)), m_columns(std::move(copied.m_columns)),
-	m_alloced_lines(std::move(copied.m_alloced_lines)), m_lines_deleted(std::move(copied.m_lines_deleted))
-{
-	copied.m_matrix = nullptr;
-}
+////Move semantics
+//Matrix::Matrix(Matrix&& copied) noexcept
+//	: m_matrix(std::move(copied.m_matrix)), m_lines(std::move(copied.m_lines)), m_columns(std::move(copied.m_columns)),
+//	m_alloced_lines(std::move(copied.m_alloced_lines)), m_lines_deleted(std::move(copied.m_lines_deleted))
+//{
+//	copied.m_matrix = nullptr;
+//}
 //Destrutor Padrão
 Matrix::~Matrix(void)
 {
@@ -216,10 +216,10 @@ void Matrix::clear()
 }
 
 //Operador Soma
-Matrix operator + (Matrix &matrix1, Matrix &matrix2)
+Matrix operator + (Matrix& matrix1, Matrix& matrix2)
 {
 	//Verifica se as dimensões das matrizes são compatíveis
-	if ((matrix1.getLines() != matrix2.getLines()) || (matrix1.getColumns() != matrix2.getColumns()))
+	if (( matrix1.getLines() != matrix2.getLines() ) || ( matrix1.getColumns() != matrix2.getColumns() ))
 	{
 		//Mensagem de erro - Dimensões Incompatíveis
 		printf("Matrizes devem possuir a mesma dimensao! \n");
@@ -262,42 +262,12 @@ Matrix operator - (Matrix &matrix1, Matrix &matrix2)
 			return_matrix.m_matrix[i] = matrix1.m_matrix[i] - matrix2.m_matrix[i];
 
 		//Retorna a matriz subtração
-		return std::move(return_matrix);
+		return return_matrix;
+		//return std::move(return_matrix);
 	}
 }
 
-//Operador Multiplicacao de matrizes
-template <typename Array>
-Matrix operator* (Matrix& matrix, Array& arr)
-{
-	//Verificação da possibilidade de multiplicação
-	if (arr.size() != matrix.m_columns)
-	{
-		printf("Nao e possivel multiplicar as matrizes. Dimensoes incompativeis!");
-		return nullptr;
-	}
-	else
-	{
-		Matrix return_m(matrix.m_columns, 1);
-		//Se a segunda matriz for um vetor
-		//if (matrix.m_columns == 1)
-		{
-			for (long line = 0; long line < matrix.m_lines; long line++)
-			{
-				for (long column = 0; column < matrix_m_columns; column++)
-				{
-					return_m(line, 0) += matrix[line + column * matrix.m_lines] * arr[line];
-				}
-			}
 
-		}
-		//Se não
-		else
-		return_m.print();
-		
-		return return_m;
-	}
-}
 //Operador Multiplicacao de matrizes
 Matrix operator * (Matrix &matrix1, Matrix &matrix2)
 {
@@ -333,7 +303,7 @@ Matrix operator * (Matrix &matrix1, Matrix &matrix2)
 	}
 }
 //Operador Multiplicacao por escalar
-Matrix operator * (double escalar, Matrix &matrix1)
+Matrix operator * (double escalar, Matrix& matrix1)
 {
 	//Cria uma matriz de retorno
 	Matrix return_matrix(matrix1.getLines(), matrix1.getColumns());
@@ -348,7 +318,7 @@ Matrix operator * (double escalar, Matrix &matrix1)
 
 }
 //Operador Multiplicacao por escalar
-Matrix operator * (Matrix &matrix1, double escalar)
+Matrix operator * (Matrix& matrix1, double escalar)
 {
 	//Retorna a função anterior, já que esta operação é comutativa
 	return escalar * matrix1;
@@ -396,31 +366,31 @@ Matrix &Matrix::operator = (Matrix const &matrix1)
 	//Retorna esta matriz
 	return *this;
 }
-//Operador de Atribuição	
-Matrix& Matrix::operator=(Matrix&& matrix1) noexcept
-{
-	//Verifica dimensões da matriz - se necessário, faz re-alocação
-	if (this->m_alloced_lines != matrix1.m_alloced_lines)
-	{
-		this->flush();
-		m_alloced_lines = 0;
-		m_lines = std::move(matrix1.m_lines);
-		m_columns = std::move(matrix1.m_columns);
-		m_lines_deleted = std::move(matrix1.m_lines_deleted);
-		//Inicializa a matriz como null e tenta alocá-la
-		m_matrix = std::move(matrix1.m_matrix);
-		if (!alloc())
-			printf("Nao foi possivel alocar matriz! \n");
-	}
-	////Copia os valores na nova matriz
-	//for (long i = 0; i < matrix1.m_alloced_lines; i++)
-	//	m_matrix[i] = matrix1.m_matrix[i];
-	m_matrix = std::move(matrix1.m_matrix);
-
-	matrix1.m_matrix = nullptr;
-	//Retorna esta matriz
-	return *this;
-}
+////Operador de Atribuição	
+//Matrix& Matrix::operator=(Matrix&& matrix1) noexcept
+//{
+//	//Verifica dimensões da matriz - se necessário, faz re-alocação
+//	if (this->m_alloced_lines != matrix1.m_alloced_lines)
+//	{
+//		this->flush();
+//		m_alloced_lines = 0;
+//		m_lines = std::move(matrix1.m_lines);
+//		m_columns = std::move(matrix1.m_columns);
+//		m_lines_deleted = std::move(matrix1.m_lines_deleted);
+//		//Inicializa a matriz como null e tenta alocá-la
+//		m_matrix = std::move(matrix1.m_matrix);
+//		if (!alloc())
+//			printf("Nao foi possivel alocar matriz! \n");
+//	}
+//	////Copia os valores na nova matriz
+//	//for (long i = 0; i < matrix1.m_alloced_lines; i++)
+//	//	m_matrix[i] = matrix1.m_matrix[i];
+//	m_matrix = std::move(matrix1.m_matrix);
+//
+//	matrix1.m_matrix = nullptr;
+//	//Retorna esta matriz
+//	return *this;
+//}
 //Retorno do valor na posição especificada
 double &Matrix::operator() (long line, long column)
 {
