@@ -3,11 +3,7 @@
 
 Node::Node()
 	: number(0), mark_comment(false), ref_coordinates({0.,0.,0.}), comment("\0")
-{
-	//ref_coordinates.resize(3);
-	//number = 0;
-	//mark_comment = false;
-}
+{}
 
 Node::~Node()
 {}

@@ -42,8 +42,8 @@ bool MoorLoad::Read(FILE* f)
 
 		if (fscanf(f, "%s %zd", str, &lineID) && strcmp(str, "LineID"))
 		{
-			warning += "\n   +Error reading segment or line data";
-			Log::AddWarning(warning);
+			warning += "\n   + Error reading segment or line data";
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 
@@ -52,8 +52,8 @@ bool MoorLoad::Read(FILE* f)
 	//Read step
 	if (fscanf(f, "%s %d", str, &step) == EOF || strcmp(str, "Step"))
 	{
-		warning += "\n   +Error reading step";
-		Log::AddWarning(warning);
+		warning += "\n   + Error reading step";
+		Log::getInstance().AddWarning(warning);
 		return false;
 	}
 
@@ -73,8 +73,8 @@ bool MoorLoad::Read(FILE* f)
 	}
 	else
 	{
-		warning += "\n   +Error reading force data of type \"" + std::string(str) + "\"";
-		Log::AddWarning(warning);
+		warning += "\n   + Error reading force data of type \"" + std::string(str) + "\"";
+		Log::getInstance().AddWarning(warning);
 		return false;
 	}
 

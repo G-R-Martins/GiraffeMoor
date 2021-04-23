@@ -2,69 +2,39 @@
 #include "Table.h"
 
 Table::Table()
-{
-	table.clear();
-}
+{}
+Table::~Table()
+{}
 
 //Assignment operator
 Table& Table::operator=(Table&& other) noexcept
 {
 	if (this != &other)
 	{
-		for (size_t i = 0; i < table.size(); i++)
-			delete[] table[i];
-		table.clear();
-
+		table.erase(table.begin(), table.end());
 		table = other.table;
-
-		for (size_t i = 0; i < other.table.size(); i++)
-			delete[] other.table[i];
-		other.table.clear();
+		other.table.erase(other.table.begin(), other.table.end());
 	}
 	return *this;
 }
-
+//Copy constructor
 Table::Table(const Table& toCopy)
 {
-	table.clear();
-	for (int i = 0; i < (int)toCopy.table.size(); i++)
-	{
-		table.push_back(new double[7]);
-		for (int j = 0; j < 7; j++)
-			table[i][j] = toCopy.table[i][j];
-	}
+	table.erase(table.begin(), table.end());
+	table = toCopy.table;
 }
 
-Table::~Table()
-{
-	for (int i = 0; i < (int)table.size(); i++)
-		delete[] table[i];
-	table.clear();
-}
+
 
 //Push back a new line
 void Table::SetLine(const double& time, const double& V1, const double& V2, const double& V3, const double& V4, const double& V5, const double& V6)
 {
-	table.push_back(new double[7]);
-	table.back()[0] = time;
-	table.back()[1] = V1;
-	table.back()[2] = V2;
-	table.back()[3] = V3;
-	table.back()[4] = V4;
-	table.back()[5] = V5;
-	table.back()[6] = V6;
+	table.emplace_back(std::array{ time, V1, V2, V3, V4, V5, V6 });
 }
 
 void Table::SetLineFront(const double& time, const double& V1, const double& V2, const double& V3, const double& V4, const double& V5, const double& V6)
 {
-	table.push_front(new double[7]);
-	table.front()[0] = time;
-	table.front()[1] = V1;
-	table.front()[2] = V2;
-	table.front()[3] = V3;
-	table.front()[4] = V4;
-	table.front()[5] = V5;
-	table.front()[6] = V6;
+	table.emplace_front(std::array{ time, V1, V2, V3, V4, V5, V6 });
 }
 
 void Table::SetStartTime(const double& start_time, const size_t& start_line)
@@ -105,11 +75,7 @@ bool Table::Read(FILE *f)
 	while (!flag_not_digit)
 	{
 		if (col == 0)
-		{
-			table.push_back(new double[7]);
-			for (int i = 0; i < 7; i++)
-				table[lin][i] = 0.0;
-		}
+			table.emplace_back(std::array{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0 });
 		
 		table[lin][col]=atof(s);
 		//Próxima leitura

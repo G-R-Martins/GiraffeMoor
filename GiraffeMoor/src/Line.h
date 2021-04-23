@@ -49,6 +49,11 @@ public:
 
 	//Boolean to indicate if the line is shared between more than one vessel
 	bool isShared;
+
+	//Segment set number (if exist, must be different than zero)
+	size_t segment_set;
+	bool usingSegmentSet;
+
 	//============================================================================
 
 	/*--------
@@ -64,19 +69,12 @@ public:
 	//Global number of nodes in transitions between segments
 	std::vector<unsigned int> transition_nodes;
 
-	///TO DO -> std::string configuration;
+	///TODO -> std::string configuration;
 	char configuration[100]; 
 
-	//Container with vessel IDs (in case os a shared line)
+	//Container with vessel IDs (if is a shared line - no anchor)
 	std::vector<unsigned int> vesselIDs;
-	//============================================================================
 
-	/*-----
-	Objects
-	------*/
-	
-	//Versor
-	//Matrix laying_direction;
 
 	//============================================================================
 
@@ -101,7 +99,7 @@ public:
 	-------------------*/
 
 	friend bool operator<(const Line& line1, const Line& line2);
-	//friend bool operator>(const Line& anchor1, const Line& line2);
+	friend bool operator>(const Line& line1, const Line& line2);
 	friend bool operator!=(const Line& line1, const Line& line2);
 	friend bool operator==(const Line& line1, const Line& line2);
 	friend bool operator!=(const Line& line1, const unsigned int& line2);

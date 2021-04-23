@@ -40,5 +40,6 @@ public:
 	//============================================================================
 
 	//Deque with data
-	std::deque<double*> table;
+	//std::deque<std::array<double,7>> table;
+	std::deque<std::array<double,7>> table;
 };

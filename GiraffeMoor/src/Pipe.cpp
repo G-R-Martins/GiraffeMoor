@@ -3,22 +3,14 @@
 
 
 Pipe::Pipe()
+	: label("")
 {
-	/*material = 0;
-	section = 0;
-	n_nodes = 3;
-	number = 0;*/
-	//nodes.reserve(3);
 	nodes.resize(3);
-	/*cs = 0;
-	mark_segment_begin = false;*/
 }
 
 
 Pipe::~Pipe()
-{
-
-}
+{}
 
 void Pipe::WriteGiraffeModelFile(FILE *f)
 {

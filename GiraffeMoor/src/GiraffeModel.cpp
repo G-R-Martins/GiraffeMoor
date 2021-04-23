@@ -5,21 +5,6 @@
 
 GiraffeModel::GiraffeModel()
 {
-	node_vector.clear();
-	element_vector.clear();
-	cs_vector.clear();
-	displacement_vector.clear();
-	constraint_vector.clear();
-	point_vector.clear();
-	triangle_vector.clear();
-	oscillatory_vector.clear();
-	node_set_vector.clear();
-	surface_set_vector.clear();
-	pipe_section_vector.clear();
-	rbdata_vector.clear();
-	special_constraint_vector.clear();
-	contact_vector.clear();
-	solution_vector.clear();
 	run_giraffe = false;
 }
 
@@ -55,17 +40,8 @@ GiraffeModel::~GiraffeModel()
 		delete[] solution_vector[i];
 	solution_vector.clear();
 
-	node_vector.clear();
-
-	cs_vector.clear();
-	point_vector.clear();
-	oscillatory_vector.clear();
-	triangle_vector.clear();
-	node_set_vector.clear();
-	surface_set_vector.clear();
-	pipe_section_vector.clear();
-	rbdata_vector.clear();
 }
+
 void GiraffeModel::GenerateNode(const unsigned int& number, Matrix& pos, const char* comment)
 {
 	node_vector.emplace_back();
@@ -472,7 +448,7 @@ bool GiraffeModel::ReadGiraffeAddress(FILE *f)
 		run_giraffe = true;
 	else
 	{
-		Log::AddWarning("\n   +Error reading keyword to call Giraffe. It must be 'run'.");
+		Log::getInstance().AddWarning("\n   + Error reading keyword to call Giraffe. It must be 'run'.");
 		return false;
 	}
 	

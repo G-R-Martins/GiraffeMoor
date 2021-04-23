@@ -1,0 +1,71 @@
+/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Giraffe Moor v0.1.30 input file                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+
+/* Name: 
+	CAIXA  */
+	
+Keypoints
+	//Line 1
+	Keypoint	1	X	1129.98757943999	Y	-1749.3784866	Z	-1500.000
+	Keypoint	2	X	120.000000000000	Y	0.00000000000	Z	-8.25
+	//Line 2                                  
+	Keypoint	3	X	-1900.0000000000	Y	0.0000000000	Z	-1500.000
+	Keypoint	4	X	120.000000000000	Y	0.0000000000 	Z	-8.25
+	//Line 3                                  
+	Keypoint	5	X	1129.98757943999	Y	1749.3784866	Z	-1500.000
+	Keypoint	6	X	120.000000000000	Y	0.0000000000 	Z	-8.25
+	//Vessel
+	Keypoint	7	X	95.0000000000000	Y	0.0000000000 	Z	0.00
+	
+Vessels
+	Vessel 1 PilotNode 7
+	
+Lines
+	Line	1	Anchor	1	Fairlead	2	VesselID 1
+		Segment Length	2450	Property	1	Discretization	250
+	Line	2	Anchor	3	Fairlead	4	VesselID 1
+		Segment Length	2450	Property	1	Discretization	250
+	Line	3	Anchor	5	Fairlead	6	VesselID 1
+		Segment Length	2450	Property	1	Discretization	250
+		
+SegmentProperties 
+	SegmentProperty	1 truss	
+		SpecificMass	10.1916	Diameter	0.0795825	EA	130.052e6	CDt	0	CDn	0	CAt	1	CAn	1
+		
+Environment
+	Gravity		9.81 
+	RhoFluid	1025 
+	WaterDepth	1500
+	Seabed	flat	Stiffness	3e6	Damping	1e2	FrictionCoefficient	0.2 
+	
+Solution
+	//SeaCurrentTimeStep 2
+	Analysis
+		Step 1	static  	Time	1	TimeStep 1.0 	MinTimeStep	1e-4	Sample	1 NumericalDamping	extreme
+		Step 2	dynamic 	Time	5	TimeStep 0.05 	MinTimeStep	1e-4	Sample	5 NumericalDamping	extreme
+		
+/*VesselDisplacements
+	VesselDispID	1
+		Step	2
+		MathCode
+			X	if (t>t0, 5.000000*sin((t-t0)*2*pi/105.000000),0)
+			Z	if (t>t0, 2.000000*sin((t-t0)*2*pi/10.000000+0.523599), 0)
+			ROTY	if (t>t0, 0.034907*sin((t-t0)*2*pi/25.000000-0.750492), 0)
+		
+Constraints
+	VesselConstraints
+		VesselID	2
+		  X	0 			Y 1 		Z 1 
+		  ROTX 1 		ROTY 0		ROTZ 0 
+*/
+		  
+
+Monitors
+	Sample 1
+	Elements fairleads
+	Nodes fairleads vessels
+
+GiraffeSolver run
+
+	

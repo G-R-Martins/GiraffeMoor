@@ -3,7 +3,7 @@
 
 
 RigidBodyData::RigidBodyData()
-	: number(0), mass(0.0), J_G({ 0.,0.,0.,0.,0.,0. }), G({ 0.,0.,0. })
+	: number(0), mass(0.0), J_G(std::array{ 0.,0.,0.,0.,0.,0. }), G(std::array{ 0.,0.,0. })
 {}
 
 RigidBodyData::~RigidBodyData()

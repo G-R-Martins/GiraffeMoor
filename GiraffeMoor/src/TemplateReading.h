@@ -5,11 +5,11 @@
 
 namespace LoopReading
 {
-		/***********************
+		/* * * * * * * * * * * *
 		 *					   *
 		 * Templates functions *
 		 *					   *
-		 ***********************/
+		 * * * * * * * * * * * */
 
 /*-+-+-+-+-+-+-+-+
  First keyword(s)
@@ -43,15 +43,12 @@ namespace LoopReading
 			std::sort(c.begin(), c.end());
 			c.erase(std::unique(c.begin(), c.end()), c.end());
 
-			//Size after repeated elements excluded
-			size_t after = c.size();
-
 			//Removed objects
-			size_t removed = before - after;
+			size_t removed = before - c.size();
 			if (removed > 0)
 			{
-				std::string warning = "\n   +" + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
-				Log::AddWarning(warning);
+				std::string warning = "\n   + " + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
+				Log::getInstance().AddWarning(warning);
 			}
 			c.shrink_to_fit();
 		}
@@ -115,16 +112,13 @@ namespace LoopReading
 			std::sort(c.begin(), c.end());
 			c.erase(std::unique(c.begin(), c.end()), c.end());
 
-			//Size after repeated elements excluded
-			size_t after = c.size();
-
 			//Removed objects
-			size_t removed = before - after;
+			size_t removed = before - c.size();
 
 			if (removed > 0)
 			{
-				std::string warning = "\n   +" + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
-				Log::AddWarning(warning);
+				std::string warning = "\n   + " + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
+				Log::getInstance().AddWarning(warning);
 			}
 			
 			c.shrink_to_fit();
@@ -189,7 +183,7 @@ namespace LoopReading
 				}
 				//Checks for another keyword
 				else if (keyword_set.find(std::string_view(str)) != keyword_set.end())
-					/*Do nothing, continue the loop*/;
+					continue /*Do nothing, continue the loop*/;
 				//Checks for an upper level keyword
 				else if (upper_keyword_set.find(std::string_view(str)) != upper_keyword_set.end())
 				{
@@ -240,7 +234,8 @@ namespace LoopReading
 					return true; //end of file
 				}
 				//Checks for another keyword
-				else if (keyword_set.find(std::string_view(str)) != keyword_set.end()) /*Do nothing, continue the loop*/;
+				else if (keyword_set.find(std::string_view(str)) != keyword_set.end()) 
+					continue /*Do nothing, continue the loop*/;
 				//Checks for a first level keyword
 				else if (AuxFunctions::isKeyword(str))
 				{

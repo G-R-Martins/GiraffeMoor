@@ -3,10 +3,8 @@
 
 
 RigidNodeSet::RigidNodeSet()
-{
-	pilot_node = 0;
-	node_set = 0;
-}
+	: pilot_node(0), node_set(0), comment("")
+{}
 
 
 RigidNodeSet::~RigidNodeSet()

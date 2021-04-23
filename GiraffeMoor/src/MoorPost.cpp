@@ -20,8 +20,6 @@ MoorPost::~MoorPost()
 //Reads input file
 bool MoorPost::Read(FILE *f)
 {
-	//Template functions to read loops
-	using namespace AuxFunctions;
 
 	//Keywords
 	typedef std::unordered_set<std::string_view> uset;
@@ -41,7 +39,7 @@ bool MoorPost::Read(FILE *f)
 	 -----------------*/
 
 	//Searches for comment block before keywords
-	TryComment(f);
+	AuxFunctions::TryComment(f);
 
 	uset keywords({ "CADs", "PostFiles"});
 	uset::iterator it;
@@ -87,7 +85,7 @@ bool MoorPost::Read(FILE *f)
 			}
 		}
 		//Not a keyword
-		else if (try_comment && str[0] == '/' && ReadComment(f, str))
+		else if (try_comment && str[0] == '/' && AuxFunctions::ReadComment(f, str))
 			continue;	//Try to read other keyword after comment
 		//Other word -> backs position go to IO class
 		else

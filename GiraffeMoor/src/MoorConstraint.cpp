@@ -16,9 +16,6 @@ MoorConstraint::~MoorConstraint()
 //Reads inout file
 bool MoorConstraint::Read(FILE * f)
 {
-	//Template functions to read loops
-	using namespace LoopReading;
-
 	//Saves keywords and values readed
 	char str[500];
 
@@ -33,12 +30,12 @@ bool MoorConstraint::Read(FILE * f)
 	{
 		if (!strcmp(str, "VesselConstraints"))
 		{
-			if (!TryNestedKeyword_UnorderedMultiple(mm.vessel_constraint, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
+			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(mm.vessel_constraint, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
 				return false;
 		}
 		else if (!strcmp(str, "AnchorConstraints"))
 		{
-			if (!TryNestedKeyword_UnorderedMultiple(mm.anc_constraint, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
+			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(mm.anc_constraint, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
 				return false;
 		}
 		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))

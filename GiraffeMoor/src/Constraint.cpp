@@ -8,5 +8,4 @@ Constraint::Constraint()
 
 
 Constraint::~Constraint()
-{
-}
+{}

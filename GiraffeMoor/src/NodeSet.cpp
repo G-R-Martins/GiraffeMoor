@@ -4,20 +4,14 @@
 
 NodeSet::NodeSet()
 	: number(0), total_nodes(0), init(0), increment(0), comment("\0")
-{
-	nodes.clear();
-}
+{}
 
 NodeSet::NodeSet(const unsigned int& num_nodes, const unsigned int& node0, const unsigned int& inc)
 	: number(0), total_nodes(num_nodes), init(node0), increment(inc), comment("\0")
-{
-	nodes.clear();
-}
+{}
 
 NodeSet::~NodeSet()
-{
-	nodes.clear();
-}
+{}
 
 void NodeSet::WriteGiraffeModelFile(FILE *f)
 {

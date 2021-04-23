@@ -4,16 +4,12 @@
 
 Environment::Environment()
 	: gravity(0.0), rhofluid(0.0), waterdepth(0.0)
-{
-	seacurrent_vector.clear();
-	bool_g.Clear();
+{	bool_g.Clear();
 	bool_current.Clear();
 }
 
 Environment::~Environment()
-{
-	seacurrent_vector.clear();
-}
+{}
 
 void Environment::WriteGiraffeModelFile(FILE *f)
 {

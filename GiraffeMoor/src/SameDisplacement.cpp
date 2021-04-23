@@ -4,8 +4,7 @@
 
 SameDisplacement::SameDisplacement()
 	: node_A(0), node_B(0), initial_load_step(0)
-{
-}
+{}
 
 SameDisplacement::~SameDisplacement()
 {

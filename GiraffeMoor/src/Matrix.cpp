@@ -63,6 +63,7 @@ Matrix::Matrix(Matrix const &copied)
 //{
 //	copied.m_matrix = nullptr;
 //}
+
 //Destrutor Padrão
 Matrix::~Matrix(void)
 {

@@ -8,8 +8,7 @@ Dynamic::Dynamic()
 {}
 
 Dynamic::~Dynamic()
-{
-}
+{}
 
 //Writes output file
 void Dynamic::WriteGiraffeModelFile(FILE *f)

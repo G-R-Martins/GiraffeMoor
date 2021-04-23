@@ -171,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\SegmentSet.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\SolutionStep.cpp" />
@@ -249,6 +250,7 @@
     <ClCompile Include="src\Summary.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\SegmentSet.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\TemplateReading.h" />
     <ClInclude Include="src\SolutionStep.h" />

@@ -4,13 +4,10 @@
 
 Point::Point()
 	: number(0), coordinates(Matrix(3))
-{	//coordinates = Matrix(3);
-}
-
+{}
 
 Point::~Point()
-{
-}
+{}
 
 void Point::WriteGiraffeModelFile(FILE *f)
 {

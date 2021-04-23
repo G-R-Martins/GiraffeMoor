@@ -3,16 +3,13 @@
 
 
 SurfaceSet::SurfaceSet()
-{
-	surfaces.clear();
-	number = 0;
-}
+	: number(0)
+{}
 
 
 SurfaceSet::~SurfaceSet()
-{
-	surfaces.clear();
-}
+{}
+
 void SurfaceSet::WriteGiraffeModelFile(FILE *f) const
 {
 	fprintf(f, "\tSurfaceSet\t%d\tSurfaces\t%d\tList\t", number, (int)surfaces.size());

@@ -3,20 +3,10 @@
 
 NodalConstraint::NodalConstraint()
 	: node_set(0)
-{
-	//number = 0;
-	//setting default values for constraints (false) - in case of not reading
-	//UX_table.Clear();
-	//UY_table.Clear();
-	//UZ_table.Clear();
-	//ROTX_table.Clear();
-	//ROTY_table.Clear();
-	//ROTZ_table.Clear();
-}
+{}
 
 NodalConstraint::~NodalConstraint()
-{
-}
+{}
 
 //Writes output file
 void NodalConstraint::WriteGiraffeModelFile(FILE *f)

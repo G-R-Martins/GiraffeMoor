@@ -45,19 +45,16 @@ bool SegmentProperty::Read(FILE *f)
 	//Reading boolean
 	bool readOk = true;
 
-	/*Tries to read a number indicated by the user this number is just for organization, 
-	the real parameter 'number' will be setted with the static variable 'n_prop'*/
+
 	fgetpos(f, &pos);
-	//If a word is readed, back position to read segment type
-	if (fscanf(f, "%d", &number) == EOF)//&& isalpha(str[0]))
+	//If a word is readed, return an error
+	if (fscanf(f, "%s", str) == EOF || isalpha(str[0]))
 	{
-		Log::AddWarning("\n   +Error reading segment property ID.\n");
+		Log::getInstance().AddWarning("\n   + Error reading segment property ID.\n");
 		return false;
 	}
-		//fsetpos(f, &pos);
-	
-	////Segment property ID
-	//number = ++n_prop;
+	else
+		number = atoi(str);
 
 	if (fscanf(f, "%s", str) != EOF && (!strcmp(str, "truss") || !strcmp(str, "chain")))
 	{
@@ -69,7 +66,7 @@ bool SegmentProperty::Read(FILE *f)
 	}
 	else
 	{
-		Log::AddWarning("\n   +Error reading segment property type.\n");
+		Log::getInstance().AddWarning("\n   + Error reading segment property type.\n");
 		return false;
 	}
 
@@ -143,14 +140,14 @@ bool SegmentProperty::Read(FILE *f)
 		//ERROR
 		else 
 		{
-			Log::AddWarning("\n   +Error reading segment property data.\n");
+			Log::getInstance().AddWarning("\n   + Error reading segment property data.\n");
 			return false;
 		}
 	}
 	//ERROR
 	else
 	{
-		Log::AddWarning("\n   +Error defining segment property data.\n");
+		Log::getInstance().AddWarning("\n   + Error defining segment property data.\n");
 		return false;
 	}
 

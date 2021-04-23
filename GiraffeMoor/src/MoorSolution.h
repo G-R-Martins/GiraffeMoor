@@ -60,6 +60,6 @@ public:
 	//Container with analysis steps
 	std::vector <SolutionStep> solution_steps;
 
-	/// TO DO
+	/// TODO: use multiple cores 
 	int ncores;
 };

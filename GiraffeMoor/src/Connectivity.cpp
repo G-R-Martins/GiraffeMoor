@@ -18,9 +18,7 @@ Connectivity::Connectivity()
 {}
 
 Connectivity::~Connectivity()
-{
-	connectivity_nodes.clear();
-}
+{}
 
 //Reads input file
 bool Connectivity::Read(FILE *f)

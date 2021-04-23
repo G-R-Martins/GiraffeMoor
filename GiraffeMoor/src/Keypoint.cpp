@@ -9,8 +9,7 @@ Keypoint::Keypoint()
 
 
 Keypoint::~Keypoint()
-{
-}
+{}
 
 //Reads input file
 bool Keypoint::Read(FILE *f)
@@ -22,7 +21,7 @@ bool Keypoint::Read(FILE *f)
 		number = atoi(str);
 	else
 	{
-		Log::AddWarning("\n   +Error reading a keypoit number.\n");
+		Log::getInstance().AddWarning("\n   + Error reading a keypoit number\n");
 		return false;
 	}
 
@@ -33,8 +32,8 @@ bool Keypoint::Read(FILE *f)
 
 	if (!readOk)
 	{
-		std::string w = "\n   +Error reading data of the keypoit number " + std::to_string(number);
-		Log::AddWarning(w);
+		std::string w = "\n   + Error reading data of the keypoit number " + std::to_string(number);
+		Log::getInstance().AddWarning(w);
 		return false;
 	}
 	
@@ -48,18 +47,16 @@ bool operator<(const Keypoint& obj1, const Keypoint& obj2)
 {
 	return obj1.number < obj2.number;
 }
-
 bool operator>(const Keypoint& obj1, const Keypoint& obj2)
 {
-	return obj1.number > obj2.number;;
+	return !(obj1 < obj2);
 }
 
 bool operator==(const Keypoint& obj1, const Keypoint& obj2)
 {
-	return obj1.number == obj2.number;;
+	return obj1.number == obj2.number;
 }
-
 bool operator!=(const Keypoint& obj1, const Keypoint& obj2)
 {
-	return obj1.number != obj2.number;;
+	return !(obj1 == obj2);
 }

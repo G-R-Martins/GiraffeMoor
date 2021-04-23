@@ -22,7 +22,7 @@ bool VesselConstraint::Read(FILE *f)
 	//Tries to read the first coordinate keyword
 	if (fscanf(f, "%d %s", &number, str) == EOF)
 	{
-		Log::AddWarning("\n   +Error reading vessel ID at 'VesselConstraint' block.");
+		Log::getInstance().AddWarning("\n   + Error reading vessel ID at 'VesselConstraint' block.");
 		return false;
 	}
 
@@ -56,8 +56,8 @@ bool VesselConstraint::Read(FILE *f)
 			//No constraint defined for the current DOF
 			else if (constraints[i].size() == 0)
 			{
-				std::string warning = "\n   +There is at least one DOF of the vessel number " + std::to_string(number) + "with no constraint defined.";
-				Log::AddWarning(warning);
+				std::string warning = "\n   + There is at least one DOF of the vessel number " + std::to_string(number) + "with no constraint defined.";
+				Log::getInstance().AddWarning(warning);
 				return false;
 			}
 			//It can be other keyword

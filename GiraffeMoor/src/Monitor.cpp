@@ -8,27 +8,14 @@ Monitor::Monitor()
 	: sample(1), bool_nodes_fairleads(true), bool_nodes_anchors(false), bool_nodes_tdz(false),
 	bool_nodes_vessel(true), bool_elements_fairleads(false), bool_elements_anchors(false),
 	bool_elements_tdz(false), bool_elements_vessel(false), bool_contact_seabed_moor(false)
-{
-	nodes.clear();
-	elements.clear();
-	contacts.clear();
-	node_sets.clear();
-}
+{}
 
 Monitor::~Monitor()
-{
-	nodes.clear();
-	elements.clear();
-	contacts.clear();
-	node_sets.clear();
-}
+{}
 
 //Reads input file
 bool Monitor::Read(FILE *f)
 {
-	//Read comment
-	using namespace AuxFunctions;
-	
 	//REading variables
 	char str[200];
 	fpos_t pos;
@@ -38,7 +25,7 @@ bool Monitor::Read(FILE *f)
  	fgetpos(f, &pos);
 	if (fscanf(f, "%s %d", str, &sample) != EOF && strcmp(str, "Sample"))
 	{
-		Log::AddWarning("\n   +Monitors sample was not defined in the input file. The default value (one) is considered.\n");
+		Log::getInstance().AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered.\n");
 		fsetpos(f, &pos);
 	}
 
@@ -47,7 +34,7 @@ bool Monitor::Read(FILE *f)
 	 -----------------*/
 	
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	TryComment(f);
+	AuxFunctions::TryComment(f);
 
 	uset keywords({ "Nodes","Elements","Contacts" });
 	uset::iterator it;
@@ -105,12 +92,12 @@ bool Monitor::Read(FILE *f)
 					bool_contact_seabed_moor = true;
 				else
 				{
-					Log::AddWarning("\n   +Error reading contact monitor\n");
+					Log::getInstance().AddWarning("\n   + Error reading contact monitor\n");
 					return false;
 				}
 			}
 		}
-		else if (try_comment && str[0] == '/' && ReadComment(f, str))
+		else if (try_comment && str[0] == '/' && AuxFunctions::ReadComment(f, str))
 			continue;	//Try to read other keyword after comment
 		//Other word -> backs position go to IO class
 		else

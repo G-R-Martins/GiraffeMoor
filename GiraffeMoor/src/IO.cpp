@@ -33,6 +33,7 @@ bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 	else if (!strcmp(word, "SegmentProperties"))	cur_level = FirstLevelKeyword::SegmentProperties;
 	else if (!strcmp(word, "Solution"))				cur_level = FirstLevelKeyword::Solution;
 	//Optional
+	else if (!strcmp(word, "SegmentSets"))			cur_level = FirstLevelKeyword::SegmentSets;
 	else if (!strcmp(word, "VesselDisplacements"))	cur_level = FirstLevelKeyword::VesselDisplacements;
 	else if (!strcmp(word, "Platforms"))			cur_level = FirstLevelKeyword::Platforms;
 	else if (!strcmp(word, "GiraffeConvergenceCriteria"))	cur_level = FirstLevelKeyword::GiraffeConvergenceCriteria;
@@ -56,9 +57,6 @@ bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 //Reads GiraffeMoor input file
 bool IO::ReadFile()
 {
-	//Template functions to read loops
-	using namespace LoopReading;
-
 	//Reading the input file name
 	bool readOK = false;
 	FILE* f = NULL;
@@ -124,7 +122,9 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 {
 	while (ReadKeyword(f, pos, str))// && cur_level != FirstLevelKeyword::EndOfFile)
 	{
-		Log::SetLastKeyword(str);
+		//Last valid keyword
+		Log::getInstance().SetLastKeyword(str);
+
 		switch (cur_level)
 		{
 		//First level only
@@ -181,7 +181,7 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+              Keypoints             -+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Keypoints:
-			if (!TryKeyword(mm.keypoint_vector, std::unordered_set<std::string_view>({ "Keypoint" }), f, pos, str))
+			if (!LoopReading::TryKeyword(mm.keypoint_vector, std::unordered_set<std::string_view>({ "Keypoint" }), f, pos, str))
 				return false;
 			else
 				mandatory_keywords.erase("Keypoints");
@@ -189,7 +189,7 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+               Vessels              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Vessels:
-			if (!TryKeyword(mm.vessel_vector, std::unordered_set<std::string_view>({ "Vessel" }), f, pos, str))
+			if (!LoopReading::TryKeyword(mm.vessel_vector, std::unordered_set<std::string_view>({ "Vessel" }), f, pos, str))
 				return false;
 			else
 				mandatory_keywords.erase("Vessels");
@@ -197,7 +197,7 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           SegmentProperty          +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::SegmentProperties:
-			if (!TryKeyword(mm.segment_property_vector, std::unordered_set<std::string_view>({ "SegmentProperty" }), f, pos, str))
+			if (!LoopReading::TryKeyword(mm.segment_property_vector, std::unordered_set<std::string_view>({ "SegmentProperty" }), f, pos, str))
 				return false;
 			else
 				mandatory_keywords.erase("SegmentProperties");
@@ -205,13 +205,13 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             NodalForces            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::NodalForces:
-			if (!TryKeyword_UnorderedMultiple(mm.moorload_vector, std::unordered_set<std::string_view>({ "Node" }), f, pos, str))
+			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.moorload_vector, std::unordered_set<std::string_view>({ "Node" }), f, pos, str))
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+         VesselDisplacements        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::VesselDisplacements:
-			if (!TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({ "VesselDispID" }), f, pos, str))
+			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({ "VesselDispID" }), f, pos, str))
 				return false;
 			break;
 
@@ -221,12 +221,18 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 				return false;
 			break;
 
+			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             SegmentSets            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		case FirstLevelKeyword::SegmentSets:
+			if (!LoopReading::TryKeyword(mm.segment_set_vector, std::unordered_set<std::string_view>({ "Set" }), f, pos, str))
+				return false;
+			break;
+
 
 		//Three levels
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+                Lines               +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Lines:
-			if (!TryKeyword(mm.line_vector, std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }), f, pos, str))
+			if (!LoopReading::TryKeyword(mm.line_vector, std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }), f, pos, str))
 				return false;
 			else
 				mandatory_keywords.erase("Lines");
@@ -234,7 +240,7 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+              Platforms             +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Platforms:
-			if (!TryKeyword(mm.platform_vector, std::unordered_set<std::string_view>({ "Platform" }), f, pos, str))
+			if (!LoopReading::TryKeyword(mm.platform_vector, std::unordered_set<std::string_view>({ "Platform" }), f, pos, str))
 				return false;
 			break;
 
@@ -254,7 +260,7 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 		case FirstLevelKeyword::Error:
 			std::stringstream ss;
 			ss << "   \"" << str << "\" is not a valid keyword.";
-			Log::AddWarning(ss);
+			Log::getInstance().AddWarning(ss);
 
 			return false;
 		}
@@ -263,31 +269,26 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 	fclose(f);
 
 	//Checks if all mandatory blocks were defined
-	if (mandatory_keywords.size() > 0)
+	if (!mandatory_keywords.empty())
 	{
-		std::cout << "[WARNING] " << mandatory_keywords.size() << " mandatory block(s) missed:\n";
+		//Initial message
+		std::string w = std::string("\n   + ") + std::to_string(mandatory_keywords.size()) + " mandatory block(s) missed:\n";
+		Log::getInstance().AddWarning(w);
+
+		//Appends missed mandatory keywords
 		for (const std::string_view& missed_block : mandatory_keywords)
 		{
-			std::cout << "\t- " << missed_block << std::endl;
+			//auto warning_keyword = missed_block + "\n";
+			Log::getInstance().AddWarning(missed_block);
+			Log::getInstance().AddWarning("\n");
 		}
 		return false;
 	}
 
 	mm.penetration = new Table[mm.line_vector.size()];
 
-/*	//Check sine wave (math code) displacement and offsets for stiffness matrix incompatibility
-	if (mm.stiff_matrix && mm.stiff_matrix->bool_num)
-	{
-		for (Vessel& vessel : mm.vessel_vector)
-		{
-			//if (vessel.SineWaveDisp)
-			{
-				std::cout << "[WARNING] Displacement with math code and table (offsets for numerical stiffness matrix) for the same nodeset is not allowed.\nPlease consider evaluating stiffness matrix in a different simulation.\n";
-				return false;
-			}
-		}
-	}*/
-
+	
+	//All ok while reading
 	return true;
 }
 

@@ -3,18 +3,9 @@
 
 
 NSSS::NSSS()
+	: number(0), node_set(0), surface_set(0), mu(0), epn(0), cn(0), ept(0), ct(0), 
+	pinball(0), radius(0), max_interactions(0)
 {
-	number = 0;
-	node_set = 0;
-	surface_set = 0;
-	mu = 0;
-	epn = 0;
-	cn = 0;
-	ept = 0;
-	ct = 0;
-	pinball = 0;
-	radius = 0;
-	max_interactions = 0;
 	bool_table.Clear();
 }
 

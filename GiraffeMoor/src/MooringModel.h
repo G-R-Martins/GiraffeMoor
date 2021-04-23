@@ -13,6 +13,7 @@
 #include "VesselDisplacement.h"
 #include "AnchorConstraint.h"
 #include "StiffnessMatrix.h"
+#include "SegmentSet.h"
 
 //Mooring and Giraffe models -> read, manipulate and write data
 #include "Vessel.h"
@@ -162,12 +163,15 @@ public:
 	//Vector with pointers to anchor/vessel constraints
 	MoorConstraint moor_constraint;
 
-	//List with anchor constraints objects (constraint data)
+	//Vector with anchor constraints objects (constraint data)
 	std::vector<AnchorConstraint> anc_constraint;
 
 	//Vector with vessel constraints objects (constraint data)
 	std::vector<VesselConstraint> vessel_constraint;
 	
+	//Vector with segment sets
+	std::vector<SegmentSet> segment_set_vector;
+
 
 	//============================================================================
 
@@ -220,7 +224,7 @@ public:
 	void SetMeshProperties(Line& line, const unsigned int& n_segs);
 
 	//Gera a malha das linhas
-	void GenerateMesh(Line& line, Matrix& A, Matrix& F);
+	void GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, double& Vf);
 
 	void GenerateCatenaryDisplacement(Line& line, const unsigned int& n_segs, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
 									  std::vector<std::vector<double>>& xcat_n, std::vector<std::vector<double>>& zcat_n, std::vector<std::vector<double>>& roty_n);
@@ -267,21 +271,6 @@ public:
 	void GeneratePlatform();
 
 
-
-
-
-
-
-	
-	
-
-
-
-
-
-
-
-
-//	//Moves lines to the corresponding vessel
-//	void MoveLines2Vessels();
+	//Generate segments from 'SegmentSet', if needed
+	void GenerateSegments();
 };
