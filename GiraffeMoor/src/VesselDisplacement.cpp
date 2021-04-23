@@ -35,15 +35,15 @@ bool VesselDisplacement::Read(FILE* f)
 		vesselID = atoi(str);
 	else
 	{
-		Log::AddWarning("\n   +Error reading vessel displacement.\n");
+		Log::getInstance().AddWarning("\n   + Error reading vessel displacement.\n");
 		return false;
 	}
 
 	//Step
 	if (fscanf(f, "%s %d", str, &step) == EOF || strcmp(str, "Step"))
 	{
-		warning = "\n   +Error reading step of the displacement of the vessel number " + std::to_string(vesselID);
-		Log::AddWarning(warning);
+		warning = "\n   + Error reading step of the displacement of the vessel number " + std::to_string(vesselID);
+		Log::getInstance().AddWarning(warning);
 		return false;
 	}
 
@@ -54,14 +54,14 @@ bool VesselDisplacement::Read(FILE* f)
 		time_series = new Table();
 		if (!time_series->Read(f))
 		{
-			warning = "\n   +Error reading time series displacement of the vessel number " + std::to_string(vesselID);
-			Log::AddWarning(warning);
+			warning = "\n   + Error reading time series displacement of the vessel number " + std::to_string(vesselID);
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 		else if (time_series->table[0][0] == 0)
 		{
-			warning = "\n   +There is no need to define a null row.\nPlease check your Giraffe input file (or the monitor) and make sure you are running the whole desirable time.\n";
-			Log::AddWarning(warning);
+			warning = "\n   + There is no need to define a null row.\nPlease check your Giraffe input file (or the monitor) and make sure you are running the whole desirable time.\n";
+			Log::getInstance().AddWarning(warning);
 		}
 		isTable = true;
 	}
@@ -74,8 +74,8 @@ bool VesselDisplacement::Read(FILE* f)
 		//Reads input file
 		if (!sineWaveDisp->Read(f))
 		{
-			warning = "\n   +Error reading 'SineWave' displacement of the vessel number " + std::to_string(vesselID);
-			Log::AddWarning(warning);
+			warning = "\n   + Error reading 'SineWave' displacement of the vessel number " + std::to_string(vesselID);
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 
@@ -88,8 +88,8 @@ bool VesselDisplacement::Read(FILE* f)
 		mathCode = new MathCode();
 		if (!mathCode->Read(f))
 		{
-			warning = "\n   +Error reading 'MathCode' of the displacement of the vessel number " + std::to_string(vesselID);
-			Log::AddWarning(warning);
+			warning = "\n   + Error reading 'MathCode' of the displacement of the vessel number " + std::to_string(vesselID);
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 

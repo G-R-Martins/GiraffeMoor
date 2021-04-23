@@ -26,8 +26,6 @@ StiffnessMatrix::~StiffnessMatrix()
 
 bool StiffnessMatrix::Read(FILE *f)
 {
-	////Template functions to read loops
-	using namespace AuxFunctions;
 
 	char str[200];			//salva palavras-chave lidas e valores lidos
 	fpos_t pos;
@@ -42,7 +40,7 @@ bool StiffnessMatrix::Read(FILE *f)
 				/*Do nothing, "false" is the default value*/;
 			else
 			{
-				Log::AddWarning("\n   +Error reading analytical stiffness matrix definition.\n");
+				Log::getInstance().AddWarning("\n   + Error reading analytical stiffness matrix definition.\n");
 				return false;
 			}
 		}
@@ -56,7 +54,7 @@ bool StiffnessMatrix::Read(FILE *f)
 					fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &disp_matrix_x, &disp_matrix_y, &disp_matrix_z,
 						   &rot_matrix_x, &rot_matrix_y, &rot_matrix_z) == EOF || strcmp(str, "Offsets"))
 				{
-					Log::AddWarning("\n   +Error reading numerical stiffness matrix data.\n");
+					Log::getInstance().AddWarning("\n   + Error reading numerical stiffness matrix data.\n");
 					return false;
 				}
 			}
@@ -69,7 +67,7 @@ bool StiffnessMatrix::Read(FILE *f)
 			}
 		}
 		//Checks for comment
-		else if (str[0] == '/' && ReadComment(f, str));
+		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str));
 		//Other word -> backs position go to IO class
 		else
 		{

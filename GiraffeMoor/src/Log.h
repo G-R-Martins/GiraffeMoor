@@ -10,14 +10,28 @@ private:
 	unsigned int contErrors;
 	unsigned int contWarnings;
 
-	static std::string error;
-	static std::string warning;
-	static std::string final_message;
+	std::string error;
+	std::string warning;
+	std::string final_message;
 
-	static std::string_view last_keyword;
+	std::string_view last_keyword;
+
+
+	//Private constructor to prevent copies
+	Log();
 
 public:
-	Log();
+	// Deleting copy and assignment 
+	Log(const Log&) = delete;
+	Log& operator=(const Log&) = delete;
+
+	//Static factory
+	static Log& getInstance()
+	{
+		static Log log_instance;
+		return log_instance;
+	}
+
 	~Log() = default;
 
 	/*****************
@@ -25,31 +39,31 @@ public:
 	 *****************/
 
 	//Add error to the string (from a string view)
-	static void AddError(const std::string_view& toAdd);
+	void AddError(const std::string_view& toAdd);
 	//Add error to the string (from a string stream)
-	static void AddError(const std::stringstream& toAdd);
+	void AddError(const std::stringstream& toAdd);
 	//Add error to the string (from a string)
-	static void AddError(const std::string& toAdd);
+	void AddError(const std::string& toAdd);
 	//Add error to the string (from a char array)
-	static void AddError(const char* toAdd);
+	void AddError(const char* toAdd);
 
 	//Add warning to the string 
-	static void AddWarning(const std::string_view& toAdd);
+	void AddWarning(const std::string_view& toAdd);
 	//Add warning to the string (from a string stream)
-	static void AddWarning(const std::stringstream& toAdd);
+	void AddWarning(const std::stringstream& toAdd);
 	//Add warning to the string (from a string)
-	static void AddWarning(const std::string& toAdd);
+	void AddWarning(const std::string& toAdd);
 	//Add warning to the string (from a char array)
-	static void AddWarning(const char* toAdd);
+	void AddWarning(const char* toAdd);
 	
 	//Add message to the string 
-	static void AddFinalMessage(const std::string_view& toAdd);
+	void AddFinalMessage(const std::string_view& toAdd);
 	//Add message to the string (from a string stream)
-	static void AddFinalMessage(const std::stringstream& toAdd);
+	void AddFinalMessage(const std::stringstream& toAdd);
 	//Add message to the string (from a string)
-	static void AddFinalMessage(const std::string& toAdd);
+	void AddFinalMessage(const std::string& toAdd);
 	//Add message to the string (from a char array)
-	static void AddFinalMessage(const char* toAdd);
+	void AddFinalMessage(const char* toAdd);
 	
 	/* Update counters */
 
@@ -84,26 +98,23 @@ public:
 	 * Get functions *
 	 *****************/
 
-	//Return Singleton
-	static Log& Log::Get();
-
 	//Get the string with error message(s)
-	static std::string& GetError();
+	std::string& GetError();
 
 	//Get the string with warning message(s)
-	static std::string& GetWarning();
+	std::string& GetWarning();
 
 	//Get the string with final message
-	static std::string& GetFinalMessage();
+	std::string& GetFinalMessage();
 	
 
 	/***********************
 	 * Last keyword readed *
 	 ***********************/
 
-	static void SetLastKeyword(const std::string_view& key);
-	static void SetLastKeyword(const char* key);
-	static std::string_view& GetLastKeyword();
+	void SetLastKeyword(const std::string_view& key);
+	void SetLastKeyword(const char* key);
+	std::string_view& GetLastKeyword();
 
 
 };

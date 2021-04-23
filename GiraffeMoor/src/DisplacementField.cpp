@@ -9,9 +9,7 @@ DisplacementField::DisplacementField()
 }
 
 DisplacementField::~DisplacementField()
-{
-	disp_data.clear();
-}
+{}
 
 void  DisplacementField::WriteGiraffeModelFile(FILE *f)
 {

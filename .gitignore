@@ -361,3 +361,26 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/inputs/500m/500m.gmr
+/inputs/Giraffe_old.exe
+/inputs/GiraffeMoor.exe
+/inputs/Giraffe.exe
+/inputs/exemplo/post
+/inputs/500m/post
+/inputs/500m/monitors
+/inputs/fpso/monitors
+/inputs/fpso/post
+/inputs/w_L300m_c09/monitors
+/inputs/w_L300m_c09/post
+/inputs/w_L300m_c09/w_L300m_c09.sum
+/inputs/w_L300m_c09/w_L300m_c09.inp
+/inputs/w_L300m_c09/simulation_report.txt
+/inputs/w_L300m_c09/output.inp
+/inputs/fpso/simulation_report.txt
+/inputs/fpso/output.inp
+/inputs/fpso/fpso.sum
+/inputs/fpso/fpso.inp
+/inputs/exemplo/exemplo.inp
+/inputs/500m/simulation_report.txt
+/inputs/500m/output.inp
+/inputs/500m/500m.inp

@@ -38,8 +38,8 @@ public:
 		//EOF
 		EndOfFile = -1,
 
-		//ERROR
 		Error = -100,
+		//ERROR
 
 		//Comment after a block with only first level keyword
 		CommentAfterBlock = 1, 
@@ -49,7 +49,7 @@ public:
 
 		//Optional keywords
 		VesselDisplacements = 101, Platforms, GiraffeConvergenceCriteria, Monitors,
-		PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces
+		PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces, SegmentSets
 
 	} cur_level; //Manages the reading first level (blue bold words)
 

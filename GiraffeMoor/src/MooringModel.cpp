@@ -3,6 +3,7 @@
 #include "Summary.h"
 #include "Log.h"
 
+
 //Global object
 extern GiraffeModel gm;
  
@@ -12,8 +13,6 @@ extern std::string folder_name;
 //Constants variables
 constexpr auto PI = 3.1415926535897932384626433832795;
 static double g;
-constexpr int MAXITERATIONS_EQUATIONSYSTEM = 100;
-constexpr double error_max = 1e-6;
 
 MooringModel::MooringModel()
 	: stiff_matrix(nullptr), cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
@@ -30,28 +29,10 @@ MooringModel::MooringModel()
 	platform_vector.reserve(32);
 	anc_constraint.reserve(16);
 	vessel_constraint.reserve(16);
-
-	//Cleaning containers
-	anchor_nodesets.clear();
-	fairlead_nodesets.clear();
-	anc_constraint.clear();
-	vessel_constraint.clear();
 }
 
 MooringModel::~MooringModel()
 {
-	//Cleaning containers
-	line_vector.erase(line_vector.begin(), line_vector.end());
-	vessel_vector.erase(vessel_vector.begin(), vessel_vector.end());
-	keypoint_vector.erase(keypoint_vector.begin(), keypoint_vector.end());
-	segment_property_vector.erase(segment_property_vector.begin(), segment_property_vector.end());
-	platform_vector.erase(platform_vector.begin(), platform_vector.end());
-	moorload_vector.erase(moorload_vector.begin(), moorload_vector.end());
-	anc_constraint.erase(anc_constraint.begin(), anc_constraint.end());
-	vessel_constraint.erase(vessel_constraint.begin(), vessel_constraint.end());
-	anchor_nodesets.clear();
-	fairlead_nodesets.clear();
-
 	//Destroying pointers
 	if (penetration)	delete[] penetration;
 	if (stiff_matrix)	delete stiff_matrix;
@@ -59,6 +40,9 @@ MooringModel::~MooringModel()
 
 bool MooringModel::GenerateGiraffeModel()
 {
+	//Check if segments must be generated from 'SegmentSet'
+	GenerateSegments();
+
 	//Computes segment properties from readed data
 	PreCalcSegmentPropertiesData();
 
@@ -260,7 +244,7 @@ bool MooringModel::GenerateCatenary()
 		SetMeshProperties(line, n_segs);
 
 		//Call GenerateMesh to generate the current line mesh
-		GenerateMesh(line, coordinates_A, coordinates_B);
+		GenerateMesh(line, coordinates_A, coordinates_B, Hf, Vf);
 
 		//Generates displacement field (and updates fairlead rotation)
 		GenerateCatenaryDisplacement(line, n_segs, F, FV, cur_node, xcat_n, zcat_n, roty_n);
@@ -308,6 +292,11 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 										  double& Hf, double& Vf, Matrix& F, std::vector <double>& FV,
 										  Matrix& Fairleads_StiffnessMatrix)
 {
+	//Limits to the counters (force initial guess) and error
+	static constexpr int MAX_ITERATIONS_FH0 = 10;
+	static constexpr int MAX_ITERATIONS_FV0 = 1000;
+	static constexpr double error_max = 1e-6;
+
 	//Residue
 	double res;
 
@@ -317,20 +306,30 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	//Counters
 	int aux0, aux1, aux2, aux3;
 
-	int m = 3; //int m = (int) floor(log10(max_gamma_s));
+	//Supposes that there is no TDP
+	existTDP = false;
+
+	//Order of the force initial guess
+	auto [gmin, gmax] = std::minmax_element(line.gamma_s.begin(), line.gamma_s.end());
+	int m = (int)floor(log10(max(fabs(*gmin), fabs(*gmax))));
+
+	//int m = ( int )floor(log10(*( std::max_element(line.gamma_s.begin(), line.gamma_s.end()) )));
+	
+	//Two times = before and after penetration
 	for (aux0 = 1; aux0 <= 2; aux0++)
 	{
 		//Anchor and fairlead horizontal projections
 		Hf = sqrt(pow(( A(0, 0) - B(0, 0) ), 2) + pow(( A(1, 0) - B(1, 0) ), 2));
 		if (aux0 == 1)	Vf = B(2, 0) - A(2, 0);
 
-		//Solve forces
-		for (aux1 = 1; aux1 <= MAXITERATIONS_EQUATIONSYSTEM; aux1++)
+		//Updates FH initial guess 
+		for (aux1 = 1; aux1 < MAX_ITERATIONS_FH0; aux1++)
 		{
-			for (aux2 = 1; aux2 <= MAXITERATIONS_EQUATIONSYSTEM; aux2++)
+			//Updates FV initial guess 
+			for (aux2 = 1; aux2 < MAX_ITERATIONS_FV0; aux2++)
 			{
 				if (aux0 == 2 && aux1 == 1 && aux2 == 1)
-					/*Use the last calculated values*/;
+					/*Use the last calculated values - before penetration*/;
 				else
 				{
 					F(0, 0) = aux1 * pow(10.0, m);
@@ -348,14 +347,14 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 						FV[cont_ds] = FV[n_segs] + dif;
 					}
 
-					if (A(2, 0) <= -environment.waterdepth)
-					{
+					//if (A(2, 0) <= -environment.waterdepth)
+					//{
 						for (unsigned int cont = 0; cont < n_segs + 1; cont++)
 						{
 							if (FV[cont] < 0)	FV[cont] = 0.0;
-							else break;	//When it starts to be positive, the negative values are related to buoys only
+							else break;	//Break when it starts to be positive, the negative values are related to buoys only
 						}
-					}
+					//}
 
 					std::vector <double> raiz;
 					for (unsigned int r = 0; r < n_segs + 1; r++)
@@ -366,22 +365,22 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 
 					//Jacobian matrix
 					Matrix J(2, 2);
-					for (unsigned int seg = 1; seg <= n_segs; seg++)
+					for (size_t seg = 1; seg <= ( size_t )n_segs; seg++)
 					{
-						double cur_gamma = line.gamma_s[( size_t )seg - 1];
-						double cur_EA = segment_property_vector[( line.segments[( size_t )seg - 1].property ) - 1].EA;
-						double cur_len = line.segments[( size_t )seg - 1].length;
+						double cur_gamma = line.gamma_s[seg - 1];
+						double cur_EA = segment_property_vector[( line.segments[seg - 1].property ) - 1].EA;
+						double cur_len = line.segments[seg - 1].length;
 
 						Matrix J_aux(2, 2);
-						J_aux(0, 0) = cur_len / cur_EA + 1.0 / cur_gamma * ( log(( FV[seg] + raiz[seg] ) / F(0, 0)) - log(( FV[( size_t )seg - 1] + raiz[( size_t )seg - 1] ) / F(0, 0)) ) - 1.0 / cur_gamma * ( FV[seg] / raiz[seg] - FV[( size_t )seg - 1] / raiz[( size_t )seg - 1] );
-						J_aux(0, 1) = F(0, 0) / cur_gamma * ( 1.0 / raiz[seg] - 1.0 / raiz[( size_t )seg - 1] );
+						J_aux(0, 0) = cur_len / cur_EA + 1.0 / cur_gamma * ( log(( FV[seg] + raiz[seg] ) / F(0, 0)) - log(( FV[seg - 1] + raiz[seg - 1] ) / F(0, 0)) ) - 1.0 / cur_gamma * ( FV[seg] / raiz[seg] - FV[seg - 1] / raiz[seg - 1] );
+						J_aux(0, 1) = F(0, 0) / cur_gamma * ( 1.0 / raiz[seg] - 1.0 / raiz[seg - 1] );
 						J_aux(1, 0) = J_aux(0, 1);
-						J_aux(1, 1) = 1.0 / cur_gamma * ( FV[seg] / raiz[seg] - FV[( size_t )seg - 1] / raiz[( size_t )seg - 1] ) + 1.0 / ( cur_EA * cur_gamma ) * ( FV[seg] - FV[( size_t )seg - 1] );
+						J_aux(1, 1) = 1.0 / cur_gamma * ( FV[seg] / raiz[seg] - FV[seg - 1] / raiz[seg - 1] ) + 1.0 / ( cur_EA * cur_gamma ) * ( FV[seg] - FV[seg - 1] );
 
 						J = J + J_aux;
 
-						h += cur_len * ( 1 + F(0, 0) / cur_EA ) - ( FV[seg] - FV[( size_t )seg - 1] ) / cur_gamma + F(0, 0) / cur_gamma * ( log(( FV[seg] + raiz[seg] ) / F(0, 0)) - log(( FV[( size_t )seg - 1] + raiz[( size_t )seg - 1] ) / F(0, 0)) );
-						v += 1.0 / cur_gamma * ( raiz[seg] - raiz[( size_t )seg - 1] ) + 0.5 * ( pow(FV[seg], 2) - pow(FV[( size_t )seg - 1], 2) ) / ( cur_gamma * cur_EA );
+						h += cur_len * ( 1 + F(0, 0) / cur_EA ) - ( FV[seg] - FV[seg - 1] ) / cur_gamma + F(0, 0) / cur_gamma * ( log(( FV[seg] + raiz[seg] ) / F(0, 0)) - log(( FV[seg - 1] + raiz[seg - 1] ) / F(0, 0)) );
+						v += 1.0 / cur_gamma * ( raiz[seg] - raiz[seg - 1] ) + 0.5 * ( pow(FV[seg], 2) - pow(FV[seg - 1], 2) ) / ( cur_gamma * cur_EA );
 					}
 					E(0, 0) = h - Hf;
 					E(1, 0) = v - Vf;
@@ -409,32 +408,37 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 		}
 
 		//Checks for divergence (maximum number of iterations)
-		if (aux1 == MAXITERATIONS_EQUATIONSYSTEM && aux2 == MAXITERATIONS_EQUATIONSYSTEM)
+		if (aux1 == MAX_ITERATIONS_FH0 && aux2 == MAX_ITERATIONS_FV0)
 		{
 			std::stringstream ss;
-			ss << "\n   +Error solving equations for line number " << line.number;
-			Log::AddWarning(ss);
+			ss << "\n   + Error solving equations for line number " << line.number;
+			Log::getInstance().AddWarning(ss);
 			return false;
 		}
 		
+		//Before apply penetration in seabed
 		if (aux0 == 1)
+		{
+			//Tension at first and last nodes -> used in summary file
 			extrem_tensions = { sqrt(pow(F(0,0),2) + pow(FV[0],2)), sqrt(pow(F(0,0),2) + pow(F(1,0),2)) };
 
-		//Finding the TDP location
-		if (A(2, 0) <= -environment.waterdepth)
-		{
-			for (unsigned int cont = 0; cont < n_segs + 1; cont++)
+			//If FV0 <= 0  and  Anchor point <= Water depth -> exist TDP
+			if (FV[0] <= 0 && A(2, 0) <= -environment.waterdepth)
 			{
-				if (FV[cont] > 0)
+				existTDP = true;
+				for (unsigned int cont = 1; cont < n_segs + 1; cont++)
 				{
-					existTDP = cont == 1 ? true : false;
-					seg_tdp = --cont;
-					break;
+					if (FV[cont] > 0)
+					{
+						seg_tdp = --cont;
+						break;
+					}
 				}
 			}
+			//Otherwise, set segment to the first
+			else
+				seg_tdp = 0;
 		}
-		else
-			existTDP = false;
 
 
 		//Equivalent weight until reach TDP segment (included)
@@ -447,7 +451,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 		{
 			//The penetration is calculated with data of the segments that have contact with seabed in the static configuration 
 			//or the first segment (in cases like a steep wave line)
-			unsigned int lim_seg = ( seg_tdp < 0 ) ? 0 : seg_tdp;
+			unsigned int lim_seg = existTDP ? seg_tdp : 0;
 
 			//Equivalents paramenters to set penetration
 			double rholen = 0.0, arealen = 0.0;
@@ -464,13 +468,13 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			}
 
 			//Equivalent specific weight
-			if (lim_seg != -1)		gamma_eq = g * rholen / line.total_length;
+			if (existTDP)		gamma_eq = g * rholen / line.total_length;
 
 			//If exist other segments, calculate equivalent parameters (used to calculate dynamic relaxation, if exists)
-			if (lim_seg != n_segs)
+			if (lim_seg != n_segs - 1)
 			{
 				//If there is no TDP, starts at segment 0, otherwise; at the next segment after TDP
-				unsigned int seg = lim_seg == -1 ? 0 : lim_seg + 1;
+				unsigned int seg = existTDP ? lim_seg + 1 : 0;
 				for (; seg < n_segs; seg++)
 				{
 					arealen += ( PI * pow(segment_property_vector[line.segments[seg].property - 1].diameter, 2) / 4.0 ) * line.segments[seg].length;
@@ -486,7 +490,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			/*Imposing penetrarion in the seabed*/
 
 			//Equivalent specific weight
-			if (lim_seg == -1)	gamma_eq = g * rholen / line.total_length;
+			if (!existTDP)	gamma_eq = g * rholen / line.total_length;
 
 			//Vertical displacement
 			double dz = -gamma_eq * line.total_length / ( elements * environment.seabed.stiffness );
@@ -873,7 +877,7 @@ void MooringModel::SetMeshProperties(Line& line, const unsigned int& n_segs)
 }
 
 //Generates mesh for the current line
-void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F)
+void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, double& Vf)
 {
 	//Esta função deve gerar todos os nós e elementos da linha de ancoragem a partir das definições da linha e seus segmentos
 	
@@ -894,17 +898,37 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F)
 	//Creating points to represent the anchor (A) and the fairlead (F)
 	F(2, 0) = line.hasAnchor == true ? keypoint_vector[line.keypoint_A - 1].z : keypoint_vector[line.keypoint_B - 1].z;
 
-	E3.clear();
-	E1.clear();
-	E3 = 1.0 / norm(F - A) * (F - A);
-	E1(0, 0) = 0.0;
-	E1(1, 0) = 0.0;
-	E1(2, 0) = 1.0;
-
 	//Generating local coordinate system - for each line a single CS is established
-	gm.GenerateCoordinateSystem(cur_cs, E1, E3);
-	line.cs = cur_cs;
+	if (Hf > 0.0)
+	{
+		E3.clear();
+		E1.clear();
+		E3 = 1.0 / norm(F - A) * ( F - A );
+		E1(0, 0) = 0.0;
+		E1(1, 0) = 0.0;
+		E1(2, 0) = 1.0;
 
+		gm.GenerateCoordinateSystem(cur_cs, E1, E3);
+		line.cs = cur_cs;
+	}
+	else //Otherwie, uses the global coordinate system
+	{
+		line.cs = 1;
+		E3.clear();
+		E1.clear();
+
+		E1(0, 0) = 0.0;
+		E1(1, 0) = 0.0;
+		E1(2, 0) = 1.0;
+
+		E3(0, 0) = 1.0;
+		E3(1, 0) = 0.0;
+		E3(2, 0) = 0.0;
+
+	}
+
+
+	//Iterates through the segments
 	for (size_t seg = 0; seg < line.segments.size(); seg++)
 	{
 		//Nodesets of the first nodes
@@ -1056,7 +1080,9 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F)
 					gm.monitor.elements.push_front(cur_node_mesh + n - 1);
 				
 				//Summary list
-				///TO DO: insert nodes into the table in the summary file, between anchor and fairlead data
+
+				/// TODO: insert nodes into the table in the summary file, between anchor and fairlead data
+ 
 			}
 
 			//Generate other(s) element node(s) and update node lists
@@ -1382,7 +1408,9 @@ void MooringModel::GenerateVessel()
 			//Check CAD name for the current vessel
 			auto& [bool_cad, plat_name] = moorpost.GetName(( size_t )vessel.number);
 			
-			//Include inertial data of vessel here (TO DO)		//if (!moorpost.platform_names.empty() && bool_cad)
+
+			///TODO: check inertial data for multiple vessels case
+			//if (!moorpost.platform_names.empty() && bool_cad)
 			gm.GenerateRigidBodyData(++cur_rbdata, vessel.mass, vessel.inertiaTensor, vessel_coord, plat_name);
 			
 			//Rigid body element
@@ -2002,7 +2030,7 @@ void MooringModel::GenerateSeaBed()
 	//Establishing surface set
 	gm.GenerateSurfaceSet(1, list);
 
-	///TO DO
+	///TODO: check order of contacts generation
 
 	//Contact booltables
 	BoolTable bool_c, bool_c2;
@@ -2047,7 +2075,7 @@ void MooringModel::GenerateSeaBed()
 		VTKwaterOk = gm.post.CreateWaterVTK(surfaces_folder, { 2.0 * xmin, 2.0 * fabs(xmax) }, { 2.0 * ymin, 2.0 * fabs(ymax) });
 	}
 	else //ERROR
-		Log::AddWarning("\n   +Post files directory could not be created");
+		Log::getInstance().AddWarning("\n   + Post files directory could not be created.");
 
 	//Setting contact surface flag
 	if (!VTKseabedOk && !gm.post.WriteRigidContactSurfaces_flag)
@@ -2192,7 +2220,6 @@ void MooringModel::GenerateConstraints()
 	gm.GenerateNodalConstraint(++cur_constraint, pil_node_set, U, U, U, ROT, ROT, ROT);
 }
 
-
 //Creates platform object(s)
 void MooringModel::GeneratePlatform()
 {
@@ -2200,5 +2227,22 @@ void MooringModel::GeneratePlatform()
 	{
 		platform.GenerateRigidBodyElements(cur_elem, cur_node_set, cur_rbdata, cur_special_constraint, cur_constraint);
 		platform.GenerateNodeSetsSpecialConstraints(cur_node_set, cur_constraint, cur_special_constraint);
+	}
+}
+
+//Create segments for lines with 'SegmentSet' defined 
+void MooringModel::GenerateSegments()
+{
+	//Iterates through the lines
+	for (Line& line : line_vector)
+	{
+		if (line.usingSegmentSet)
+		{
+			//Iterates through the 'LineSegment' objects in 'SegmentSet', 
+			//copying it to the 'segments' vector in the current line
+			size_t setID = line.segment_set - 1;
+			for (size_t i = 0; i < segment_set_vector[setID].SegmentSetSize(); ++i)
+				line.segments.emplace_back(segment_set_vector[setID].GetSegment(i));
+		}
 	}
 }

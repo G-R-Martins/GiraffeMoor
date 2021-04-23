@@ -10,9 +10,7 @@ MathCode::MathCode()
 {}
 
 MathCode::~MathCode()
-{
-	equations.clear();
-}
+{}
 
 //Math GiraffeMoor and Giraffe times
 void MathCode::SetStartTime(const double& start)
@@ -77,7 +75,7 @@ bool MathCode::Read(FILE *f)
 			equations[i] = str;
 		else
 		{
-			Log::AddWarning("\n   +Error reading MathCode line");
+			Log::getInstance().AddWarning("\n   + Error reading MathCode line");
 			return false;
 		}
 

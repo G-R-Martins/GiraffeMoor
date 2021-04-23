@@ -38,7 +38,7 @@ namespace AuxFunctions
 		{
 			//Leitura até encontrar o caracter de fim de linha
 			while (s[0] != '\n')
-				fscanf(f, "%c", s);
+				auto toignore = fscanf(f, "%c", s);
 			read = true;
 		}
 		else if (s[0] == '/' && s[1] == '*') //bloco de comentário
@@ -111,7 +111,7 @@ namespace AuxFunctions
 	{
 		if (/*Mandatory*/!strcmp(word, "Environment") || !strcmp(word, "Keypoints") || !strcmp(word, "Lines")
 			|| !strcmp(word, "Vessels") || !strcmp(word, "SegmentProperties") || !strcmp(word, "Solution") ||
-			/*Optional*/ !strcmp(word, "VesselDisplacements") || !strcmp(word, "Platforms") || !strcmp(word, "StiffnessMatrix")
+			/*Optional*/ !strcmp(word, "SegmentSets") || !strcmp(word, "VesselDisplacements") || !strcmp(word, "Platforms") || !strcmp(word, "StiffnessMatrix")
 			|| !strcmp(word, "Monitors") || !strcmp(word, "PostProcessing") || !strcmp(word, "GiraffeConvergenceCriteria")
 			|| !strcmp(word, "GiraffeSolver") || !strcmp(word, "Constraints") || !strcmp(word, "NodalForces"))
 			return true;

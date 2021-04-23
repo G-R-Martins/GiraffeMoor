@@ -5,7 +5,7 @@
 
 ConvergenceCriteria::ConvergenceCriteria()
 	: force_tol(1e-4), moment_tol(1e-4), force_min(1e0), moment_min(1e0), constraint_min(1e-7),
-	disp_tol(1e-4), rot_tol(1e-4), lag_tol(1e-4), disp_min(1e-6), rot_min(1e-6), lag_min(1e-6), divergence_ref(1e15)
+	disp_tol(1e-4), rot_tol(1e-4), lag_tol(1e-4), disp_min(1e-5), rot_min(1e-5), lag_min(1e-6), divergence_ref(1e15)
 {}
 
 ConvergenceCriteria::~ConvergenceCriteria()
@@ -14,9 +14,6 @@ ConvergenceCriteria::~ConvergenceCriteria()
 //Reads input file
 bool ConvergenceCriteria::Read(FILE *f)
 {
-	//Read comment
-	using namespace AuxFunctions;
-
 	char str[50];
 	fpos_t pos;
 
@@ -47,7 +44,7 @@ bool ConvergenceCriteria::Read(FILE *f)
 			else if (*it == "LagrangeMinimumReference")			lag_min = atof(str);
 			else if (*it == "DivergenceReference")				divergence_ref = atof(str);
 		}
-		else if (str[0] == '/' && ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
 			continue;
 		//Other word -> backs position go to IO class
 		else

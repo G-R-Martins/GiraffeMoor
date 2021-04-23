@@ -38,14 +38,14 @@ bool AnchorConstraint::Read(FILE *f)
 
 	if (fscanf(f, "%d", &number) == EOF)
 	{
-		Log::AddWarning("\n   +Error reading a line number\n");
+		Log::getInstance().AddWarning("\n   + Error reading a line number\n");
 		return false;
 	}
 
 	if (fscanf(f, "%s %d %d %d", str, &rotx, &roty, &rotz) == EOF || strcmp(str, "Rotations"))
 	{
-		std::string warning = "\n   +Error reading the constraint of the line number " + std::to_string(number);
-		Log::AddWarning(warning);
+		std::string warning = "\n   + Error reading the constraint of the line number " + std::to_string(number);
+		Log::getInstance().AddWarning(warning);
 		return false;
 	}
 

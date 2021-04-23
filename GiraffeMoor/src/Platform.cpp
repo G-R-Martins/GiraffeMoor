@@ -12,10 +12,7 @@ Platform::Platform()
 {}
 
 Platform::~Platform()
-{
-	cylinders_container.clear();
-	connectivity_container.clear();
-}
+{}
 
 /*-------------------
  Overloaded operators
@@ -45,9 +42,6 @@ bool operator!= (Platform& plat1, Platform& plat2)
 //Reads input file
 bool Platform::Read(FILE *f)
 {
-	//Template functions to read loops
-	using namespace LoopReading;
-	using namespace AuxFunctions; //comments
 
 	typedef std::unordered_set<std::string_view> uset;
 
@@ -67,12 +61,12 @@ bool Platform::Read(FILE *f)
 		return false;
 	}
 	//Read cylinders
-	else if (!TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
+	else if (!LoopReading::TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
 		return false;
 
 
 	//Searches for comment block before "Connectivity" and "ConcentratedMass"
-	TryComment(f);
+	AuxFunctions::TryComment(f);
 
 	uset::iterator it;
 	//Loop to read solution parameters
@@ -84,13 +78,13 @@ bool Platform::Read(FILE *f)
 			if (*it == "Connectivity")
 			{
 				sub_keyword.erase("Connectivity");
-				if (!TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
+				if (!LoopReading::TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
 					return false;
 			}
 			else if (*it == "ConcentratedMass")
 			{
 				sub_keyword.erase("ConcentratedMass");
-				if (!TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
+				if (!LoopReading::TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
 					return false;
 			}
 			else if (*it == "Platform")
@@ -99,7 +93,7 @@ bool Platform::Read(FILE *f)
 				return true;
 			}
 		}
-		else if (str[0] == '/' && ReadComment(f, str));
+		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str));
 		//Other word -> end loop and backs to IO class
 		else
 		{

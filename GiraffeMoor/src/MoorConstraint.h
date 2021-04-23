@@ -10,6 +10,10 @@ public:
 	//Reads input file
 	bool Read(FILE* f);
 
+	
+	///TODO: transformar vessel e anchor constraint em subclasses
+	///		 assim como 'Static' e 'Dynamic' com respeito a 'Solution'
+	
 	/*-------
 	Variables
 	--------*/

@@ -6,14 +6,12 @@
 
 Line::Line()
 	: number(0), keypoint_A(0), keypoint_B(0), cs(0), vessel(0), node_A(0), node_B(0), 
-	nodeset_A(0), nodeset_B(0), total_length(0.0), configuration("\0"), hasAnchor(true), isShared(false),
+	nodeset_A(0), nodeset_B(0), total_length(0.0), configuration("\0"), 
+	hasAnchor(true), isShared(false), segment_set(0), usingSegmentSet(false),
 	tdz(nullptr), percent(0.0), anc_tdp(0.0), tdp_fair(0.0)
 {
 	segments.reserve(4);
-	//laying_direction.alloc(3);
 	gamma_s.reserve(4);
-	transition_nodes.clear();
-	vesselIDs.clear();
 }
 
 Line::~Line()
@@ -26,8 +24,8 @@ Line::Line(Line&& other) noexcept
 	cs(std::move(other.cs)), vessel(std::move(other.vessel)), node_A(std::move(other.node_A)), node_B(std::move(other.node_B)),
 	nodeset_A(std::move(other.nodeset_A)), nodeset_B(std::move(other.nodeset_B)),
 	total_length(std::move(other.total_length)), hasAnchor(std::move(other.hasAnchor)), isShared(std::move(other.isShared)),
-	segments(std::move(other.segments)), gamma_s(std::move(other.gamma_s)),
-	transition_nodes(std::move(other.transition_nodes)), configuration("\0"), vesselIDs(std::move(other.vesselIDs)),
+	segment_set(std::move(other.segment_set)), usingSegmentSet(std::move(other.usingSegmentSet)), segments(std::move(other.segments)), 
+	gamma_s(std::move(other.gamma_s)), transition_nodes(std::move(other.transition_nodes)), configuration("\0"), vesselIDs(std::move(other.vesselIDs)),
 	//laying_direction(std::move(other.laying_direction)), tdz(std::move(other.tdz)),
 	percent(std::move(other.percent)), anc_tdp(std::move(other.anc_tdp)), tdp_fair(std::move(other.tdp_fair))
 {
@@ -49,13 +47,14 @@ Line& Line::operator=(Line&& other) noexcept
 	total_length = std::move(other.total_length);
 	hasAnchor = std::move(other.hasAnchor);
 	isShared = std::move(other.isShared);
+	segment_set = std::move(other.segment_set);
+	usingSegmentSet = std::move(other.usingSegmentSet);
 
 	segments = std::move(other.segments);
 	gamma_s = std::move(other.gamma_s);
 	transition_nodes = std::move(other.transition_nodes);
 	configuration[0] = '\0';
 	vesselIDs = std::move(other.vesselIDs);
-	//laying_direction = std::move(other.laying_direction);
 	//tdz = std::move(other.tdz);
 	percent = std::move(other.percent);
 	anc_tdp = std::move(other.anc_tdp);
@@ -68,13 +67,17 @@ Line& Line::operator=(Line&& other) noexcept
 	return *this;
 }
 
+
+/* Overloaded operators */
 bool operator< (const Line& line1, const Line& line2)
 {
-
+	//Both lines with vessels identified and different between them
+	// -> uses the line numbers to compare
 	if (line1.vessel != 0 && line2.vessel != 0 && line1.vessel == line2.vessel)
 	{
 		return line1.number < line2.number;
 	}
+	//Otherwise -> uses the vessel number to compare
 	else
 		return line1.vessel < line2.vessel;
 }
@@ -107,8 +110,6 @@ bool operator!= (const Line& line1, const unsigned int& line2)
 //Reads input file
 bool Line::Read(FILE *f)
 {
-	//Template functions to read loops
-	using namespace LoopReading;
 
 	char str[500];			//salva palavras-chave lidas e valores lidos
 	fpos_t pos;				//variável que salva ponto do stream de leitura
@@ -119,7 +120,7 @@ bool Line::Read(FILE *f)
 		number = atoi(str);
 	else
 	{
-		Log::AddWarning("\n   +Error reading the ID number of a line");
+		Log::getInstance().AddWarning("\n   + Error reading the ID number of a line");
 		return false;
 	}
 
@@ -148,8 +149,8 @@ bool Line::Read(FILE *f)
 	{
 		if (hasAnchor)
 		{
-			std::string warning = "\n   +The line number " + std::to_string(number) + " supposed to be addressed to a vessel.\n";
-			Log::AddWarning(warning);
+			std::string warning = "\n   + The line number " + std::to_string(number) + " supposed to be addressed to a vessel.";
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 		fsetpos(f, &pos);
@@ -182,38 +183,52 @@ bool Line::Read(FILE *f)
 			}
 		}
 	}
+	//Other word -> ERROR
 	else
 		readOk = false;
 
 
 	if (!readOk)
 	{
-		std::string warning = "\n   +Error reading parameters of line " + std::to_string(number);
-		Log::AddWarning(warning);
+		std::string warning = "\n   + Error reading parameters of line " + std::to_string(number);
+		Log::getInstance().AddWarning(warning);
 		return false;
 	}
 	
 		
 	//Check if there is a touchdown zone
-	if (fscanf(f, "%s", str) && !strcmp(str, "TouchdownZone"))
+	if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "TouchdownZone"))
 	{
 		if (fscanf(f, "%lf %lf %lf", &percent, &anc_tdp, &tdp_fair) == EOF || percent == 0.0 || anc_tdp == 0.0 || tdp_fair == 0.0 ||
-			fscanf(f, "%s", str) == EOF) //Segment after TDZ
+			( !fgetpos(f, &pos) && fscanf(f, "%s", str) == EOF )) //Segment after TDZ
 		{
-			std::string warning = "\n   +Error reading touchdown zone of line number " + std::to_string(number);
-			Log::AddWarning(warning);
+			std::string warning = "\n   + Error reading touchdown zone of line number " + std::to_string(number);
+			Log::getInstance().AddWarning(warning);
 			return false;
 		}
 	}
 
 	//Read segment(s)
-	if (!TryNestedKeyword_UnorderedMultiple(segments, std::unordered_set<std::string_view>({ "Segment" }), 
-											   std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }), f, pos, str))
+	if (!strcmp(str, "SegmentSet"))
 	{
-		std::string warning = "\n   +Error reading a segment of the line number " + std::to_string(number);
-		Log::AddWarning(warning);
-		return false;
+		fscanf(f, "%zd", &segment_set);
+		usingSegmentSet = true;
 	}
+	else
+	{
+		//Backs position because it can be a comment, then, try to read 'Length'
+		fsetpos(f, &pos);
+		if (!LoopReading::TryNestedKeyword_UnorderedMultiple(segments,
+															 std::unordered_set<std::string_view>({ "Length" }),
+															 std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }),
+															 f, pos, str))
+		{
+			std::string warning = "\n   + Error reading a segment of the line number " + std::to_string(number);
+			Log::getInstance().AddWarning(warning);
+			return false;
+		}
+	}
+
 
 	//All OK while reading
 	return true;

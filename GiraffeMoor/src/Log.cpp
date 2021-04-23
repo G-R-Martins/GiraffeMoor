@@ -1,14 +1,11 @@
 #include "PCH.h"
 #include "Log.h"
 
-std::string Log::error = "\n\n!!! ERROR !!!";
-std::string Log::warning = "\n\n*** WARNINGS ***";
-std::string Log::final_message = "";
-std::string_view Log::last_keyword = "";
 
 Log::Log()
-	: existError(false), existWarning(false), contErrors(0), contWarnings(0)
-	//error("\n\n***** ERROR *****\n"), warning("\n\n*** WARNINGS ***\n"), final_message("")
+	: existError(false), existWarning(false), contErrors(0), contWarnings(0),
+	error("\n\n# # # # # #\n#  ERROR  #\n# # # # # #\n"), 
+	warning("\n\n* * * * * * *\n*  WARNING  *\n* * * * * * *\n"), final_message(""), last_keyword("")
 {}
 
 
@@ -19,73 +16,73 @@ Log::Log()
 //Errors
 void Log::AddError(const std::string_view& toAdd)
 {
-	Get().UpdateErrorCounter();
-	Log::error += toAdd;
+	getInstance().UpdateErrorCounter();
+	getInstance().error += toAdd;
 }
 void Log::AddError(const std::stringstream& toAdd)
 {
-	Get().UpdateErrorCounter();
-	Log::error += toAdd.str();
+	getInstance().UpdateErrorCounter();
+	getInstance().error += toAdd.str();
 }
 void Log::AddError(const std::string& toAdd)
 {
-	Get().UpdateErrorCounter();
-	Log::error += toAdd;
+	getInstance().UpdateErrorCounter();
+	getInstance().error += toAdd;
 }
 void Log::AddError(const char* toAdd)
 {
-	Get().UpdateErrorCounter();
-	Log::error += toAdd;
+	getInstance().UpdateErrorCounter();
+	getInstance().error += toAdd;
 }
 //Warnings
 void Log::AddWarning(const std::string_view& toAdd)
 {
-	Get().UpdateWarningCounter();
-	Log::warning += toAdd;
+	getInstance().UpdateWarningCounter();
+	getInstance().warning += toAdd;
 }
 void Log::AddWarning(const std::stringstream& toAdd)
 {
-	Get().UpdateWarningCounter();
-	Log::warning += toAdd.str();
+	getInstance().UpdateWarningCounter();
+	getInstance().warning += toAdd.str();
 }
 void Log::AddWarning(const std::string& toAdd)
 {
-	Get().UpdateWarningCounter();
-	Log::warning += toAdd;
+	getInstance().UpdateWarningCounter();
+	getInstance().warning += toAdd;
 }
 void Log::AddWarning(const char* toAdd)
 {
-	Get().UpdateWarningCounter();
-	Log::warning += toAdd;
+	getInstance().UpdateWarningCounter();
+	getInstance().warning += toAdd;
 }
 //Final messages
 void Log::AddFinalMessage(const std::string_view& toAdd)
 {
-	Log::final_message += toAdd;
+	getInstance().final_message += toAdd;
 }
 void Log::AddFinalMessage(const std::stringstream& toAdd)
 {
-	Log::final_message += toAdd.str();
+	getInstance().final_message += toAdd.str();
 }
 void Log::AddFinalMessage(const std::string& toAdd)
 {
-	Log::final_message += toAdd;
+	getInstance().final_message += toAdd;
 }
 void Log::AddFinalMessage(const char* toAdd)
 {
-	Log::final_message += toAdd;
+	getInstance().final_message += toAdd;
 }
 
 /* Update counters */
 void Log::UpdateErrorCounter()
 {
-	if (!existError) existError = true;
-	++contErrors;
+	if (!getInstance().existError) getInstance().existError = true;
+	++getInstance().contErrors;
 }
 void Log::UpdateWarningCounter()
 {
-	if (!existWarning) existWarning = true;
-	++contWarnings;
+	if (!getInstance().existWarning) getInstance().existWarning = true;
+	++getInstance().contWarnings;
 }
 
 /*********************************************
@@ -94,12 +91,12 @@ void Log::UpdateWarningCounter()
 
 bool Log::Check4Errors()
 {
-	return existError;
+	return getInstance().existError;
 }
 
 bool Log::Check4Warnings()
 {
-	return existWarning;
+	return getInstance().existWarning;
 }
 
 
@@ -109,43 +106,37 @@ bool Log::Check4Warnings()
 
 void Log::ShowErrors()
 {
-	std::cout << Log::GetError() << "\n";
+	std::cout << getInstance().GetError() << "\n";
 }
 
 void Log::ShowWarnings()
 {
-	std::cout << Log::GetWarning() << "\n";
+	std::cout << getInstance().GetWarning() << "\n";
 }
 
 void Log::ShowFinalMessage()
 {
-	std::cout << Log::GetFinalMessage() << "\n";
+	std::cout << getInstance().GetFinalMessage() << "\n";
 }
 
 
 /*****************
- * Get functions *
+ * get functions *
  *****************/
-
-Log& Log::Get()
-{
-	static Log log_messages;
-	return log_messages;
-}
 
 std::string& Log::GetError()
 {
-	return Log::error;
+	return getInstance().error;
 }
 
 std::string& Log::GetWarning()
 {
-	return Log::warning;
+	return getInstance().warning;
 }
 
 std::string& Log::GetFinalMessage()
 {
-	return Log::final_message;
+	return getInstance().final_message;
 }
 
 
@@ -155,16 +146,16 @@ std::string& Log::GetFinalMessage()
 
 void Log::SetLastKeyword(const std::string_view& key)
 {
-	last_keyword = key;
+	getInstance().last_keyword = key;
 }
 
 void Log::SetLastKeyword(const char* key)
 {
-	last_keyword = key;
+	getInstance().last_keyword = key;
 }
 
 std::string_view& Log::GetLastKeyword()
 {
-	return last_keyword;
+	return getInstance().last_keyword;
 }
 

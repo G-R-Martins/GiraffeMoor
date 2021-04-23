@@ -7,8 +7,7 @@ OscillatorySurf::OscillatorySurf()
 {}
 
 OscillatorySurf::~OscillatorySurf()
-{
-}
+{}
 
 void OscillatorySurf::WriteGiraffeModelFile(FILE *f) const
 {

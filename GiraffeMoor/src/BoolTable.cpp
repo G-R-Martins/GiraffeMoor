@@ -4,9 +4,7 @@
 
 
 BoolTable::BoolTable()
-{
-	data_table.clear();
-}
+{}
 
 BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps)
 {
@@ -67,9 +65,7 @@ void BoolTable::Print() const
 }
 
 BoolTable::~BoolTable()
-{
-	data_table.clear();
-}
+{}
 
 //Atribui valor value ao fim da tabela
 void BoolTable::Set(int nargs, ...)

@@ -3,15 +3,13 @@
 
 
 Truss::Truss()
+	: label("")
 {
-	label.clear();
 	nodes.resize(2);
 }
 
 Truss::~Truss()
-{
-	
-}
+{}
 
 void Truss::WriteGiraffeModelFile(FILE *f)
 {

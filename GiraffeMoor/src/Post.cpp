@@ -24,7 +24,7 @@ bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, c
 	std::ofstream vtk_file(folder + "seabed.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
-		Log::AddWarning("\n   +Seabed vtk file could not be created. Using Giraffe 'ContactSurfaces' instead.");
+		Log::getInstance().AddWarning("\n   + Seabed vtk file could not be created. Using Giraffe 'ContactSurfaces' instead.");
 		return false;
 	}
 
@@ -52,7 +52,7 @@ bool Post::CreateWaterVTK(std::string folder, const std::array<double, 2>& x, co
 	std::ofstream vtk_file(folder + "water.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
-		Log::AddWarning("\n   +Water surface vtk file could not be created");
+		Log::getInstance().AddWarning("\n   + Water surface vtk file could not be created");
 		return false;
 	}
 

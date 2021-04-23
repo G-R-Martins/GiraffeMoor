@@ -8,5 +8,4 @@ Contact::Contact()
 
 
 Contact::~Contact()
-{
-}
+{}

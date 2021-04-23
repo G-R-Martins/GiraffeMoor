@@ -39,7 +39,7 @@ public:
 	Numerical stiffness matrix parameters
 	------------------------------------*/
 
-	///Displacement to a new reference position [TO DO]
+	///TODO: Displacement to a new reference position before evaluate stiffness matrix
 
 	double time_init;
 	double disp_init_x;

@@ -3,20 +3,9 @@
 
 
 Static::Static()
-{
-	solution_number = 0;
-
-	start_time = 0.0;
-	end_time = 0;
-	i_time_step = 0;
-	max_time_step = 0;
-	min_time_step = 0;
-	max_it = 0;
-	min_it = 0;
-	conv_increase = 0;
-	inc_factor = 0;
-	sample = 0;
-}
+	: i_time_step(0), max_time_step(0), min_time_step(0), max_it(0), min_it(0), 
+	conv_increase(0), inc_factor(0), sample(0)
+{}
 
 Static::~Static()
 {}

@@ -19,8 +19,6 @@ MoorSolution::~MoorSolution()
 //Reads input file
 bool MoorSolution::Read(FILE *f)
 {
-	using namespace LoopReading;
-	using namespace AuxFunctions;
 
 	typedef std::unordered_set<std::string_view> uset;
 
@@ -34,7 +32,7 @@ bool MoorSolution::Read(FILE *f)
 	uset::iterator it;
 	
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	TryComment(f);
+	AuxFunctions::TryComment(f);
 
 	//Loop to read solution parameters
 	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
@@ -57,7 +55,7 @@ bool MoorSolution::Read(FILE *f)
 					if (sub_keywords.find(std::string(str)) == sub_keywords.end())
 					{
 						//Backs position and tries to read a comment
-						if (str[0] == '/' && ReadComment(f, str))
+						if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
 						{
 							//Tries again to read second level keyword after a comment
 							if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && sub_keywords.find(std::string(str)) == sub_keywords.end())
@@ -78,8 +76,8 @@ bool MoorSolution::Read(FILE *f)
 							continue;
 						else
 						{
-							ss += "\n   +Error reading dynamic relaxation parameters after 'LineConfiguration'.";
-							Log::AddWarning(ss);
+							ss += "\n   + Error reading dynamic relaxation parameters after 'LineConfiguration'.";
+							Log::getInstance().AddWarning(ss);
 							return false; //ERROR
 						}
 					}
@@ -91,8 +89,8 @@ bool MoorSolution::Read(FILE *f)
 						// Reads data 
 						if (!fscanf(f, "%s %lf", str, &release_timestep) || strcmp(str, "Time"))
 						{
-							ss += "\n   +Error reading dynamic relaxation parameters after 'PlatformForces'.";
-							Log::AddWarning(ss);
+							ss += "\n   + Error reading dynamic relaxation parameters after 'PlatformForces'.";
+							Log::getInstance().AddWarning(ss);
 							return false;
 						}
 					}
@@ -110,22 +108,22 @@ bool MoorSolution::Read(FILE *f)
 				}
 				else
 				{
-					ss += "\n   +Error reading sea current time definition.";
-					Log::AddWarning(ss);
+					ss += "\n   + Error reading sea current time definition.";
+					Log::getInstance().AddWarning(ss);
 					return false;
 				}
 			}
 			else if (*it == "Analysis")
 			{
 				keywords.erase("Analysis");
-				if (!TryNestedKeyword(solution_steps, uset({ "Step" }), keywords, f, pos, str))
+				if (!LoopReading::TryNestedKeyword(solution_steps, uset({ "Step" }), keywords, f, pos, str))
 				{
 					return false;
 				}
 				
 			}
 		}
-		else if (str[0] == '/' && ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
 			continue;	//Other word -> end loop and backs to IO class
 		else
 		{

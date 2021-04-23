@@ -4,11 +4,8 @@
 Element::Element()
 	: material(0), section(0), number(0), n_nodes(0), cs(0), 
 	mark_segment_begin(false)
-{
-	nodes.clear();
-}
+{}
 
 
 Element::~Element()
-{
-}
+{}
