@@ -19,13 +19,16 @@ private:
 
 public:
 	//Boolean to indicate the type of the displacement
-	bool isTable, isSineWave, isMathCode;
+	bool isTable, isSineWave, isMathCode, fromFile;
+	unsigned int header_lines; //in the external csv/txt file 
+	unsigned int n_times;      //lines in the csv/txt file
 
 private:
 	//Pointers to vessel displacement (Table, SineWaveDisplacement or MathCode)
 	Table* time_series;
 	SineWaveDisplacement* sineWaveDisp;
 	MathCode* mathCode;
+	std::string file_name;
 
 public:
 	VesselDisplacement();
@@ -42,6 +45,10 @@ public:
 	Table* const GetTimeSeries() const;
 	SineWaveDisplacement* const GetSineWave() const;
 	MathCode* const GetMathCode() const;
+	std::string& GetFileName();
+	const unsigned int& GetFileHeaders() const;
+	const unsigned int& GetFileNTimes() const;
+
 
 	unsigned int GetVesselID();
 	unsigned int GetStep();

@@ -10,6 +10,7 @@ public:
 
 	NodalDisplacement(Table* tbl);
 	NodalDisplacement(MathCode* mc);
+	NodalDisplacement(const std::string& f_name, const unsigned int& h_lines, const unsigned int& ntimes);
 
 	//Writes Giraffe file
 	void WriteGiraffeModelFile(FILE *f) override;
@@ -34,5 +35,9 @@ public:
 
 	//MathCode with displacement equations
 	MathCode* mathCode;
+
+	//External file
+	std::string file_name;
+	unsigned int header_lines, n_times;
 };
 

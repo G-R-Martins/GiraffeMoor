@@ -252,7 +252,7 @@
   <ItemGroup>
     <ClInclude Include="src\SegmentSet.h" />
     <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\TemplateReading.h" />
+    <ClInclude Include="src\LoopReading.h" />
     <ClInclude Include="src\SolutionStep.h" />
     <ClInclude Include="src\MoorConstraint.h" />
     <ClInclude Include="src\MoorLoad.h" />
@@ -311,7 +311,7 @@
     <ClInclude Include="src\StiffnessMatrix.h" />
     <ClInclude Include="src\SurfaceSet.h" />
     <ClInclude Include="src\Table.h" />
-    <ClInclude Include="src\ReadingAuxiliaryFunctions.h" />
+    <ClInclude Include="src\AuxFunctions.h" />
     <ClInclude Include="src\TriangleSurf.h" />
     <ClInclude Include="src\Truss.h" />
     <ClInclude Include="src\Vessel.h" />

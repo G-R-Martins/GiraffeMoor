@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "IO.h"
-#include "TemplateReading.h"
+#include "LoopReading.h"
 #include "Log.h"
 
 
@@ -14,12 +14,9 @@ extern std::string folder_name;
 extern std::string name; //with directory and extension
 extern std::string version;
 
-IO::IO()
-	: cur_level(FirstLevelKeyword::None)
-{}
+//Static variable
+FirstLevelKeyword IO::cur_level = FirstLevelKeyword::None;
 
-IO::~IO()
-{}
 
 bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 {
@@ -65,7 +62,7 @@ bool IO::ReadFile()
 	std::cout << "|                        GiraffeMoor                         |\n";
 	std::cout << "|               University of Sao Paulo - Brazil             |\n";
 	std::cout << "|                                                            |\n";
-	std::cout << "|                                                 v. " << version << "  |\n";
+	std::cout << "|                                                v. " << version << "  |\n";
 	std::cout << "|____________________________________________________________|\n\n";
 
 	while (!readOK)
@@ -118,12 +115,13 @@ bool IO::ReadFile()
 	//Set with mandatory keywords to check if these blocks were defined
 	std::unordered_set<std::string_view> mandatory_keywords({ "Environment", "Keypoints" , "Lines" , "Vessels" , "SegmentProperties" , "Solution" });
 
-END: while (cur_level != FirstLevelKeyword::EndOfFile)
-{
-	while (ReadKeyword(f, pos, str))// && cur_level != FirstLevelKeyword::EndOfFile)
+	while (ReadKeyword(f, pos, str))
 	{
-		//Last valid keyword
-		Log::getInstance().SetLastKeyword(str);
+		//Last keyword
+		Log::SetLastKeyword(str);
+		if (cur_level != FirstLevelKeyword::CommentAfterBlock &&
+			cur_level != FirstLevelKeyword::Error)
+			Log::SetLastValidKeyword(str);
 
 		switch (cur_level)
 		{
@@ -256,31 +254,34 @@ END: while (cur_level != FirstLevelKeyword::EndOfFile)
 			break;
 
 		//ERROR -> other word
-			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+               Comment              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 ERROR              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Error:
-			std::stringstream ss;
-			ss << "   \"" << str << "\" is not a valid keyword.";
-			Log::getInstance().AddWarning(ss);
+			std::string warning = std::string("   + \"") + str + "\" is not a valid keyword!";
+				//+ " Last valid block: \"" + std::string(Log::GetLastValidKeyword()) + "\"";
+			Log::AddWarning(warning);
 
 			return false;
 		}
+
+		//Last valid keyword
+		/*if (cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error)
+			Log::SetLastValidKeyword(str);*/
 	}
-}
-	fclose(f);
+END:	fclose(f);
 
 	//Checks if all mandatory blocks were defined
 	if (!mandatory_keywords.empty())
 	{
 		//Initial message
 		std::string w = std::string("\n   + ") + std::to_string(mandatory_keywords.size()) + " mandatory block(s) missed:\n";
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 
 		//Appends missed mandatory keywords
 		for (const std::string_view& missed_block : mandatory_keywords)
 		{
 			//auto warning_keyword = missed_block + "\n";
-			Log::getInstance().AddWarning(missed_block);
-			Log::getInstance().AddWarning("\n");
+			Log::AddWarning(missed_block);
+			Log::AddWarning("\n");
 		}
 		return false;
 	}
@@ -309,8 +310,8 @@ void IO::WriteGiraffeModelFile()
 	fprintf(f, "\n/*Units:\n\tTime: s\n\tMass: kg\n\tLinear: m\n\tForce: N\n\tRotation: rad\n\tAzimuth: degree\n*/\n");
 
 	fprintf(f, "\nSolutionSteps\t%d\n", ( int )gm.solution_vector.size());
-	for (int i = 0; i < ( int )gm.solution_vector.size(); i++)
-		gm.solution_vector[i]->WriteGiraffeModelFile(f);
+	for (Solution* sol : gm.solution_vector)
+		sol->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nMonitor\n");
 	gm.monitor.WriteGiraffeModelFile(f);
@@ -318,75 +319,71 @@ void IO::WriteGiraffeModelFile()
 	fprintf(f, "\nPostFiles\n");
 	gm.post.WriteGiraffeModelFile(f);
 
-
 	/***********************
 	 * SORT NODESET VECTOR *
 	 ***********************/
-
-	//Sorting and excluding repeated objects
 	std::sort(gm.node_set_vector.begin(), gm.node_set_vector.end());
 
-
 	fprintf(f, "\nNodeSets\t%d\n", ( int )gm.node_set_vector.size());
-	for (int i = 0; i < ( int )gm.node_set_vector.size(); i++)
-		gm.node_set_vector[i].WriteGiraffeModelFile(f);
+	for (NodeSet& ns : gm.node_set_vector)
+		ns.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nConstraints\t%d\n", ( int )gm.constraint_vector.size());
-	for (int i = 0; i < ( int )gm.constraint_vector.size(); i++)
-		gm.constraint_vector[i]->WriteGiraffeModelFile(f);
+	for (Constraint* constraint : gm.constraint_vector)
+		constraint->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nContacts\t%d\n", ( int )gm.contact_vector.size());
-	for (int i = 0; i < ( int )gm.contact_vector.size(); i++)
-		gm.contact_vector[i]->WriteGiraffeModelFile(f);
+	for (Contact* cont : gm.contact_vector)
+		cont->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nPipeSections\t%d\n", ( int )gm.pipe_section_vector.size());
-	for (int i = 0; i < ( int )gm.pipe_section_vector.size(); i++)
-		gm.pipe_section_vector[i].WriteGiraffeModelFile(f);
+	for (PipeSection& ps : gm.pipe_section_vector)
+		ps.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nRigidBodyData\t%d\n", ( int )gm.rbdata_vector.size());
-	for (int i = 0; i < ( int )gm.rbdata_vector.size(); i++)
-		gm.rbdata_vector[i].WriteGiraffeModelFile(f);
+	for (RigidBodyData& rbdata : gm.rbdata_vector)
+		rbdata.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nEnvironment\n");
 	gm.environment.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nSurfaces\t%d\n", ( int )gm.oscillatory_vector.size());
-	for (int i = 0; i < ( int )gm.oscillatory_vector.size(); i++)
-		gm.oscillatory_vector[i].WriteGiraffeModelFile(f);
+	for (OscillatorySurf& osc_surf : gm.oscillatory_vector)
+		osc_surf.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nSurfaceSets\t%d\n", ( int )gm.surface_set_vector.size());
-	for (int i = 0; i < ( int )gm.surface_set_vector.size(); i++)
-		gm.surface_set_vector[i].WriteGiraffeModelFile(f);
+	for (SurfaceSet& surf_set : gm.surface_set_vector)
+		surf_set.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nConvergenceCriteria\n");
 	gm.conv_criteria.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nSpecialConstraints\t%d\n", ( int )gm.special_constraint_vector.size());
-	for (int i = 0; i < ( int )gm.special_constraint_vector.size(); i++)
-		gm.special_constraint_vector[i]->WriteGiraffeModelFile(f);
+	for (SpecialConstraint*  spec_constr : gm.special_constraint_vector)
+		spec_constr->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nCoordinateSystems\t%d\n", ( int )gm.cs_vector.size());
-	for (int i = 0; i < ( int )gm.cs_vector.size(); i++)
-		gm.cs_vector[i].WriteGiraffeModelFile(f);
+	for (CoordinateSystem& cood_sys : gm.cs_vector)
+		cood_sys.WriteGiraffeModelFile(f);
 
-	if (gm.load_vector.size() > 0)
+	if (!gm.load_vector.empty())
 	{
 		fprintf(f, "\nLoads\t%d\n", ( int )gm.load_vector.size());
-		for (int i = 0; i < ( int )gm.load_vector.size(); i++)
-			gm.load_vector[i]->WriteGiraffeModelFile(f);
+		for (Load* load : gm.load_vector)
+			load->WriteGiraffeModelFile(f);
 	}
 
 	fprintf(f, "\nElements\t%d\n", ( int )gm.element_vector.size());
-	for (int i = 0; i < ( int )gm.element_vector.size(); i++)
-		gm.element_vector[i]->WriteGiraffeModelFile(f);
+	for (Element* element : gm.element_vector)
+		element->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nNodes\t%d\n", ( int )gm.node_vector.size());
-	for (int i = 0; i < ( int )gm.node_vector.size(); i++)
-		gm.node_vector[i].WriteGiraffeModelFile(f);
+	for (Node& node : gm.node_vector)
+		node.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nDisplacements\t%d\n", ( int )gm.displacement_vector.size());
-	for (int i = 0; i < gm.displacement_vector.size(); i++)
-		gm.displacement_vector[i]->WriteGiraffeModelFile(f);
+	for (Displacement* disp  :gm.displacement_vector)
+		disp->WriteGiraffeModelFile(f);
 
 	fclose(f);
 }

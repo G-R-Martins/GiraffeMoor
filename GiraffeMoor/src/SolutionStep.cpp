@@ -45,7 +45,7 @@ bool SolutionStep::Read(FILE* f)
 		number = atoi(str);
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading analysis step number.");
+		Log::AddWarning("\n   + Error reading analysis step number.");
 		return false;
 	}
 
@@ -54,7 +54,7 @@ bool SolutionStep::Read(FILE* f)
 	else if (!strcmp(str, "dynamic"))					isStatic = false;
 	else //ERROR
 	{
-		Log::getInstance().AddWarning("\n   + Analysis should be \"static\" or \"dynamic\".");
+		Log::AddWarning("\n   + Analysis should be \"static\" or \"dynamic\".");
 		return false;
 	}
 
@@ -63,7 +63,7 @@ bool SolutionStep::Read(FILE* f)
 	else //ERROR (End time)
 	{
 		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 
@@ -72,7 +72,7 @@ bool SolutionStep::Read(FILE* f)
 	else //ERROR
 	{
 		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 
@@ -91,7 +91,7 @@ bool SolutionStep::Read(FILE* f)
 	else //ERROR
 	{
 		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 
@@ -100,11 +100,11 @@ bool SolutionStep::Read(FILE* f)
 	else //ERROR
 	{
 		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 
-	// Numerical dampling	for dynamic analysis 
+	// Numerical damping for dynamic analysis 
 
 	//Saves position
 	fgetpos(f, &pos);
@@ -116,7 +116,7 @@ bool SolutionStep::Read(FILE* f)
 		if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
 		{
 			std::string w = "\n   + There is no need to define numerical damping for static analysis of the step number " + std::to_string(number);
-			Log::getInstance().AddWarning(w);
+			Log::AddWarning(w);
 		}
 	}
 	else if (!isStatic && !strcmp(str, "NumericalDamping"))
@@ -159,14 +159,14 @@ bool SolutionStep::Read(FILE* f)
 	|  high      |  0.3  |  0.550  |
 	|  extreme   |  0.3  |  0.600  |
 	 ------------------------------)";
-			Log::getInstance().AddWarning(w);
+			Log::AddWarning(w);
 			return false;
 		}
 	}
 	else if (!isStatic && strcmp(str, "NumericalDamping"))
 	{
 		std::string w = "\n   + Numerical damping was not defined for the step number " + std::to_string(number) + ". Newmark coeficients were set to zero.";
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		fsetpos(f, &pos);
 	}
 	else

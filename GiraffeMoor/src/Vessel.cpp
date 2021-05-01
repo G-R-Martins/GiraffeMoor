@@ -50,7 +50,7 @@ bool Vessel::Read(FILE *f)
 	{
 		if (fscanf(f, "%s", str) && isalpha(str[0]))
 		{
-			Log::getInstance().AddWarning("\n   + Error reading vessel keypoint.\n");
+			Log::AddWarning("\n   + Error reading vessel keypoint.\n");
 			return false;
 		}
 		else
@@ -58,7 +58,7 @@ bool Vessel::Read(FILE *f)
 	}
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading vessel keypoint.\n");
+		Log::AddWarning("\n   + Error reading vessel keypoint.\n");
 		return false;
 	}
 

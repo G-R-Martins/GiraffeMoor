@@ -350,7 +350,7 @@
     <ClInclude Include="src\Post.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="src\ReadingAuxiliaryFunctions.h">
+    <ClInclude Include="src\AuxFunctions.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="src\RigidBody.h">
@@ -404,7 +404,7 @@
     <ClInclude Include="src\Table.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="src\TemplateReading.h">
+    <ClInclude Include="src\LoopReading.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="src\TouchdownZone.h">

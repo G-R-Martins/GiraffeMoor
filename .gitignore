@@ -384,3 +384,8 @@ FodyWeavers.xsd
 /inputs/500m/simulation_report.txt
 /inputs/500m/output.inp
 /inputs/500m/500m.inp
+/inputs/exemplo/monitors
+/inputs/exemplo/time series/teste.csv
+/inputs/exemplo/time series
+/inputs/exemplo/simulation_report.txt
+/inputs/exemplo/output.inp

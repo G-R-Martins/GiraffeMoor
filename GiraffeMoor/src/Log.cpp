@@ -5,7 +5,8 @@
 Log::Log()
 	: existError(false), existWarning(false), contErrors(0), contWarnings(0),
 	error("\n\n# # # # # #\n#  ERROR  #\n# # # # # #\n"), 
-	warning("\n\n* * * * * * *\n*  WARNING  *\n* * * * * * *\n"), final_message(""), last_keyword("")
+	warning("\n\n* * * * * * *\n*  WARNING  *\n* * * * * * *\n"), 
+	final_message(""), last_keyword(""), last_valid_keyword("")
 {}
 
 
@@ -14,89 +15,98 @@ Log::Log()
  *****************/
 
 //Errors
-void Log::AddError(const std::string_view& toAdd)
+void Log::AddError_Impl(const std::string_view& toAdd)
 {
-	getInstance().UpdateErrorCounter();
-	getInstance().error += toAdd;
+	UpdateErrorCounter();
+	error += toAdd;
 }
-void Log::AddError(const std::stringstream& toAdd)
+void Log::AddError_Impl(const std::stringstream& toAdd)
 {
-	getInstance().UpdateErrorCounter();
-	getInstance().error += toAdd.str();
+	UpdateErrorCounter();
+	error += toAdd.str();
 }
-void Log::AddError(const std::string& toAdd)
+void Log::AddError_Impl(const std::string& toAdd)
 {
-	getInstance().UpdateErrorCounter();
-	getInstance().error += toAdd;
+	UpdateErrorCounter();
+	error += toAdd;
 }
-void Log::AddError(const char* toAdd)
+void Log::AddError_Impl(const char* toAdd)
 {
-	getInstance().UpdateErrorCounter();
-	getInstance().error += toAdd;
+	UpdateErrorCounter();
+	error += toAdd;
 }
 //Warnings
-void Log::AddWarning(const std::string_view& toAdd)
+void Log::AddWarning_Impl(const std::string_view& toAdd)
 {
-	getInstance().UpdateWarningCounter();
-	getInstance().warning += toAdd;
+	UpdateWarningCounter();
+	warning += toAdd;
 }
-void Log::AddWarning(const std::stringstream& toAdd)
+void Log::AddWarning_Impl(const std::stringstream& toAdd)
 {
-	getInstance().UpdateWarningCounter();
-	getInstance().warning += toAdd.str();
+	UpdateWarningCounter();
+	warning += toAdd.str();
 }
-void Log::AddWarning(const std::string& toAdd)
+void Log::AddWarning_Impl(const std::string& toAdd)
 {
-	getInstance().UpdateWarningCounter();
-	getInstance().warning += toAdd;
+	UpdateWarningCounter();
+	warning += toAdd;
 }
-void Log::AddWarning(const char* toAdd)
+void Log::AddWarning_Impl(const char* toAdd)
 {
-	getInstance().UpdateWarningCounter();
-	getInstance().warning += toAdd;
+	UpdateWarningCounter();
+	warning += toAdd;
 }
 //Final messages
-void Log::AddFinalMessage(const std::string_view& toAdd)
+void Log::AddFinalMessage_Impl(const std::string_view& toAdd)
 {
-	getInstance().final_message += toAdd;
+	final_message += toAdd;
 }
-void Log::AddFinalMessage(const std::stringstream& toAdd)
+void Log::AddFinalMessage_Impl(const std::stringstream& toAdd)
 {
-	getInstance().final_message += toAdd.str();
+	final_message += toAdd.str();
 }
-void Log::AddFinalMessage(const std::string& toAdd)
+void Log::AddFinalMessage_Impl(const std::string& toAdd)
 {
-	getInstance().final_message += toAdd;
+	final_message += toAdd;
 }
-void Log::AddFinalMessage(const char* toAdd)
+void Log::AddFinalMessage_Impl(const char* toAdd)
 {
-	getInstance().final_message += toAdd;
+	final_message += toAdd;
 }
 
-/* Update counters */
+
+//Update counters
 void Log::UpdateErrorCounter()
 {
-	if (!getInstance().existError) getInstance().existError = true;
-	++getInstance().contErrors;
+	if (!existError) existError = true;
+	++contErrors;
 }
 void Log::UpdateWarningCounter()
 {
-	if (!getInstance().existWarning) getInstance().existWarning = true;
-	++getInstance().contWarnings;
+	if (!existWarning) existWarning = true;
+	++contWarnings;
 }
 
-/*********************************************
- * Functions to check if exist error/warning *
- *********************************************/
 
-bool Log::Check4Errors()
+//Functions to check if exist error/warning
+void Log::CheckLogs_Impl()
 {
-	return getInstance().existError;
+	//Same final message with or without errors
+	AddFinalMessage_Impl("\nPress enter key to close GiraffeMoor.");
+
+	if (Check4Errors_Impl())	ShowErrors_Impl();
+	if (Check4Warnings_Impl())	ShowWarnings_Impl();
+
+	//Print final message
+	ShowFinalMessage_Impl();
 }
-
-bool Log::Check4Warnings()
+bool Log::Check4Errors_Impl()
 {
-	return getInstance().existWarning;
+	return existError;
+}
+bool Log::Check4Warnings_Impl()
+{
+	return existWarning;
 }
 
 
@@ -104,39 +114,35 @@ bool Log::Check4Warnings()
  * Functions to print to console *
  *********************************/
 
-void Log::ShowErrors()
+void Log::ShowErrors_Impl()
 {
-	std::cout << getInstance().GetError() << "\n";
+	std::cout << GetError() << "\n";
 }
-
-void Log::ShowWarnings()
+void Log::ShowWarnings_Impl()
 {
-	std::cout << getInstance().GetWarning() << "\n";
+	std::cout << GetWarning() << "\n";
 }
-
-void Log::ShowFinalMessage()
+void Log::ShowFinalMessage_Impl()
 {
-	std::cout << getInstance().GetFinalMessage() << "\n";
+	std::cout << GetFinalMessage() << "\n";
 }
 
 
 /*****************
- * get functions *
+ * Get functions *
  *****************/
 
 std::string& Log::GetError()
 {
-	return getInstance().error;
+	return error;
 }
-
 std::string& Log::GetWarning()
 {
-	return getInstance().warning;
+	return warning;
 }
-
 std::string& Log::GetFinalMessage()
 {
-	return getInstance().final_message;
+	return final_message;
 }
 
 
@@ -144,18 +150,48 @@ std::string& Log::GetFinalMessage()
  * Last keyword readed *
  ***********************/
 
-void Log::SetLastKeyword(const std::string_view& key)
+//Any keyword readed
+void Log::SetLastKeyword_Impl(const std::string_view& key)
 {
-	getInstance().last_keyword = key;
+	last_keyword = key;
+}
+void Log::SetLastKeyword_Impl(const char* key)
+{
+	last_keyword = key;
+}
+std::string_view& Log::GetLastKeyword_Impl()
+{
+	return last_keyword;
+}
+//Valid keyword
+void Log::SetLastValidKeyword_Impl(const std::string_view& key)
+{
+	last_valid_keyword = key;
+}
+void Log::SetLastValidKeyword_Impl(const char* key)
+{
+	last_valid_keyword = key;
+}
+std::string_view& Log::GetLastValidKeyword_Impl()
+{
+	return last_valid_keyword;
 }
 
-void Log::SetLastKeyword(const char* key)
+void Log::SetError_Impl(Log::Error error)
 {
-	getInstance().last_keyword = key;
-}
+	std::string reading_error;
 
-std::string_view& Log::GetLastKeyword()
-{
-	return getInstance().last_keyword;
+	switch (error)
+	{
+	case Error::Reading:
+		reading_error = "\n   + Error at \"" + std::string(last_keyword) + "\" block.";
+		AddError_Impl(reading_error);
+		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during reading process.\nCheck your input file with the hint(s) from warning message(s).");
+		break;
+	case Error::FEM_Generation:
+		AddError_Impl("\n   + Error generating FE model.");
+		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during FE model construction. Please, check your input data.");
+		break;
+	}
 }
 

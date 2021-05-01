@@ -69,8 +69,8 @@ public:
 	//Global number of nodes in transitions between segments
 	std::vector<unsigned int> transition_nodes;
 
-	///TODO -> std::string configuration;
-	char configuration[100]; 
+	//Geometric configuration description
+	std::string configuration; 
 
 	//Container with vessel IDs (if is a shared line - no anchor)
 	std::vector<unsigned int> vesselIDs;

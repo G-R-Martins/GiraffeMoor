@@ -21,7 +21,7 @@ bool Keypoint::Read(FILE *f)
 		number = atoi(str);
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading a keypoit number\n");
+		Log::AddWarning("\n   + Error reading a keypoit number\n");
 		return false;
 	}
 
@@ -33,7 +33,7 @@ bool Keypoint::Read(FILE *f)
 	if (!readOk)
 	{
 		std::string w = "\n   + Error reading data of the keypoit number " + std::to_string(number);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 	

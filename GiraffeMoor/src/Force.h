@@ -27,7 +27,8 @@ public:
 	// Coordinate system ID
 	unsigned int CS; 
 
-	//Boolean to indicate if current nodal force uses math code
-	bool isMathCode;
+	//Booleans to indicate if current nodal force uses math code or an external file
+	///otherwise, must be defined in the GiraffeMoor input file after 'TimeSeries' keyword
+	bool isMathCode, extFile;
 };
 

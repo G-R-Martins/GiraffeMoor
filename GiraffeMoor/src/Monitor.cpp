@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Monitor.h"
-#include "ReadingAuxiliaryFunctions.h"
+#include "AuxFunctions.h"
 #include "Log.h"
 
 
@@ -25,7 +25,7 @@ bool Monitor::Read(FILE *f)
  	fgetpos(f, &pos);
 	if (fscanf(f, "%s %d", str, &sample) != EOF && strcmp(str, "Sample"))
 	{
-		Log::getInstance().AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered.\n");
+		Log::AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered.\n");
 		fsetpos(f, &pos);
 	}
 
@@ -92,7 +92,7 @@ bool Monitor::Read(FILE *f)
 					bool_contact_seabed_moor = true;
 				else
 				{
-					Log::getInstance().AddWarning("\n   + Error reading contact monitor\n");
+					Log::AddWarning("\n   + Error reading contact monitor\n");
 					return false;
 				}
 			}

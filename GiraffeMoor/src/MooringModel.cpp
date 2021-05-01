@@ -77,15 +77,15 @@ bool MooringModel::GenerateGiraffeModel()
 	GeneralSetting();
 
 	//Seabed
-	GenerateSeaBed();
+	GenerateSeabed();
 
 	//Nodal constraints 
 	GenerateConstraints();
 
 	//Platform(s)
-	if (platform_vector.size() > 0)
+	if (!platform_vector.empty())
 		GeneratePlatform();
-
+		
 	return true;
 }
 
@@ -300,9 +300,11 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	//Residue
 	double res;
 
+	//Jacobian matrix
+	Matrix J(2, 2);
+
 	//Contribution to stiffness matrix for the current line
 	static Matrix Ki(2, 2);
-
 	//Counters
 	int aux0, aux1, aux2, aux3;
 
@@ -363,8 +365,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					double h = 0.0, v = 0.0; //projections
 					Matrix E(2); //equation system
 
-					//Jacobian matrix
-					Matrix J(2, 2);
+					J.clear();
 					for (size_t seg = 1; seg <= ( size_t )n_segs; seg++)
 					{
 						double cur_gamma = line.gamma_s[seg - 1];
@@ -385,34 +386,29 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					E(0, 0) = h - Hf;
 					E(1, 0) = v - Vf;
 
-					res = sqrt(pow(E(0, 0), 2) + pow(E(1, 0), 2));
-					if (res < error_max) break;
-
-					Matrix dF(2);
-					dF = invert2x2(J) * E;
-					F = F - dF;
-
-					//Stiffness matrix
-					Ki = invert2x2(J);
+					//Matrix dF(2);
+					F = F - (invert2x2(J) * E);
 
 					if (F(0, 0) < 0) F(0, 0) = abs(F(0, 0));
-
 					if (F(1, 0) < 0) F(1, 0) = abs(F(1, 0));
-				}
-				if (res < error_max)
-					break;
 
+					res = sqrt(pow(E(0, 0), 2) + pow(E(1, 0), 2));
+					if (res < error_max) break;
+				}
+				if (res < error_max) break;
 			}
-			if (res < error_max)
-				break;
+			if (res < error_max) break;
 		}
+		
+		//Stiffness matrix
+		Ki = invert2x2(J);
 
 		//Checks for divergence (maximum number of iterations)
 		if (aux1 == MAX_ITERATIONS_FH0 && aux2 == MAX_ITERATIONS_FV0)
 		{
 			std::stringstream ss;
 			ss << "\n   + Error solving equations for line number " << line.number;
-			Log::getInstance().AddWarning(ss);
+			Log::AddWarning(ss);
 			return false;
 		}
 		
@@ -426,7 +422,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			if (FV[0] <= 0 && A(2, 0) <= -environment.waterdepth)
 			{
 				existTDP = true;
-				for (unsigned int cont = 1; cont < n_segs + 1; cont++)
+				for (unsigned int cont = 1; cont < n_segs + 1; ++cont)
 				{
 					if (FV[cont] > 0)
 					{
@@ -439,7 +435,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			else
 				seg_tdp = 0;
 		}
-
 
 		//Equivalent weight until reach TDP segment (included)
 		double gamma_eq = 0.0;
@@ -475,7 +470,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			{
 				//If there is no TDP, starts at segment 0, otherwise; at the next segment after TDP
 				unsigned int seg = existTDP ? lim_seg + 1 : 0;
-				for (; seg < n_segs; seg++)
+				for (; seg < n_segs; ++seg)
 				{
 					arealen += ( PI * pow(segment_property_vector[line.segments[seg].property - 1].diameter, 2) / 4.0 ) * line.segments[seg].length;
 					rholen += segment_property_vector[line.segments[seg].property - 1].rho * line.segments[seg].length;
@@ -546,22 +541,28 @@ void MooringModel::SetLinesConfiguration(Line& line, Matrix& F, std::vector <dou
 	for (unsigned int cont = 0; cont < n_segs; cont++)
 	{
 		if (!existTDP)
-			strcpy(line.configuration, "Suspendend above the seabed");
-		else if (line.gamma_s[cont] < 0 && strcmp(line.configuration, "Lazy wave") && strcmp(line.configuration, "Steep wave"))
+		{
+			if (keypoint_vector[line.keypoint_A-1].x == keypoint_vector[line.keypoint_B-1].x &&
+				keypoint_vector[line.keypoint_A-1].y == keypoint_vector[line.keypoint_B-1].y)
+				line.configuration = "Vertical line";
+			else
+				line.configuration = "Suspended above the seabed";
+		}
+		else if (line.gamma_s[cont] < 0 && line.configuration != "Lazy wave" && line.configuration != "Steep wave")
 		{
 			if (x_tdp > 0)
-				strcpy(line.configuration, "Lazy wave");
+				line.configuration = "Lazy wave";
 			else
-				strcpy(line.configuration, "Steep wave");
+				line.configuration = "Steep wave";
 		}
 		else
 		{
-			if (strcmp(line.configuration, "Lazy wave") && strcmp(line.configuration, "Steep wave"))
+			if (line.configuration != "Lazy wave" && line.configuration != "Steep wave")
 			{
 				if (x_tdp > 0)
-					strcpy(line.configuration, "Catenary");
+					line.configuration = "Catenary";
 				else
-					strcpy(line.configuration, "Taut-Leg");
+					line.configuration = "Taut-Leg";
 			}
 		}
 	}
@@ -899,33 +900,21 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 	F(2, 0) = line.hasAnchor == true ? keypoint_vector[line.keypoint_A - 1].z : keypoint_vector[line.keypoint_B - 1].z;
 
 	//Generating local coordinate system - for each line a single CS is established
+	E1.clear();	E3.clear();
+	E1(0, 0) = 0.0;
+	E1(1, 0) = 0.0;
+	E1(2, 0) = 1.0;
 	if (Hf > 0.0)
-	{
-		E3.clear();
-		E1.clear();
 		E3 = 1.0 / norm(F - A) * ( F - A );
-		E1(0, 0) = 0.0;
-		E1(1, 0) = 0.0;
-		E1(2, 0) = 1.0;
-
-		gm.GenerateCoordinateSystem(cur_cs, E1, E3);
-		line.cs = cur_cs;
-	}
-	else //Otherwie, uses the global coordinate system
+	//If is vertical -> global coordinate system
+	else 
 	{
-		line.cs = 1;
-		E3.clear();
-		E1.clear();
-
-		E1(0, 0) = 0.0;
-		E1(1, 0) = 0.0;
-		E1(2, 0) = 1.0;
-
 		E3(0, 0) = 1.0;
 		E3(1, 0) = 0.0;
 		E3(2, 0) = 0.0;
-
 	}
+	line.cs = cur_cs;
+	gm.GenerateCoordinateSystem(cur_cs, E1, E3);
 
 
 	//Iterates through the segments
@@ -1121,7 +1110,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 	line.nodeset_B = cur_node_set - 1;
 
 	//Summary file
-	Summary::AddLine({ line.node_A, line.node_B }, summ_elem, summ_nodesets, extrem_tensions, line.number, line.configuration, existTDP, x_tdp_ext, line.total_length, ( unsigned int )line.segments.size());
+	Summary::AddLine({ line.node_A, line.node_B }, summ_elem, summ_nodesets, extrem_tensions, 
+					 line.number, line.configuration, existTDP, x_tdp_ext, line.total_length, ( unsigned int )line.segments.size());
 
 	//Mooring line NodeSet
 	sprintf(comment, "Nodes - line %d", line.number);
@@ -1146,8 +1136,8 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, const unsigned int& 
 			double prev_xcat = 0.0, prev_zcat = 0.0;
 			if (seg > 0)
 			{
-				prev_xcat /*= xcat_n(0, seg) */ = xcat_n[seg - 1][line.segments[seg - 1].n_nodes - 1];
-				prev_zcat /*= zcat_n(0, seg) */ = zcat_n[seg - 1][line.segments[seg - 1].n_nodes - 1];
+				prev_xcat = xcat_n[seg - 1][line.segments[seg - 1].n_nodes - 1];
+				prev_zcat = zcat_n[seg - 1][line.segments[seg - 1].n_nodes - 1];
 			}
 
 			double s = x0_n[seg][node];
@@ -1553,10 +1543,10 @@ void MooringModel::GeneralSetting()
 	 * Post processing parameters *
 	 *============================*/
 
-		//If there is just one line, do not write rigid member coupling fairlead and vessel
+	//If there is just one line, do not write rigid member coupling fairlead and vessel
 	gm.post.WriteSpecialConstraints_flag = ( line_vector.size() == 1 ) ? false : true;
 
-		//If there is at least one platform STL, write RenderRigidBodies
+	//If there is at least one platform STL, write RenderRigidBodies
 	gm.post.WriteRenderRigidBodies_flag = ( moorpost.platform_names.size() > 0 ) ? true : false;
 
 	//Monitor contact
@@ -1576,22 +1566,24 @@ void MooringModel::GeneralSetting()
 	GenerateAnalysisSteps(step, start);
 	
 	//Generate vessel displacements
-	if (vessel_disp_vector.size() > 0)	GenerateVesselDisplacements(step, start);
+	if (!vessel_disp_vector.empty()) 
+		GenerateVesselDisplacements(step);
 
 	//Generate forces
-	if (moorload_vector.size() > 0)	GenerateForces();
+	if (!moorload_vector.empty())	
+		GenerateForces();
 }
 
 void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 {
 	//Enforcing penetration
 	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 100);
-	Summary::Get().steps.emplace_back(std::make_tuple(start, start + 1.0, "Enforcing penetration"));
+	Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1.0, "Enforcing penetration"));
 	start += 1.0;
 
 	//Applying prescribed displacements
 	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 100);
-	Summary::Get().steps.emplace_back(std::make_tuple(start, start + 1.0, "Applying prescribed displacement field"));
+	Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1.0, "Applying prescribed displacement field"));
 	start += 1.0;
 
 	//Time step when sea current will be included
@@ -1604,19 +1596,19 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 
 		//Dynamic relaxation
 		gm.GenerateDynamicSolutionStep(++step, start, start + ( double )moorsolution.TimeRelax * ( double )moorsolution.dyn_relax_periods, 0.01, 0.1, 0.0000001, 15, 3, 4, 2, 1000000, moorsolution.alpha_relax, 0.0, 0, 0.6, 0.3);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + ( double )moorsolution.TimeRelax * ( double )moorsolution.dyn_relax_periods, "Coupling fairleads during a dynamic relaxation"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + ( double )moorsolution.TimeRelax * ( double )moorsolution.dyn_relax_periods, "Coupling fairleads during a dynamic relaxation"));
 		start += ( double )moorsolution.TimeRelax * ( double )moorsolution.dyn_relax_periods;
 
 		//Static step
 		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 100);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + 1., "Static step after dynamic relaxation"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1., "Static step after dynamic relaxation"));
 		start += 1.;
 	}
 	else
 	{
 		//Static step
 		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 100);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + 1., "Coupling fairleads statically"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1., "Coupling fairleads statically"));
 		start += 1.;
 	}
 
@@ -1725,19 +1717,19 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 */
 
 	//Platform -> forces releaf
-	if (moorsolution.bool_ReleaseForces && platform_vector.size() > 0)
+	if (moorsolution.bool_ReleaseForces && !platform_vector.empty())
 	{
 		//sea current booltable
 		seacurrent_booltable += 2;
 
 		//Dynamic relaxation
 		gm.GenerateDynamicSolutionStep(++step, start, start + moorsolution.release_timestep, moorsolution.release_timestep, moorsolution.release_timestep, moorsolution.release_timestep / 100.0, 10, 2, 4, 2, 1000000, 0.0, 0.0, 0, 0.6, 0.3);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + moorsolution.release_timestep, "Releasing platform DOFs dynamically"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + moorsolution.release_timestep, "Releasing platform DOFs dynamically"));
 		start += moorsolution.release_timestep;
 
 		//Static step
 		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 100);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + 1., "Static step after release platform DOFs"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1., "Static step after release platform DOFs"));
 		start += 1.;
 	}
 
@@ -1751,7 +1743,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 
 		//Solution step
 		gm.GenerateStaticSolutionStep(++step, start, start + moorsolution.seacurrent_timestep, moorsolution.seacurrent_timestep, moorsolution.seacurrent_max_timestep, moorsolution.seacurrent_min_timestep, 20, 2, 3, 1.5, 100);
-		Summary::Get().steps.emplace_back(std::make_tuple(start, start + moorsolution.seacurrent_timestep, "Establishing sea current"));
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + moorsolution.seacurrent_timestep, "Establishing sea current"));
 		start += moorsolution.seacurrent_timestep;
 	}
 	//Sea current bool table, just for Morison effects
@@ -1770,7 +1762,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 		//	gm.GenerateNodal_Displacement(origem?.disp_step, origem?.nodeset, 1, stiff_matrix->time_series);
 	}
 
-	moorsolution.steps_to_set_model = step - 1;
+	moorsolution.steps_to_set_model = step;
 }
 
 void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
@@ -1780,49 +1772,72 @@ void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
 
 	for (size_t analysis_step = 0; analysis_step < moorsolution.solution_steps.size(); analysis_step++)
 	{
+		///"global_start" might be used to apply vessel displacements and/or nodal loads
 		moorsolution.solution_steps[analysis_step].global_start = start;
 		dt = moorsolution.solution_steps[analysis_step].end_time;
 		
 		//Static step
 		if (moorsolution.solution_steps[analysis_step].isStatic)
 		{
-			gm.GenerateStaticSolutionStep(++step, start, start + moorsolution.solution_steps[analysis_step].end_time,
+			gm.GenerateStaticSolutionStep(++step, start, start + dt,
 										  moorsolution.solution_steps[analysis_step].timestep,
 										  moorsolution.solution_steps[analysis_step].max_timestep,
 										  moorsolution.solution_steps[analysis_step].min_timestep, 20, 2, 4, 1.5,
 										  moorsolution.solution_steps[analysis_step].sample);
-			Summary::Get().steps.emplace_back(std::make_tuple(start, start + dt, "Static step"));
+			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Static step"));
 		}
 		//Dynamic step
 		else 
 		{
-			gm.GenerateDynamicSolutionStep(++step, start, start + moorsolution.solution_steps[analysis_step].end_time,
+			gm.GenerateDynamicSolutionStep(++step, start, start + dt,
 										   moorsolution.solution_steps[analysis_step].timestep,
 										   moorsolution.solution_steps[analysis_step].max_timestep,
 										   moorsolution.solution_steps[analysis_step].min_timestep, 15, 3, 2, 1.5,
 										   moorsolution.solution_steps[analysis_step].sample, 0.0, 0.0, 0,
 										   moorsolution.solution_steps[analysis_step].gamma_new,
 										   moorsolution.solution_steps[analysis_step].beta_new);
-			Summary::Get().steps.emplace_back(std::make_tuple(start, start + dt, "Dynamic step"));
+			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Dynamic step"));
 		}
 		//Update initial time
 		start += dt;
 	}
 }
 
-void MooringModel::GenerateVesselDisplacements(unsigned int& step, double& start)
+void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 {
 	for (VesselDisplacement& disp : vessel_disp_vector)
 	{
+		//Temporary auxiliary variables
 		size_t ID = ( size_t )disp.GetVesselID() - 1;
-		unsigned int analysis_step = disp.GetStep();
+		unsigned int analysis_step = disp.GetStep() - 1;
 		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
+		double start = moorsolution.solution_steps[analysis_step].global_start;
 
 		//Displacement description (vessel number and type of displacement)
 		std::string description2add;
 
+		//MathCode
+		if (disp.isMathCode)
+		{
+			MathCode* ptr = disp.GetMathCode();
+
+			//Changes 't0' to real value in the equation(s)
+			ptr->SetEquationInitialTime(start);
+
+			//Displacement
+			gm.GenerateNodalDisplacement(++cur_disp, vessel_vector[ID].nodeset, 1, ptr);
+			description2add = "\n\t\t- Displacement of the vessel " + std::to_string(vessel_vector[ID].number) + " with MathCode";
+		}
+		//External file
+		else if (disp.fromFile)
+		{
+			//Displacement
+			gm.GenerateNodalDisplacement(++cur_disp, vessel_vector[ID].nodeset, 1, disp.GetFileName(), disp.GetFileHeaders(), disp.GetFileNTimes());
+			description2add = "\n\t\t- Displacement of the vessel " + std::to_string(vessel_vector[ID].number) + 
+				" with data from file \"" + disp.GetFileName() + "\"";
+		}
 		//Time series
-		if (disp.isTable)
+		else if (disp.isTable)
 		{
 			Table* time_series = disp.GetTimeSeries();
 
@@ -1845,7 +1860,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step, double& start
 
 			//Generate displacement
 			gm.GenerateNodalDisplacement(++cur_disp, vessel_vector[ID].nodeset, 1, time_series);
-			description2add = " - Applying time series to vessel " + std::to_string(vessel_vector[ID].number);
+			description2add = "\n\t\t- Applying time series to vessel " + std::to_string(vessel_vector[ID].number);
 		}
 		//Sine Wave
 		else if (disp.isSineWave)
@@ -1857,25 +1872,13 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step, double& start
 
 			//Displacement
 			gm.GenerateNodalDisplacement(++cur_disp, vessel_vector[ID].nodeset, 1, ptr);
-			description2add = " - Start of sinusoidal displacement with MathCode on vessel " + std::to_string(vessel_vector[ID].number);
+			description2add = "\n\t\t- Start of sinusoidal displacement with MathCode on vessel " + std::to_string(vessel_vector[ID].number);
 
 			//Generates equations
 			ptr->GenerateMathCode();
 		}
-		//MathCode
-		else if (disp.isMathCode)
-		{
-			MathCode* ptr = disp.GetMathCode();
-
-			//Changes 't0' to real value in the equation(s)
-			ptr->SetEquationInitialTime(start);
-
-			//Displacement
-			gm.GenerateNodalDisplacement(++cur_disp, vessel_vector[ID].nodeset, 1, ptr);
-			description2add = " - Displacement of the vessel " + std::to_string(vessel_vector[ID].number) + " with MathCode";
-		}
 		//Append description of the current step (after 'dynamic' or 'static' description)
-		std::get<2>(Summary::Get().steps[global_step]) += description2add;
+		std::get<2>(Summary::GetSteps()[global_step]) += description2add;
 	}
 }
 
@@ -1884,29 +1887,47 @@ void MooringModel::GenerateForces()
 {
 	for (MoorLoad& load : moorload_vector)
 	{
+		//Temporary auxiliary variables
+		unsigned int analysis_step = load.step - 1;
+		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
+		double start = moorsolution.solution_steps[analysis_step].global_start;
+		size_t line = load.lineID - 1;
+		unsigned int node = load.nodeID - 1;
+		unsigned int nodeset;
+
 		//Updates load number
 		++cur_load;
 
-		unsigned int nodeset;
+		//Displacement description (vessel number and type of displacement)
+		std::string description2add = "\n\t\t- Applying load at ";
 
 		//Vessel node
 		if (load.description == "vessel")
-			nodeset = vessel_vector[load.nodeID - 1].nodeset;
+		{
+			nodeset = vessel_vector[node].nodeset;
+			description2add += "vessel " + std::to_string(vessel_vector[node].number);
+		}
 		//First node of a line
 		else if (load.description == "first" && load.segmentID == 1)
-			nodeset = line_vector[load.lineID - 1].nodeset_A;
+		{
+			nodeset = line_vector[line].nodeset_A;
+			description2add += "the first node of the line " + std::to_string(load.lineID);
+		}
 		//Last node of a line
-		else if (load.description == "last" && load.segmentID == line_vector[load.lineID - 1].segments.size())
-			nodeset = line_vector[load.lineID - 1].nodeset_B;
+		else if (load.description == "last" && load.segmentID == line_vector[line].segments.size())
+		{
+			nodeset = line_vector[line].nodeset_B;
+			description2add += "the last node of the line " + std::to_string(load.lineID);
+		}
 		// If is not a vessel or fairlead node, a new nodeset must be created
 		else
 		{
-			unsigned int temp_node = line_vector[load.lineID - 1].node_A - 1; //first node
+			unsigned int temp_node = line_vector[line].node_A - 1; //first node
 			unsigned int add_nodes;
 
-			for (unsigned int seg = 0; seg < load.segmentID; seg++)
+			for (unsigned int seg = 0; seg < load.segmentID; ++seg)
 			{
-				unsigned int nodes_seg = line_vector[load.lineID - 1].segments[seg].n_nodes;
+				unsigned int nodes_seg = line_vector[line].segments[seg].n_nodes;
 				if (load.segmentID == seg + 1)
 				{
 					if (load.description == "first")
@@ -1926,8 +1947,8 @@ void MooringModel::GenerateForces()
 				temp_node += add_nodes; //Before exclude transition nodes (they may have been counted twice)
 			}
 
-			//Exclude transition nodes
-			temp_node -= ( unsigned int )line_vector[load.lineID - 1].segments.size() - 1;
+			//Exclude nodes of transition between segments of the count
+			temp_node -= ( unsigned int )line_vector[line].segments.size() - 1;
 
 			//Node set
 			char comment[500];
@@ -1937,11 +1958,16 @@ void MooringModel::GenerateForces()
 		}
 
 		//Matching start time with Giraffe time
-		double start = moorsolution.solution_steps[load.step - 1].global_start;
 		if (load.mathCode)
 		{
 			load.mathCode->SetEquationInitialTime(start);
 			gm.GenerateNodalForce(cur_load, nodeset, load.mathCode);
+			description2add += " with MathCode";
+		}
+		else if (load.fromFile)
+		{
+			gm.GenerateNodalForce(cur_load, nodeset, load.file_name, load.header_lines, load.n_times);
+			description2add += " with data from file \"" + load.file_name + "\"";
 		}
 		else //Time series table
 		{
@@ -1949,16 +1975,20 @@ void MooringModel::GenerateForces()
 				load.table->table[i][0] += start;
 
 			gm.GenerateNodalForce(cur_load, nodeset, load.table);
+			description2add += " with time series data";
 		}
+
+		//Append description of the current step (after 'dynamic' or 'static' description)
+		std::get<2>(Summary::GetSteps()[global_step]) += description2add;
 	}
 }
 
 //Generates seabed (contact surface)
-void MooringModel::GenerateSeaBed()
+void MooringModel::GenerateSeabed()
 {
-	//min and max coordinate values in plane xy
-	double xmin = 0.0, xmax = 0.0; //x -> lambda 1
-	double ymin = 0.0, ymax = 0.0; //y -> lambda 2
+	//min and max coordinates
+	double xmin = 0.0, xmax = 0.0; //x -> lambda 1 of 'oscillatory surface'
+	double ymin = 0.0, ymax = 0.0; //y -> lambda 2 of 'oscillatory surface'
 
 	for (const Line& moor : line_vector)
 	{
@@ -1984,25 +2014,21 @@ void MooringModel::GenerateSeaBed()
 	{
 		size_t keypoint = ( size_t )vessel.keypoint - 1;
 		
-		double x_vessel = keypoint_vector[keypoint].x;
-		if (x_vessel != 0.0 && xmax < x_vessel && xmin > x_vessel) 
-			xmax = x_vessel;
+		//Check X (min e max)
+		if (keypoint_vector[keypoint].x < xmin)	xmin = keypoint_vector[keypoint].x;
+		if (keypoint_vector[keypoint].x > xmax)	xmax = keypoint_vector[keypoint].x;
 
-		double y_vessel = keypoint_vector[keypoint].y;
-		if (y_vessel != 0.0 && ymax < y_vessel && ymin > y_vessel) 
-			ymax = y_vessel;
+		//Check Y (min e max)
+		if (keypoint_vector[keypoint].y < ymin)	ymin = keypoint_vector[keypoint].y;
+		if (keypoint_vector[keypoint].y > ymax)	ymax = keypoint_vector[keypoint].y;
 	}
 
-	//Checks for null values of Y
-		//If X is null, set Y to half of water depth; otherwise, equal to maximum absolute value of X
-	if (ymin == 0.0 && ymax == 0.0)
-		ymax = ( xmax == 0.0 && xmin == 0.0 ) ? environment.waterdepth / 2.0 : max(fabs(xmax), fabs(xmin));
+	//Checks for null values and change they for half of water depth
+	if (ymin == 0.0)	ymin = -environment.waterdepth / 2.0;
+	if (ymax == 0.0)	ymax = environment.waterdepth / 2.0;
+	if (xmin == 0.0)	xmin = -environment.waterdepth / 2.0;
+	if (xmax == 0.0)	xmax = environment.waterdepth / 2.0;
 	
-	//Checks for null values of X
-		//If Y is null, set X to half of water depth; otherwise, equal to maximum absolute value of Y
-	if (xmin == 0.0 && xmax == 0.0)
-		xmax = ( ymax == 0.0 && ymin == 0.0 ) ? environment.waterdepth / 2.0 : max(fabs(ymax), fabs(ymin));
-
 	//Surface size (lambdas)
 	double l1 = ceil(2.0 * 1.5 * max(fabs(xmax), fabs(xmin)));
 	double l2 = ceil(2.0 * 1.5 * max(fabs(ymax), fabs(ymin)));
@@ -2061,7 +2087,6 @@ void MooringModel::GenerateSeaBed()
 	}
 
 
-
 	//Name of the folder with post files
 	std::string surfaces_folder = folder_name + "post/";
 
@@ -2075,7 +2100,7 @@ void MooringModel::GenerateSeaBed()
 		VTKwaterOk = gm.post.CreateWaterVTK(surfaces_folder, { 2.0 * xmin, 2.0 * fabs(xmax) }, { 2.0 * ymin, 2.0 * fabs(ymax) });
 	}
 	else //ERROR
-		Log::getInstance().AddWarning("\n   + Post files directory could not be created.");
+		Log::AddWarning("\n   + Post files directory could not be created.");
 
 	//Setting contact surface flag
 	if (!VTKseabedOk && !gm.post.WriteRigidContactSurfaces_flag)

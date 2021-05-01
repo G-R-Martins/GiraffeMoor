@@ -3,7 +3,7 @@
 
 
 Displacement::Displacement()
-	: isMathCode(false), number(0)
+	: isMathCode(false), extFile(false), number(0)
 {}
 
 Displacement::~Displacement()

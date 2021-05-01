@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "MoorPost.h"
 #include "GiraffeModel.h"
-#include "ReadingAuxiliaryFunctions.h"
+#include "AuxFunctions.h"
 
 //Global object
 extern GiraffeModel gm;
@@ -74,7 +74,7 @@ bool MoorPost::Read(FILE *f)
 					if (!strcmp(str, "Forces"))						gm.post.WriteForces_flag = true;
 					else if (!strcmp(str, "ContactForces"))			gm.post.WriteContactForces_flag = true;
 					else if (!strcmp(str, "SpecialConstraints"))	gm.post.WriteSpecialConstraints_flag = true;
-					else if (!strcmp(str, "RigidContact"))			gm.post.WriteRigidContactSurfaces_flag = true;
+					else if (!strcmp(str, "ContactSurface"))			gm.post.WriteRigidContactSurfaces_flag = true;
 					else
 					{
 						fsetpos(f, &pos);

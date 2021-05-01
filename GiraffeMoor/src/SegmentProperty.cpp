@@ -50,7 +50,7 @@ bool SegmentProperty::Read(FILE *f)
 	//If a word is readed, return an error
 	if (fscanf(f, "%s", str) == EOF || isalpha(str[0]))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading segment property ID.\n");
+		Log::AddWarning("\n   + Error reading segment property ID.\n");
 		return false;
 	}
 	else
@@ -66,7 +66,7 @@ bool SegmentProperty::Read(FILE *f)
 	}
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading segment property type.\n");
+		Log::AddWarning("\n   + Error reading segment property type.\n");
 		return false;
 	}
 
@@ -140,14 +140,14 @@ bool SegmentProperty::Read(FILE *f)
 		//ERROR
 		else 
 		{
-			Log::getInstance().AddWarning("\n   + Error reading segment property data.\n");
+			Log::AddWarning("\n   + Error reading segment property data.\n");
 			return false;
 		}
 	}
 	//ERROR
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error defining segment property data.\n");
+		Log::AddWarning("\n   + Error defining segment property data.\n");
 		return false;
 	}
 

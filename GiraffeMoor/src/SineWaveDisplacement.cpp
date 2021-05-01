@@ -51,25 +51,25 @@ bool SineWaveDisplacement::Read(FILE *f)
 	}
 	else //ERROR
 	{
-		Log::getInstance().AddWarning("\n   + Error reading mean drift from sine wave displacement.");
+		Log::AddWarning("\n   + Error reading mean drift from sine wave displacement.");
 		return false;
 	}
 
 	if (fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &period[0], &period[1], &period[2], &period[3], &period[4], &period[5]) == EOF || strcmp(str, "Period"))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading period from sine wave displacement.");
+		Log::AddWarning("\n   + Error reading period from sine wave displacement.");
 		return false;
 	}
 
 	if (fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &amplitude[0], &amplitude[1], &amplitude[2], &amplitude[3], &amplitude[4], &amplitude[5]) == EOF || strcmp(str, "Amplitude"))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading amplitude from sine wave displacement.");
+		Log::AddWarning("\n   + Error reading amplitude from sine wave displacement.");
 		return false;
 	}
 
 	if (fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &phase[0], &phase[1], &phase[2], &phase[3], &phase[4], &phase[5]) == EOF || strcmp(str, "Phase"))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading phase from sine wave displacement.");
+		Log::AddWarning("\n   + Error reading phase from sine wave displacement.");
 		return false;
 	}
 
@@ -150,6 +150,6 @@ void SineWaveDisplacement::GenerateMathCode()
 		}
 	}
 	else
-		Log::getInstance().AddWarning("\n   + Time is not defined for a \"SineWaveDisplacement\" block. Please, check your input file");
+		Log::AddWarning("\n   + Time is not defined for a \"SineWaveDisplacement\" block. Please, check your input file");
 
 }
