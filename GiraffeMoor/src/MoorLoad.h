@@ -16,15 +16,20 @@ public:
 	//Reads GiraffeMoor file
 	bool Read(FILE* f);
 
+//protected:
 	//============================================================================
 
 			/*-------
 			Variables
 			--------*/
 
-	//Data pointer
+	//Data type
 	Table* table;
 	MathCode* mathCode;
+	bool fromFile;
+	std::string file_name;
+	unsigned int header_lines, n_times;
+
 
 	/*Node*/
 
@@ -38,5 +43,4 @@ public:
 	//Initial step (may encompass more than one)
 	unsigned int step;
 
-	
 };

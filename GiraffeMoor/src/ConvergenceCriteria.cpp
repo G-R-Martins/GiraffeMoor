@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "ConvergenceCriteria.h"
-#include "ReadingAuxiliaryFunctions.h"
+#include "AuxFunctions.h"
 
 
 ConvergenceCriteria::ConvergenceCriteria()

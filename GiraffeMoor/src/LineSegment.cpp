@@ -39,20 +39,20 @@ bool LineSegment::Read(FILE *f)
 		length = atof(str);
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading length of a segment");
+		Log::AddWarning("\n   + Error reading length of a segment");
 		return false;
 	}
 
 
 	if (fscanf(f, "%s %d", str, &property) == EOF || strcmp(str, "Property"))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading 'Property' keyword\n");
+		Log::AddWarning("\n   + Error reading 'Property' keyword\n");
 		return false;
 	}
 
 	if (fscanf(f, "%s %d", str, &discretization) == EOF || strcmp(str, "Discretization"))
 	{
-		Log::getInstance().AddWarning("\n   + Error reading 'Discretization' keyword");
+		Log::AddWarning("\n   + Error reading 'Discretization' keyword");
 		return false;
 	}
 

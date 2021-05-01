@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "SegmentSet.h"
-#include "TemplateReading.h"
+#include "LoopReading.h"
 
 
 //Constructor
@@ -42,7 +42,7 @@ bool SegmentSet::Read(FILE * f)
 		ID = atoi(str);
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading a segment set number\n");
+		Log::AddWarning("\n   + Error reading a segment set number\n");
 		return false;
 	}
 
@@ -54,7 +54,7 @@ bool SegmentSet::Read(FILE * f)
 														 f, pos, str))
 	{
 		std::string w = "\n   + Error reading data of the segment set number " + std::to_string(ID);
-		Log::getInstance().AddWarning(w);
+		Log::AddWarning(w);
 		return false;
 	}
 

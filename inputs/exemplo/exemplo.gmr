@@ -6,39 +6,37 @@ Keypoints
 	Keypoint	5	X	418.8000	Y	-725.382878209846	Z	-200.0
 	Keypoint	6	X	20.43400	Y	-35.3927262018624	Z	-14.00
 	Keypoint	7	X	0.000000	Y	0.000000000000000	Z	0.0000
-	// // Segunda plataforma
-	// Keypoint	8	X	1418.8000	Y	725.3828782098460	Z	-200.0
-	// Keypoint	9	X	1020.43400	Y	35.39272620186240	Z	-14.00
-	// Keypoint	10	X	162.4000	Y	0.000000000000000 	Z	-200.0
-	// Keypoint	11	X	959.1320	Y	0.000000000000000 	Z	-14.00
-	// Keypoint	12	X	1418.8000	Y	-725.382878209846	Z	-200.0
-	// Keypoint	13	X	1020.43400	Y	-35.3927262018624	Z	-14.00
-	// Keypoint	14	X	1000.0000	Y	0.000000000000000	Z	0.0000
+	// Segunda plataforma
+	Keypoint	8	X	1418.8000	Y	725.3828782098460	Z	-200.0
+	Keypoint	9	X	1020.43400	Y	35.39272620186240	Z	-14.00
+	Keypoint	10	X	162.4000	Y	0.000000000000000 	Z	-200.0
+	Keypoint	11	X	959.1320	Y	0.000000000000000 	Z	-14.00
+	Keypoint	12	X	1418.8000	Y	-725.382878209846	Z	-200.0
+	Keypoint	13	X	1020.43400	Y	-35.3927262018624	Z	-14.00
+	Keypoint	14	X	1000.0000	Y	0.000000000000000	Z	0.0000
 
-
+SegmentSets
+	Set 1
+		Length 835.35 	Property 2 	Discretization	100
+		
 Lines
-	Line 1	Anchor	1	Fairlead 2 	VesselID 1 	
-		Segment Length 835.35 	Property 2 	Discretization	100
-	Line 2	Anchor	3	Fairlead 4 	VesselID 1 	
-		Segment Length 835.35 	Property 2 	Discretization	100
-	Line 3	Anchor	5	Fairlead 6 	VesselID 1 	
-		Segment Length 835.35 	Property 2 	Discretization	100
-// //Segunda plataforma +1000m na direção 'x'             	
-	// Line 4	Anchor	8	Fairlead 9  VesselID 2 	
-		// Segment Length 835.35 	Property 2 	Discretization	100
-	// Line 5	Anchor	10	Fairlead 11	VesselID 2 	
-		// Segment Length 835.35 	Property 2 	Discretization	100
-	// Line 6	Anchor	12	Fairlead 13	VesselID 2 	
-		// Segment Length 835.35 	Property 2 	Discretization	100
+	Line 1	Anchor	1	Fairlead 2 	VesselID 1 	SegmentSet 1
+	Line 2	Anchor	3	Fairlead 4 	VesselID 1 	SegmentSet 1
+	Line 3	Anchor	5	Fairlead 6 	VesselID 1 	SegmentSet 1
+//segunda plataforma +1000m na direção 'x'             	
+	Line 4	Anchor	8	Fairlead 9  VesselID 2 	SegmentSet 1
+	Line 5	Anchor	10	Fairlead 11	VesselID 2 	SegmentSet 1
+	Line 6	Anchor	12	Fairlead 13	VesselID 2 	SegmentSet 1
 		
 Vessels
 	Vessel	1	PilotNode	7	InertiaTensor	0 0 0 0 0 0	Mass 0
-	// Vessel	2	PilotNode	14	InertiaTensor	0 0 0 0 0 0	Mass 0
+	Vessel	2	PilotNode	14	InertiaTensor	0 0 0 0 0 0	Mass 0
 	
 Solution
 	Analysis
-		Step 1 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  2
-		Step 2 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  4
+		Step 1 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
+		Step 2 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
+		Step 3 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 	
 SegmentProperties 
 	//Mooring
@@ -54,20 +52,59 @@ Environment
 	Seabed flat 	Stiffness 3e6 	Damping 1e2 	FrictionCoefficient	0.2 
 
 
+VesselDisplacements
+	 VesselDispID	1 
+		Step	2 
+		File "teste.csv" HeaderLines 1 NTimes 11
+		 // TimeSeries
+			 // 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
+			 // .10	-1.1494725	0	0.0361393	0	0.0165411	0
+			 // 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
+			 // 0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
+			 // 0.25	-1.1548849	0	0.0954679	0	0.0159384	0
+			 // 0.30	-1.1543812	0	0.1150724	0	0.0157026	0
+			 // 0.35	-1.1527220	0	0.1345593	0	0.0154496	0
+			 // 0.40	-1.1499079	0	0.1539098	0	0.0151799	0
+			 // 0.45	-1.1459411	0	0.1731050	0	0.0148935	0
+			 // 0.50	-1.1408247	0	0.1921265	0	0.0145909	0
+	 // VesselDispID	1 
+		 // Step	2
+		 // MathCode
+			// Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+	 VesselDispID	2 
+		 Step	3
+		 MathCode
+			Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+
 StiffnessMatrix
 	Analytical true
 
-VesselDisplacements
-	 VesselDispID	1 
-		 Step	2
-		 TimeSeries
-			 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
-			 0.10	-1.1494725	0	0.0361393	0	0.0165411	0
-			 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
-			 0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
-			 0.25	-1.1548849	0	0.0954679	0	0.0159384	0
-			 0.30	-1.1543812	0	0.1150724	0	0.0157026	0
-			 0.35	-1.1527220	0	0.1345593	0	0.0154496	0
-			 0.40	-1.1499079	0	0.1539098	0	0.0151799	0
-			 0.45	-1.1459411	0	0.1731050	0	0.0148935	0
-			 0.50	-1.1408247	0	0.1921265	0	0.0145909	0
+NodalForces
+	Node vessel 1 Step 1
+		File "teste.csv" HeaderLines 1 NTimes 11
+	// MathCode 
+		// Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+	// Node vessel 2 Step 3
+		// File "teste.csv"
+		//0.05	-1.1453697	0	0.0162558	0	0.0167063	0
+		//.10	-1.1494725	0	0.0361393	0	0.0165411	0
+		//0.15	-1.1524285	0	0.0559821	0	0.0163579	0
+		//0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
+	// Node last LineID 2 Step 2
+		// TimeSeries
+		// 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
+		 // .10	-1.1494725	0	0.0361393	0	0.0165411	0
+		 // 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
+	// Node first LineID 6 Step 1
+		// TimeSeries
+		// 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
+		 // .10	-1.1494725	0	0.0361393	0	0.0165411	0
+		 // 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
+		 // 0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
+		 // 0.25	-1.1548849	0	0.0954679	0	0.0159384	0
+		 // 0.30	-1.1543812	0	0.1150724	0	0.0157026	0
+		 // 0.35	-1.1527220	0	0.1345593	0	0.0154496	0
+		 // 0.40	-1.1499079	0	0.1539098	0	0.0151799	0
+		 // 0.45	-1.1459411	0	0.1731050	0	0.0148935	0
+		 // 0.50	-1.1408247	0	0.1921265	0	0.0145909	0
+		 

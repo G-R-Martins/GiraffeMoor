@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "MoorSolution.h"
-#include "TemplateReading.h"
+#include "LoopReading.h"
 #include "Log.h"
 
 
@@ -77,7 +77,7 @@ bool MoorSolution::Read(FILE *f)
 						else
 						{
 							ss += "\n   + Error reading dynamic relaxation parameters after 'LineConfiguration'.";
-							Log::getInstance().AddWarning(ss);
+							Log::AddWarning(ss);
 							return false; //ERROR
 						}
 					}
@@ -90,7 +90,7 @@ bool MoorSolution::Read(FILE *f)
 						if (!fscanf(f, "%s %lf", str, &release_timestep) || strcmp(str, "Time"))
 						{
 							ss += "\n   + Error reading dynamic relaxation parameters after 'PlatformForces'.";
-							Log::getInstance().AddWarning(ss);
+							Log::AddWarning(ss);
 							return false;
 						}
 					}
@@ -109,7 +109,7 @@ bool MoorSolution::Read(FILE *f)
 				else
 				{
 					ss += "\n   + Error reading sea current time definition.";
-					Log::getInstance().AddWarning(ss);
+					Log::AddWarning(ss);
 					return false;
 				}
 			}

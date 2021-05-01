@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "StiffnessMatrix.h"
 #include "MooringModel.h"
-#include "ReadingAuxiliaryFunctions.h"
+#include "AuxFunctions.h"
 #include "Log.h"
 
 
@@ -40,7 +40,7 @@ bool StiffnessMatrix::Read(FILE *f)
 				/*Do nothing, "false" is the default value*/;
 			else
 			{
-				Log::getInstance().AddWarning("\n   + Error reading analytical stiffness matrix definition.\n");
+				Log::AddWarning("\n   + Error reading analytical stiffness matrix definition.\n");
 				return false;
 			}
 		}
@@ -54,7 +54,7 @@ bool StiffnessMatrix::Read(FILE *f)
 					fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &disp_matrix_x, &disp_matrix_y, &disp_matrix_z,
 						   &rot_matrix_x, &rot_matrix_y, &rot_matrix_z) == EOF || strcmp(str, "Offsets"))
 				{
-					Log::getInstance().AddWarning("\n   + Error reading numerical stiffness matrix data.\n");
+					Log::AddWarning("\n   + Error reading numerical stiffness matrix data.\n");
 					return false;
 				}
 			}

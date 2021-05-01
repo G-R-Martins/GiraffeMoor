@@ -25,7 +25,6 @@ Table::Table(const Table& toCopy)
 }
 
 
-
 //Push back a new line
 void Table::SetLine(const double& time, const double& V1, const double& V2, const double& V3, const double& V4, const double& V5, const double& V6)
 {
@@ -44,7 +43,7 @@ void Table::SetStartTime(const double& start_time, const size_t& start_line)
 }
 
 
-void  Table::Write(FILE *f) const
+void Table::Write(FILE *f) const
 {
 	//Escrita da tabela
 	for (int i = 0; i < (int)table.size(); i++)
@@ -56,7 +55,7 @@ void  Table::Write(FILE *f) const
 	}
 }
 
-unsigned int  Table::GetLines() const
+unsigned int Table::GetLines() const
 {
 	return static_cast< unsigned int >(table.size());
 }
@@ -64,37 +63,59 @@ unsigned int  Table::GetLines() const
 //Reads input file
 bool Table::Read(FILE *f)
 {
-	char s[1000];
-	table.clear();
+	char s[256];
 	fpos_t pos;
-	fgetpos(f, &pos);
 	bool flag_not_digit = false;
-	fscanf(f, "%s", s);
-	int col = 0;
-	int lin = 0;
-	while (!flag_not_digit)
+
+	//Reads data
+	for (size_t lin = 0; !flag_not_digit; ++lin)
 	{
-		if (col == 0)
-			table.emplace_back(std::array{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0 });
-		
-		table[lin][col]=atof(s);
-		//Próxima leitura
-		fgetpos(f, &pos);
-		if (fscanf(f, "%s", s) == EOF)
-			return true;
-		if (!isdigit(s[0]) && s[0]!='-' && s[0] != '.')
-			flag_not_digit = true;
-		else
+		//Creates a new line and set the time
+		if (!flag_not_digit && !fgetpos(f, &pos) && fscanf(f, "%s", s) != EOF ///check for digit and read next word
+			&& (isdigit(s[0]) || s[0] == '.')) ///check for valid input (must be a positive number)
+			table.emplace_back(std::array{ atof(s), 0.0, 0.0 , 0.0 , 0.0 , 0.0 , 0.0 });
+		else 
+			break;
+
+		//Reads values
+		///					   check digit        save position     read word and check for EOF       
+		for (size_t col = 1; !flag_not_digit && !fgetpos(f, &pos) && fscanf(f, "%s", s) != EOF
+			 && col != 6; ++col)///update column
 		{
-			if (col != 6)
-				col++;
+			//Check if a number was readed and assign to the current position on table
+			if (!isdigit(s[0]) && s[0] != '-' && s[0] != '.')
+				flag_not_digit = true;
 			else
-			{
-				lin++;
-				col = 0;
-			}
+				table[lin][col] = atof(s);
 		}
 	}
+
+	//fscanf(f, "%s", s);
+	//int col = 0;
+	//int lin = 0;
+	//while (!flag_not_digit)
+	//{
+	//	if (col == 0)
+	//		table.emplace_back(std::array<double, 7 >{0.0});
+	//	
+	//	table[lin][col]=atof(s);
+	//	//Próxima leitura
+	//	fgetpos(f, &pos);
+	//	if (fscanf(f, "%s", s) == EOF)
+	//		return true;
+	//	if (!isdigit(s[0]) && s[0] != '-' && s[0] != '.')
+	//		flag_not_digit = true;
+	//	else
+	//	{
+	//		if (col != 6)
+	//			++col;
+	//		else
+	//		{
+	//			++lin;
+	//			col = 0;
+	//		}
+	//	}
+	//}
 	fsetpos(f, &pos);
 	return true;
 }

@@ -3,11 +3,19 @@
 
 namespace AuxFunctions
 {
-	/*************************************************
-	 *					                             *
-	 * Functions to read comments and check keywords *
-	 *					                             *
-	 *************************************************/
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+		 *					                                 *
+		 *   Functions to read comments and check keywords   *
+		 *					                                 *
+		 * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	/// <summary>
+	///	
+	/// In this namespace some auxiliary functions to the 'LoopReading' 
+	/// are defined, which goals are to read comment and check for valid keyword.
+	/// 
+	/// </summary>
+
 
 /*-+-+-+-+-+-*
  *  Headers  *

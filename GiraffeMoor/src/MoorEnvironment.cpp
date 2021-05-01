@@ -38,7 +38,7 @@ bool MoorEnvironment::Read(FILE *f)
 	if (!readOk)
 	{
 		ss += "\n   + Error reading general environment data.";
-		Log::getInstance().AddWarning(ss);
+		Log::AddWarning(ss);
 		return false;
 	}
 
@@ -53,7 +53,7 @@ bool MoorEnvironment::Read(FILE *f)
 		else
 		{
 			ss += "\n   + Error reading seabed data.";
-			Log::getInstance().AddWarning(ss);
+			Log::AddWarning(ss);
 			return false;
 		}
 		
@@ -61,7 +61,7 @@ bool MoorEnvironment::Read(FILE *f)
 		if (!seabed.Read(f))
 		{
 			ss += "\n   + Error reading seabed data.";
-			Log::getInstance().AddWarning(ss);
+			Log::AddWarning(ss);
 			return false;
 		}
 		readOk = false;
@@ -78,7 +78,7 @@ bool MoorEnvironment::Read(FILE *f)
 	if (isdigit(str[0]))
 	{
 		ss += "\n   + Error reading se current data.";
-		Log::getInstance().AddWarning(ss);
+		Log::AddWarning(ss);
 		return false;
 	}
 
@@ -93,7 +93,7 @@ bool MoorEnvironment::Read(FILE *f)
 		if (fscanf(f, "%s", str) == EOF || strcmp(str, "Depth"))
 		{
 			ss += "\n   + Error reading sea current data.";
-			Log::getInstance().AddWarning(ss);
+			Log::AddWarning(ss);
 			return false;
 		}
 

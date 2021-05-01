@@ -1,15 +1,29 @@
 #pragma once
-#include "ReadingAuxiliaryFunctions.h"
+#include "AuxFunctions.h"
 #include "Log.h"
 
 
 namespace LoopReading
 {
-		/* * * * * * * * * * * *
-		 *					   *
-		 * Templates functions *
-		 *					   *
-		 * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+		 *					                                             *
+		 *                      Templates functions                      *
+		 *                                                               *
+		 *  To read input file in loops when many objects can be created *
+		 *					                                             *
+		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+	/// <summary>
+	///	
+	/// There is some functions that might seems to be unecessary repeated.
+	/// This choice was made to avoid some 'if' statements 
+	/// and to clarify when use ordered or unordered containers.
+	///	
+	/// Some examples are given before every function definition.
+	/// 
+	/// </summary>
+
 
 /*-+-+-+-+-+-+-+-+
  First keyword(s)
@@ -48,7 +62,7 @@ namespace LoopReading
 			if (removed > 0)
 			{
 				std::string warning = "\n   + " + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
-				Log::getInstance().AddWarning(warning);
+				Log::AddWarning(warning);
 			}
 			c.shrink_to_fit();
 		}
@@ -118,7 +132,7 @@ namespace LoopReading
 			if (removed > 0)
 			{
 				std::string warning = "\n   + " + std::to_string(removed) + " repeated \"" + std::string(*keyword_set.begin()) + "(s)\" removed.";
-				Log::getInstance().AddWarning(warning);
+				Log::AddWarning(warning);
 			}
 			
 			c.shrink_to_fit();

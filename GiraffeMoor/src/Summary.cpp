@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "Summary.h"
 #include "MooringModel.h"
+#include "Log.h"
 
 
 //Global object
@@ -8,7 +9,7 @@ extern MooringModel mm;
 
 //Constants
 constexpr int SizeColumn = 10; //Columns size to print table with line summary
-constexpr int precision = 6;  //Precision for doubles
+constexpr int precision = 6;   //Precision for doubles
 
 
 Summary::Summary()
@@ -16,13 +17,14 @@ Summary::Summary()
 {}
 
 //Creates summary file 
-void Summary::CreateSumFile(const std::string& name_with_folder, const std::string& version)
+void Summary::CreateSumFile_Impl(const std::string& name_with_folder, const std::string& version)
 {
 	summ_name = name_with_folder + ".sum";
 	std::ofstream sum_file(summ_name, std::ios::out | std::ios::binary);
 	if (!sum_file)
 	{
-		std::cout << "The summary file could not be created.\n";
+		Log::AddWarning("The summary file could not be created.\n");
+		return;
 	}
 	sum_file << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
 	sum_file << "|                                                       |\n";
@@ -50,26 +52,28 @@ void Summary::CreateSumFile(const std::string& name_with_folder, const std::stri
 }
 
 //Modifies summary file 
-void Summary::Append2File()
+void Summary::Append2File_Impl()
 {
 	//Append to summary file
 	std::ofstream sum_file(summ_name, std::ofstream::app);
 	if (!sum_file.good())
 	{
-		std::cout << "Cannot open the summary file!\n";
-		std::cin.get();
+		Log::AddWarning("Cannot open the summary file!\n");
+		return;
 	}
+
+	int cur_section = 0;
 
 	//=======================================================================
 	//Lines header
-	sum_file << ( int )Level::Lines << ") Lines\n";
+	sum_file << ++cur_section << ") Lines\n";
 
 	for (const SummLines& line : lines)
 		sum_file << line;
 
 	//=======================================================================
 	//Vessels header
-	sum_file << ( int )Level::Vessels << ") Vessels\n";
+	sum_file << ++cur_section << ") Vessels\n";
 
 	//Vessel data
 	for (Vessel& vessel : mm.vessel_vector)
@@ -83,7 +87,7 @@ void Summary::Append2File()
 
 	//=======================================================================
 	//Environment header
-	sum_file << ( int )Level::Environment << ") Environment\n";
+	sum_file << ++cur_section << ") Environment\n";
 
 	//Environment data
 	sum_file << "\tWater depth: " << mm.environment.waterdepth << "m\n";
@@ -95,6 +99,10 @@ void Summary::Append2File()
 	//Case with sea current
 	else
 	{
+		//Maximum and minumum values for the sea current speed
+		double max_speed = 0.0, min_speed = 100.0;
+		double value_const_seacur = 0.0;
+
 		//Assuming sea current is constant
 		mm.environment.const_seacurrent = true;
 		value_const_seacur = mm.environment.seacurrent_vector[0].speed;
@@ -129,7 +137,7 @@ void Summary::Append2File()
 
 	//=======================================================================
 	//Solution header
-	sum_file << ( int )Level::Solution << ") Solution steps\n";
+	sum_file << ++cur_section << ") Solution steps\n";
 
 	//Formating output
 	sum_file.setf(std::ios::scientific);
@@ -144,15 +152,14 @@ void Summary::Append2File()
 	sum_file << '\n';
 
 
-
-	
 	//=======================================================================
 	//Check if the analytical stiffness matrix of the system was calculated
 	if (mm.stiff_matrix && mm.stiff_matrix->bool_ana)
 	{
 	//Stiffness matrix header
-		sum_file << ( int )Level::StiffMatrix << ") Analytical stiffness matrix\n";
+		sum_file << ++cur_section << ") Analytical stiffness matrix\n";
 
+		//Close file
 		sum_file.close();
 
 		//Check residuos and print to file
@@ -164,19 +171,24 @@ void Summary::Append2File()
 		sum_file.close();
 }
 
-void Summary::AddLine(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
+void Summary::AddLine_Impl(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
 					  const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
 					  const unsigned int& number, const std::string_view& configuration,
 					  bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs)
 {
-	Get().lines.emplace_back(SummLines());
-	Get().lines.back().extremities = std::make_pair(Summary::LineExtremities({ nodes[0], elements[0], nodesets[0], tensions[0] }), Summary::LineExtremities({ nodes[1], elements[1], nodesets[1], tensions[1] }));
-	Get().lines.back().number = number;
-	Get().lines.back().config = configuration;
-	Get().lines.back().hasTDP = TDP;
-	Get().lines.back().tdp_pos = x_tdp;
-	Get().lines.back().len = total_length;
-	Get().lines.back().segs = segs;
+	lines.emplace_back(SummLines());
+	lines.back().extremities = std::make_pair(Summary::LineExtremities({ nodes[0], elements[0], nodesets[0], tensions[0] }), Summary::LineExtremities({ nodes[1], elements[1], nodesets[1], tensions[1] }));
+	lines.back().number = number;
+	lines.back().config = configuration;
+	lines.back().hasTDP = TDP;
+	lines.back().tdp_pos = x_tdp;
+	lines.back().len = total_length;
+	lines.back().segs = segs;
+}
+
+std::vector<std::tuple<double, double, std::string>>& Summary::GetSteps_Impl()
+{
+	return steps;
 }
 
 std::ostream& operator<<(std::ostream& out, const Summary::SummLines& line)

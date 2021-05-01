@@ -3,11 +3,23 @@
 #include "GiraffeModel.h"
 
 
+enum class FirstLevelKeyword
+{
+	None = 0,				//Initial value
+	EndOfFile = -1,			//End
+	Error = -100,			//Invalid keyword
+	CommentAfterBlock = 1,	//Comment after a block with only first level keyword
+
+	//Mandatory keywords
+	Environment = 10, Keypoints, Lines, Vessels, SegmentProperties, Solution,
+
+	//Optional keywords
+	VesselDisplacements = 101, Platforms, GiraffeConvergenceCriteria, Monitors,
+	PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces, SegmentSets
+};
+
 class IO
 {
-public:
-	IO();
-	~IO();
 
 	/*------------------------------------------------------------------------------------+
 	|                                                                                     |
@@ -23,35 +35,8 @@ public:
 
 public:
 
-	//==========================================================================================================================
-
-	/*------
-	Keywords
-	-------*/
-
-
-	enum class FirstLevelKeyword
-	{
-		//Initial value
-		None = 0,
-
-		//EOF
-		EndOfFile = -1,
-
-		Error = -100,
-		//ERROR
-
-		//Comment after a block with only first level keyword
-		CommentAfterBlock = 1, 
-
-		//Mandatory keywords
-		Environment = 10, Keypoints, Lines, Vessels, SegmentProperties, Solution,
-
-		//Optional keywords
-		VesselDisplacements = 101, Platforms, GiraffeConvergenceCriteria, Monitors,
-		PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces, SegmentSets
-
-	} cur_level; //Manages the reading first level (blue bold words)
+	//Manages the reading first level (blue bold words)
+	static FirstLevelKeyword cur_level; //Manages the reading first level (blue bold words)
 
 	//==========================================================================================================================
 
@@ -62,14 +47,14 @@ public:
 					+-+-+-+-+-+-+-+-*/
 
 	//Reads input file
-	bool ReadFile();
+	static bool ReadFile();
 
 	//Writes Giraffe input file
-	void WriteGiraffeModelFile();
+	static void WriteGiraffeModelFile();
 
 	//Reads first level keyword (blue bold words)
-	bool ReadKeyword(FILE* f, fpos_t& pos, char* word);
+	static bool ReadKeyword(FILE* f, fpos_t& pos, char* word);
 
 	//Checks model
-	bool CheckModel();
+	//static bool CheckModel();
 };

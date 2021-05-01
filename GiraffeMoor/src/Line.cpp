@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Line.h"
-#include "TemplateReading.h"
+#include "LoopReading.h"
 #include "Log.h"
 
 
@@ -120,7 +120,7 @@ bool Line::Read(FILE *f)
 		number = atoi(str);
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading the ID number of a line");
+		Log::AddWarning("\n   + Error reading the ID number of a line");
 		return false;
 	}
 
@@ -150,7 +150,7 @@ bool Line::Read(FILE *f)
 		if (hasAnchor)
 		{
 			std::string warning = "\n   + The line number " + std::to_string(number) + " supposed to be addressed to a vessel.";
-			Log::getInstance().AddWarning(warning);
+			Log::AddWarning(warning);
 			return false;
 		}
 		fsetpos(f, &pos);
@@ -191,7 +191,7 @@ bool Line::Read(FILE *f)
 	if (!readOk)
 	{
 		std::string warning = "\n   + Error reading parameters of line " + std::to_string(number);
-		Log::getInstance().AddWarning(warning);
+		Log::AddWarning(warning);
 		return false;
 	}
 	
@@ -203,7 +203,7 @@ bool Line::Read(FILE *f)
 			( !fgetpos(f, &pos) && fscanf(f, "%s", str) == EOF )) //Segment after TDZ
 		{
 			std::string warning = "\n   + Error reading touchdown zone of line number " + std::to_string(number);
-			Log::getInstance().AddWarning(warning);
+			Log::AddWarning(warning);
 			return false;
 		}
 	}
@@ -224,7 +224,7 @@ bool Line::Read(FILE *f)
 															 f, pos, str))
 		{
 			std::string warning = "\n   + Error reading a segment of the line number " + std::to_string(number);
-			Log::getInstance().AddWarning(warning);
+			Log::AddWarning(warning);
 			return false;
 		}
 	}

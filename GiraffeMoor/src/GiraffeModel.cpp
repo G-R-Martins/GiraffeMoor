@@ -314,6 +314,15 @@ void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const u
 	ptr->node_set = node_set;
 	ptr->cs = cs;
 }
+void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, 
+											 const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times)
+{
+	displacement_vector.emplace_back(new NodalDisplacement(file_name, header_lines, n_times));
+	NodalDisplacement* ptr = static_cast< NodalDisplacement* >( displacement_vector.back() );
+	ptr->number = number;
+	ptr->node_set = node_set;
+	ptr->cs = cs;
+}
 void GiraffeModel::GenerateDisplacementField(const unsigned int& number, const unsigned int& cs, const unsigned int& solution_step)
 {
 	displacement_vector.emplace_back(new DisplacementField());
@@ -418,6 +427,15 @@ void GiraffeModel::GenerateNodalForce(const unsigned int& number, const unsigned
 	ptr->number = number;
 	ptr->nodeset = nodeset;
 }
+void GiraffeModel::GenerateNodalForce(const unsigned int& number, const unsigned int& nodeset, 
+						  const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times)
+{
+	load_vector.emplace_back(new NodalForce(file_name, header_lines, n_times));
+	//Pointer to the NodalForce
+	NodalForce* ptr = static_cast< NodalForce* >( load_vector.back() );
+	ptr->number = number;
+	ptr->nodeset = nodeset;
+}
 void GiraffeModel::GenerateNodalForce(const unsigned int& number, const unsigned int& nodeset, MathCode* mathCode)
 {
 	load_vector.emplace_back(new NodalForce(mathCode));
@@ -448,7 +466,7 @@ bool GiraffeModel::ReadGiraffeAddress(FILE *f)
 		run_giraffe = true;
 	else
 	{
-		Log::getInstance().AddWarning("\n   + Error reading keyword to call Giraffe. It must be 'run'.");
+		Log::AddWarning("\n   + Error reading keyword to call Giraffe. It must be 'run'.");
 		return false;
 	}
 	

@@ -75,7 +75,7 @@ bool MathCode::Read(FILE *f)
 			equations[i] = str;
 		else
 		{
-			Log::getInstance().AddWarning("\n   + Error reading MathCode line");
+			Log::AddWarning("\n   + Error reading MathCode line");
 			return false;
 		}
 

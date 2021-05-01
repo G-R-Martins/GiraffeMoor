@@ -1,82 +1,74 @@
+//Pre-compiled headers
 #include "PCH.h"
 //Databases
 #include "GiraffeModel.h"
 #include "MooringModel.h"
-//Input/Output
+//Pure static class to manage input/output
 #include "IO.h"
+//Singletons
 #include "Summary.h"
-//Static 'Log' member
 #include "Log.h"
 
 
 //Global objects
 MooringModel mm;
 GiraffeModel gm;
-IO io;
-
 
 //Global variables
 std::string name_input;
 std::string folder_name;
 std::string name;	//with directory and extension
-std::string version("0.1.30");
+std::string version("0.01.32");
+
+//Run Giraffe (if is in release mode)
+void RunGiraffe();
 
 
 int main(int argc, char* argv[])
 {
 	//Reading input data
-	if (!io.ReadFile())
-	{
-		std::string reading_error = "\n   + Error at \"" + std::string(Log::getInstance().GetLastKeyword()) + "\" block.";
-		Log::getInstance().AddError(reading_error);
-		Log::getInstance().AddFinalMessage("\n\nGiraffeMoor execution has failed during reading process.\nCheck your input file with the hint(s) from warning message(s).");
-	}
+	if (!IO::ReadFile())
+		Log::SetError(Log::Error::Reading);
 	else
 	{
 		//Creates SummaryFile (with header)
-		Summary::Get().CreateSumFile(folder_name + name_input, version);
+		Summary::CreateSumFile(folder_name + name_input, version);
 
 		//Creates FEM model
 		if (mm.GenerateGiraffeModel())
 		{
 			//Add description to summary file 
-			Summary::Get().Append2File();
+			Summary::Append2File();
 
 			//GIRAFFE input file
-			io.WriteGiraffeModelFile();
+			IO::WriteGiraffeModelFile();
 
-			//End message
-			if (!gm.run_giraffe)
-				Log::getInstance().AddFinalMessage(std::string_view("\n\nGiraffeMoor execution has finished successfully!"));
-
-			//Run Giraffe if is in release mode
 #if _DEBUG == 0
-			if (gm.run_giraffe)
-			{
-				system("CLS");
-				std::string GiraffeFile = "Giraffe.exe " + name_input;
-				system(GiraffeFile.c_str());
-			}
+			RunGiraffe(); 
 #endif
 		}
-		else
-		{
-			Log::getInstance().AddError("\n   + Error generating FE model.");
-			Log::getInstance().AddFinalMessage("\n\nGiraffeMoor execution has failed during FE model construction. Please, check your input data.");
-		}
+		else //ERROR
+			Log::SetError(Log::Error::FEM_Generation);
 	}
-	Log::getInstance().AddFinalMessage("\nPress enter key to close GiraffeMoor."); //Same with(out) errors
-	
 	
 	//Check for error and/or warning messages
-	if (Log::getInstance().Check4Errors())		Log::getInstance().ShowErrors();
-	if (Log::getInstance().Check4Warnings())	Log::getInstance().ShowWarnings();
-
-	//Print final message
-	Log::getInstance().ShowFinalMessage();
+	Log::CheckLogs();
 	
-	//PlaySound(TEXT("C:\\Windows\\Media\\Windows Notify System Generic.wav"), NULL, SND_SYNC);
-
+	//Wait until enter key is pressed before close the console
 	std::cin.get();
 	return 0;
+}
+
+
+//Run Giraffe if is in release mode
+void RunGiraffe()
+{
+	if (gm.run_giraffe)
+	{
+		system("CLS");
+		std::string GiraffeFile = "Giraffe.exe " + name_input;
+		system(GiraffeFile.c_str());
+	}
+	else //only prints this message if Giraffe solver is not called
+		Log::AddFinalMessage("\n\nGiraffeMoor execution has finished successfully!");
 }

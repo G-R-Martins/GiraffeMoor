@@ -1,40 +1,50 @@
 Keypoints
 	//Anchor node
-	Keypoint	1	X 0.0	Y 0.0	Z -305.0
+	Keypoint	1	X 0.0	Y 0.0	Z -310.0
 	//Top node
-	Keypoint	2	X 0.0	Y 0.0	Z -5.0
-	//Vessel
+	Keypoint	2	X 0.0	Y 0.0	Z -10.0
+	//Vessel - artifcial for this case
 	Keypoint	3	X 0.0	Y 0.0	Z 0.0
 
 Vessels
 	Vessel	1	PilotNode	3	InertiaTensor	0 0 0 0 0 0	Mass 0
 	
 Lines
-	Line 1 	Anchor 1 	Fairlead 2 	VesselID 1 	
-		Segment	Length 299	Property 1	Discretization 50
+	Line 1 	Fairlead 1 	Fairlead 2 	
+		Length 300	Property 1	Discretization 50
 	
 Solution
 	Analysis
-		// Initial offset
+	//Initial offset
 		Step 1 static 	Time 1	TimeStep 1	MinTimeStep 1e-3	Sample 1	
-		//Parametric excitation
-		Step 2 dynamic 	Time 30	TimeStep  5e-3	MinTimeStep 1e-5	Sample 20	
+	//Harmonic field -> imperfection
+		Step 2 static 	Time 1	TimeStep 1	MinTimeStep 1e-3	Sample 1	
+	//Parametric excitation
+		Step 3 dynamic 	Time 1	TimeStep  5e-3	MinTimeStep 1e-5	Sample 20	NumericalDamping null
 	
 	
 SegmentProperties 
 	SegmentProperty	1 beam	
 		SpecificMass 110.6649134 	Diameter  0.2032 	
-		EA 2.837561882946e+09 	EI 1.1441758902509e+07 	GJ 8.80135300192997e+06 	GA 1.09136995497923e+09 	CDt 0	CDn 1.0	CAt 0.0	CAn	1.0
+		EA 2.837561882946e+9 	EI 1.1441758902509e+7 	
+		GJ 8.80135300192997e+6 	GA 1.09136995497923e+9 	
+		CDt 0	CDn 1.0	CAt 0.0	CAn	1.0
 	
 Environment
-	Gravity	9.81	RhoFluid 1025	WaterDepth 305
-	Seabed	flat	Stiffness 3e6	Damping 1e2	FrictionCoefficient	0.2
+	Gravity	9.81	RhoFluid 1025	WaterDepth 310
+	Seabed	flat	
+		Stiffness 3e6	Damping 1e2	FrictionCoefficient	0.2
 
 
 /////////////////////////////////////////////////////////////////////////
 //	Optional blocks												
 /////////////////////////////////////////////////////////////////////////
 
+PostProcessing
+	PostFiles ContactSurface
+
+// DisplacementField
+	
 
 /* VesselDisplacements
 	VesselDispID 1

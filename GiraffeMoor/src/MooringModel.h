@@ -1,7 +1,6 @@
 #pragma once
 
 //Database headers
-#include "IO.h"
 #include "GiraffeModel.h"
 
 //Mooring model Objets -> read and manipulate data
@@ -255,14 +254,14 @@ public:
 	//Analysis steps 
 	void GenerateAnalysisSteps(unsigned int& step, double& start);
 
-	void GenerateVesselDisplacements(unsigned int& step, double& start);
+	void GenerateVesselDisplacements(unsigned int& step);
 	//Creates applied forces
 	void GenerateForces();
 
 
 
 	//Gera fundo do mar (superficie de contato)
-	void GenerateSeaBed();
+	void GenerateSeabed();
 
 	//Generates constraints
 	void GenerateConstraints();

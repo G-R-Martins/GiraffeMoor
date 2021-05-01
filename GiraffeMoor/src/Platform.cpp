@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Platform.h"
-#include "TemplateReading.h"
+#include "LoopReading.h"
 #include "GiraffeModel.h"
 
 extern GiraffeModel gm;
