@@ -309,7 +309,7 @@ void IO::WriteGiraffeModelFile()
 
 	fprintf(f, "\n/*Units:\n\tTime: s\n\tMass: kg\n\tLinear: m\n\tForce: N\n\tRotation: rad\n\tAzimuth: degree\n*/\n");
 
-	fprintf(f, "\nSolutionSteps\t%d\n", ( int )gm.solution_vector.size());
+	fprintf(f, "\nSolutionSteps\t%zd\n", gm.solution_vector.size());
 	for (Solution* sol : gm.solution_vector)
 		sol->WriteGiraffeModelFile(f);
 
@@ -319,71 +319,74 @@ void IO::WriteGiraffeModelFile()
 	fprintf(f, "\nPostFiles\n");
 	gm.post.WriteGiraffeModelFile(f);
 
+	fprintf(f, "\nSolverOptions\n");
+	gm.solver_opt.WriteGiraffeModelFile(f);
+
+	fprintf(f, "\nConvergenceCriteria\n");
+	gm.conv_criteria.WriteGiraffeModelFile(f);
+
 	/***********************
 	 * SORT NODESET VECTOR *
 	 ***********************/
 	std::sort(gm.node_set_vector.begin(), gm.node_set_vector.end());
 
-	fprintf(f, "\nNodeSets\t%d\n", ( int )gm.node_set_vector.size());
+	fprintf(f, "\nNodeSets\t%zd\n", gm.node_set_vector.size());
 	for (NodeSet& ns : gm.node_set_vector)
 		ns.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nConstraints\t%d\n", ( int )gm.constraint_vector.size());
-	for (Constraint* constraint : gm.constraint_vector)
-		constraint->WriteGiraffeModelFile(f);
-
-	fprintf(f, "\nContacts\t%d\n", ( int )gm.contact_vector.size());
-	for (Contact* cont : gm.contact_vector)
-		cont->WriteGiraffeModelFile(f);
-
-	fprintf(f, "\nPipeSections\t%d\n", ( int )gm.pipe_section_vector.size());
+	fprintf(f, "\nPipeSections\t%zd\n", gm.pipe_section_vector.size());
 	for (PipeSection& ps : gm.pipe_section_vector)
 		ps.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nRigidBodyData\t%d\n", ( int )gm.rbdata_vector.size());
+	fprintf(f, "\nRigidBodyData\t%zd\n", gm.rbdata_vector.size());
 	for (RigidBodyData& rbdata : gm.rbdata_vector)
 		rbdata.WriteGiraffeModelFile(f);
+
+	fprintf(f, "\nConstraints\t%zd\n", gm.constraint_vector.size());
+	for (Constraint* constraint : gm.constraint_vector)
+		constraint->WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nEnvironment\n");
 	gm.environment.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nSurfaces\t%d\n", ( int )gm.oscillatory_vector.size());
+	fprintf(f, "\nContacts\t%zd\n", gm.contact_vector.size());
+	for (Contact* cont : gm.contact_vector)
+		cont->WriteGiraffeModelFile(f);
+
+	fprintf(f, "\nSurfaces\t%zd\n", gm.oscillatory_vector.size());
 	for (OscillatorySurf& osc_surf : gm.oscillatory_vector)
 		osc_surf.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nSurfaceSets\t%d\n", ( int )gm.surface_set_vector.size());
+	fprintf(f, "\nSurfaceSets\t%zd\n", gm.surface_set_vector.size());
 	for (SurfaceSet& surf_set : gm.surface_set_vector)
 		surf_set.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nConvergenceCriteria\n");
-	gm.conv_criteria.WriteGiraffeModelFile(f);
-
-	fprintf(f, "\nSpecialConstraints\t%d\n", ( int )gm.special_constraint_vector.size());
-	for (SpecialConstraint*  spec_constr : gm.special_constraint_vector)
-		spec_constr->WriteGiraffeModelFile(f);
-
-	fprintf(f, "\nCoordinateSystems\t%d\n", ( int )gm.cs_vector.size());
+	fprintf(f, "\nCoordinateSystems\t%zd\n", gm.cs_vector.size());
 	for (CoordinateSystem& cood_sys : gm.cs_vector)
 		cood_sys.WriteGiraffeModelFile(f);
 
-	if (!gm.load_vector.empty())
-	{
-		fprintf(f, "\nLoads\t%d\n", ( int )gm.load_vector.size());
-		for (Load* load : gm.load_vector)
-			load->WriteGiraffeModelFile(f);
-	}
+	fprintf(f, "\nSpecialConstraints\t%zd\n", gm.special_constraint_vector.size());
+	for (SpecialConstraint*  spec_constr : gm.special_constraint_vector)
+		spec_constr->WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nElements\t%d\n", ( int )gm.element_vector.size());
+	fprintf(f, "\nElements\t%zd\n", gm.element_vector.size());
 	for (Element* element : gm.element_vector)
 		element->WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nNodes\t%d\n", ( int )gm.node_vector.size());
+	fprintf(f, "\nNodes\t%zd\n", gm.node_vector.size());
 	for (Node& node : gm.node_vector)
 		node.WriteGiraffeModelFile(f);
 
-	fprintf(f, "\nDisplacements\t%d\n", ( int )gm.displacement_vector.size());
+	fprintf(f, "\nDisplacements\t%zd\n", gm.displacement_vector.size());
 	for (Displacement* disp  :gm.displacement_vector)
 		disp->WriteGiraffeModelFile(f);
+
+	if (!gm.load_vector.empty())
+	{
+		fprintf(f, "\nLoads\t%zd\n", gm.load_vector.size());
+		for (Load* load : gm.load_vector)
+			load->WriteGiraffeModelFile(f);
+	}
 
 	fclose(f);
 }

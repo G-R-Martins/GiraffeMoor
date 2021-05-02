@@ -4,7 +4,7 @@
 |                                                       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-File created on: Apr 29, 2021 at 18h17min 
+File created on: May  2, 2021 at 10h38min 
 
 1) Lines
 	Line 1
@@ -102,9 +102,8 @@ File created on: Apr 29, 2021 at 18h17min
 	[2] 1.000e+00s - 2.000e+00s : Applying prescribed displacement field
 	[3] 2.000e+00s - 3.000e+00s : Coupling fairleads statically
 	[4] 3.000e+00s - 4.000e+00s : Static step
-		- Applying load at vessel 1 with data from file "teste.csv"
+		- Applying load at vessel 1 with MathCode
 	[5] 4.000e+00s - 6.000e+00s : Static step
-		- Displacement of the vessel 1 with data from file "teste.csv"
 	[6] 6.000e+00s - 8.000e+00s : Static step
 		- Displacement of the vessel 2 with MathCode
 
@@ -113,7 +112,7 @@ File created on: Apr 29, 2021 at 18h17min
 |  1.41714e+05	      0     	      0     	      0     	 -2.14515e+05	      0     	|
 |       0     	 1.41714e+05	      0     	 2.14515e+05	      0     	 7.08572e+07	|
 |       0     	      0     	 3.82932e+04	      0     	 -1.91466e+07	      0     	|
-|       0     	 2.14515e+05	      0     	 1.74538e+08	      0     	 1.07257e+08	|
+|       0     	 2.14515e+05	      0     	 1.74538e+08	      0     	 1.07258e+08	|
 |  -2.14515e+05	      0     	 -1.91466e+07	      0     	 1.93211e+10	      0     	|
-|       0     	 7.08572e+07	      0     	 1.07257e+08	      0     	 7.10912e+10	|
+|       0     	 7.08572e+07	      0     	 1.07258e+08	      0     	 7.10912e+10	|
 

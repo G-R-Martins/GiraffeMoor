@@ -37,6 +37,9 @@ Solution
 		Step 1 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 2 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 3 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
+	Solver
+		Processors 2 LinSys iterative
+	
 	
 SegmentProperties 
 	//Mooring
@@ -53,9 +56,9 @@ Environment
 
 
 VesselDisplacements
-	 VesselDispID	1 
-		Step	2 
-		File "teste.csv" HeaderLines 1 NTimes 11
+	 // VesselDispID	1 
+		// Step	2 
+		// File "teste.csv" HeaderLines 1 NTimes 11
 		 // TimeSeries
 			 // 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
 			 // .10	-1.1494725	0	0.0361393	0	0.0165411	0
@@ -81,9 +84,9 @@ StiffnessMatrix
 
 NodalForces
 	Node vessel 1 Step 1
-		File "teste.csv" HeaderLines 1 NTimes 11
-	// MathCode 
-		// Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+	MathCode 
+		Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+		// File "teste.csv" HeaderLines 1 NTimes 11
 	// Node vessel 2 Step 3
 		// File "teste.csv"
 		//0.05	-1.1453697	0	0.0162558	0	0.0167063	0
