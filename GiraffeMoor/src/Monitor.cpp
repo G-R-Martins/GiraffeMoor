@@ -36,7 +36,7 @@ bool Monitor::Read(FILE *f)
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
 	AuxFunctions::TryComment(f);
 
-	uset keywords({ "Nodes","Elements","Contacts" });
+	uset keywords({ "Nodes", "Elements", "Contacts" });
 	uset::iterator it;
 
 	//Loop to read data

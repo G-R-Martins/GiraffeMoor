@@ -41,10 +41,11 @@ public:
 	//Time step for release forces
 	double release_timestep;
 
+
 	/*--------------------
 	Sea current parameters
 	---------------------*/
-
+	
 	//Sea current time step
 	double seacurrent_timestep;
 	
@@ -54,12 +55,26 @@ public:
 	//Sea current minimum time step
 	double seacurrent_min_timestep;
 	
+	
+	/*-----------
+	Steps options
+	------------*/
+
 	//Steps before analysis
 	unsigned int steps_to_set_model;
 
 	//Container with analysis steps
 	std::vector <SolutionStep> solution_steps;
 
+	
+	///
 	/// TODO: use multiple cores 
-	int ncores;
+	///
+	
+	//Number of cores used for Giraffe
+	unsigned int ncores;
+
+	//Linear system solver option
+	/// if is not direct, it will be defined as 'iterative'
+	bool lin_sys_isDirect;
 };

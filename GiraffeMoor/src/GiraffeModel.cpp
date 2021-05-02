@@ -201,10 +201,14 @@ void GiraffeModel::GenerateCoordinateSystem(unsigned int number, Matrix& E1, Mat
 }
 void GiraffeModel::GenerateCoordinateSystem(unsigned int number, const std::array<double,3>& E1, const std::array<double, 3>& E3)
 {
-	cs_vector.emplace_back();// CoordinateSystem());
+	cs_vector.emplace_back();
 	cs_vector.back().number = number;
 	cs_vector.back().E1 = E1;
 	cs_vector.back().E3 = E3;
+}
+void GiraffeModel::GenerateSolverOptions(unsigned int cores, bool bool_direct)
+{
+	solver_opt.SetSolverOptions(cores, bool_direct);
 }
 void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& file)
 {

@@ -23,11 +23,11 @@ MooringModel::MooringModel()
 {
 	//Reserving positions for vectors
 	line_vector.reserve(32);
-	vessel_vector.reserve(32);
+	vessel_vector.reserve(16);
 	keypoint_vector.reserve(64);
-	segment_property_vector.reserve(64);
-	platform_vector.reserve(32);
-	anc_constraint.reserve(16);
+	segment_property_vector.reserve(16);
+	platform_vector.reserve(16);
+	anc_constraint.reserve(32);
 	vessel_constraint.reserve(16);
 }
 
@@ -1552,6 +1552,7 @@ void MooringModel::GeneralSetting()
 	//Monitor contact
 	if (gm.monitor.bool_contact_seabed_moor)	gm.monitor.contacts.push_front(1);
 
+
 	/*================*
 	 * Solution steps *
 	 *================*/
@@ -1572,6 +1573,12 @@ void MooringModel::GeneralSetting()
 	//Generate forces
 	if (!moorload_vector.empty())	
 		GenerateForces();
+
+
+	/******************
+	 * Solver options *
+	 ******************/
+	gm.GenerateSolverOptions(moorsolution.ncores, moorsolution.lin_sys_isDirect);
 }
 
 void MooringModel::SettingModelSteps(unsigned int& step, double& start)
