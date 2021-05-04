@@ -14,7 +14,7 @@ enum class FirstLevelKeyword
 	Environment = 10, Keypoints, Lines, Vessels, SegmentProperties, Solution,
 
 	//Optional keywords
-	VesselDisplacements = 101, Platforms, GiraffeConvergenceCriteria, Monitors,
+	VesselDisplacements = 101, DisplacementFields, Platforms, GiraffeConvergenceCriteria, Monitors,
 	PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces, SegmentSets
 };
 

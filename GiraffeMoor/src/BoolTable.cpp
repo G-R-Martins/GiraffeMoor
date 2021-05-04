@@ -40,10 +40,12 @@ BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bo
 
 BoolTable::BoolTable(BoolTable &copied)
 {
-	data_table.clear();
-	data_table.resize(copied.data_table.size());
-	for (int i = 0; i < copied.data_table.size(); i++)
-		data_table[i] = copied.data_table[i];
+	data_table.~vector();
+	//data_table.erase(data_table.begin(), data_table.end());
+	data_table = copied.data_table;
+	//data_table.resize(copied.data_table.size());
+	//for (int i = 0; i < copied.data_table.size(); i++)
+	//	data_table[i] = copied.data_table[i];
 }
 
 //Writes output file
@@ -84,32 +86,40 @@ void BoolTable::Set(int nargs, ...)
 		data_table.push_back(bcopy);
 	}
 
-		
 	/* clean memory reserved for valist */
 	va_end(valist);
 	//Print();
 }
 
-//Seta a tabela de dados booleanos
+//Clear bool table data
 void BoolTable::Clear()
 {
 	data_table.clear();
 }
 
+//Push back functions
 void BoolTable::Push_Back(const bool& bool_value)
 {
 	data_table.push_back(bool_value);
 }
-
 void BoolTable::Multiple_Push_Back(const BoolTable& bt)
 {
 	this->data_table.insert(this->data_table.end(), bt.data_table.begin(), bt.data_table.end());
 }
-
 void BoolTable::Multiple_Push_Back(const std::list <bool>& list)
 {
 	for (bool b : list)
 		data_table.push_back(b);
+}
+void BoolTable::Multiple_Push_Back(const std::forward_list <bool>& list)
+{
+	for (bool b : list)
+		data_table.push_back(b);
+}
+void BoolTable::Multiple_Push_Back(const bool& bool_value, const unsigned int& n_times)
+{
+	for (unsigned int cont = 0; cont < n_times; ++cont)
+		data_table.push_back(bool_value);
 }
 
 void BoolTable::Pop_Back()

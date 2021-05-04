@@ -40,6 +40,7 @@ bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 	else if (!strcmp(word, "GiraffeSolver"))		cur_level = FirstLevelKeyword::GiraffeSolver;
 	else if (!strcmp(word, "Constraints"))			cur_level = FirstLevelKeyword::Constraints;
 	else if (!strcmp(word, "NodalForces"))			cur_level = FirstLevelKeyword::NodalForces;
+	else if (!strcmp(word, "DisplacementFields"))	cur_level = FirstLevelKeyword::DisplacementFields;
 	//Comment after 
 	else if (word[0] == '/' && 
 			 AuxFunctions::ReadComment(f, word))	cur_level = FirstLevelKeyword::CommentAfterBlock;
@@ -224,6 +225,12 @@ bool IO::ReadFile()
 			if (!LoopReading::TryKeyword(mm.segment_set_vector, std::unordered_set<std::string_view>({ "Set" }), f, pos, str))
 				return false;
 			break;
+			
+			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+          DisplacementFields        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		case FirstLevelKeyword::DisplacementFields:
+			if (!LoopReading::TryKeyword(mm.disp_field_vector, std::unordered_set<std::string_view>({ "DispLineID" }), f, pos, str))
+				return false;
+			break;
 
 
 		//Three levels
@@ -263,9 +270,6 @@ bool IO::ReadFile()
 			return false;
 		}
 
-		//Last valid keyword
-		/*if (cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error)
-			Log::SetLastValidKeyword(str);*/
 	}
 END:	fclose(f);
 

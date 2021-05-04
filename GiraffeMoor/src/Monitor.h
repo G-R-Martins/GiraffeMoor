@@ -15,7 +15,6 @@ public:
 
 	//Reads input file
 	bool Read(FILE *f);
-	//bool ReadMonitorData(FILE* f, fpos_t& pos, std::unordered_set<std::string_view>& sub_keywords, char* str);
 
 	//Writes Giraffe file data
 	void WriteGiraffeModelFile(FILE *f) const;

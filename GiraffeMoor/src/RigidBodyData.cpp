@@ -11,7 +11,7 @@ RigidBodyData::~RigidBodyData()
 
 void RigidBodyData::WriteGiraffeModelFile(FILE *f) const
 {
-	if (comment.size() > 0)
+	if (!comment.empty())
 	{
 		fprintf(f, "\t//%s\n", comment.c_str());
 	}

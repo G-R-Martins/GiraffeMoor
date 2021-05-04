@@ -59,7 +59,6 @@ public:
 	/*-----------
 	Steps options
 	------------*/
-
 	//Steps before analysis
 	unsigned int steps_to_set_model;
 
@@ -67,10 +66,10 @@ public:
 	std::vector <SolutionStep> solution_steps;
 
 	
-	///
-	/// TODO: use multiple cores 
-	///
-	
+	/*------------
+	Solver options
+	-------------*/
+		
 	//Number of cores used for Giraffe
 	unsigned int ncores;
 

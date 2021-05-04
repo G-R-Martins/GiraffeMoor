@@ -171,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MoorLineDispFields.cpp" />
     <ClCompile Include="src\SolverOptions.cpp" />
     <ClCompile Include="src\SegmentSet.cpp" />
     <ClCompile Include="src\Log.cpp" />
@@ -251,6 +252,7 @@
     <ClCompile Include="src\Summary.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\MoorLineDispFields.h" />
     <ClInclude Include="src\SolverOptions.h" />
     <ClInclude Include="src\SegmentSet.h" />
     <ClInclude Include="src\Log.h" />

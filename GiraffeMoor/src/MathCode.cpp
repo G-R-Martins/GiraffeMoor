@@ -93,12 +93,12 @@ bool MathCode::Read(FILE *f)
 void MathCode::WriteGiraffeModelFile(FILE *f)
 {
 	//fprintf(f, "\tNodalDisplacement\t%d\tNodeSet\t%d\tCS\t%d\tMathCode\n", number, node_set, cs);
-	fprintf(f, "\t//X\n\tBegin %s End\n", equations[0].c_str());
-	fprintf(f, "\t//Y\n\tBegin %s End\n", equations[1].c_str());
-	fprintf(f, "\t//Z\n\tBegin %s End\n", equations[2].c_str());
-	fprintf(f, "\t//ROTX\n\tBegin %s End\n", equations[3].c_str());
-	fprintf(f, "\t//ROTY\n\tBegin %s End\n", equations[4].c_str());
-	fprintf(f, "\t//ROTZ\n\tBegin %s End\n", equations[5].c_str());
+	fprintf(f, "\t\t//X\n\tBegin %s End\n", equations[0].c_str());
+	fprintf(f, "\t\t//Y\n\tBegin %s End\n", equations[1].c_str());
+	fprintf(f, "\t\t//Z\n\tBegin %s End\n", equations[2].c_str());
+	fprintf(f, "\t\t//ROTX\n\tBegin %s End\n", equations[3].c_str());
+	fprintf(f, "\t\t//ROTY\n\tBegin %s End\n", equations[4].c_str());
+	fprintf(f, "\t\t//ROTZ\n\tBegin %s End\n", equations[5].c_str());
 
 }
 

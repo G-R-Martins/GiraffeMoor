@@ -160,6 +160,7 @@ public:
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, SineWaveDisplacement* wavedisp_ob);
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
 	void GenerateDisplacementField(const unsigned int& number, const unsigned int& cs, const unsigned int& solution_step);
+	void GenerateDisplacementField(const unsigned int& number, const unsigned int& cs, const unsigned int& solution_step, const unsigned int& nodes);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 

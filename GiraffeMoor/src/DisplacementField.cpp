@@ -8,6 +8,12 @@ DisplacementField::DisplacementField()
 	disp_data.clear();
 }
 
+DisplacementField::DisplacementField(unsigned int n_nodes)
+	: cs(0), solution_step(0)
+{
+	disp_data.reserve(n_nodes);
+}
+
 DisplacementField::~DisplacementField()
 {}
 

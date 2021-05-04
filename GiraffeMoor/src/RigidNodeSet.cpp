@@ -14,7 +14,7 @@ RigidNodeSet::~RigidNodeSet()
 
 void RigidNodeSet::WriteGiraffeModelFile(FILE *f)
 {
-	if (comment.size() > 0)
+	if (!comment.empty())
 		fprintf(f, "\t//%s\n", comment.c_str());
 	fprintf(f, "\tRigidNodeSet\t%d\tPilotNode\t%d\tNodeSet\t%d\t", number, pilot_node, node_set);
 	bool_table.Write(f);
