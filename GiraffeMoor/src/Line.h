@@ -87,7 +87,7 @@ public:
 	------------------------*/
 	
 	//Pointers to TDZ object
-	TouchdownZone* tdz;
+	std::unique_ptr<TouchdownZone> tdz;
 	
 	//How smallest is the TDP element
 	double percent;

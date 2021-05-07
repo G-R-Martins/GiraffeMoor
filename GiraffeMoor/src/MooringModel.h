@@ -91,19 +91,19 @@ public:
 
 	//Table with values of lines penetration in the seabed 
 	Table* penetration;
-
+	
 	//Auxiliar matrix to mount line mesh
 	std::vector<std::vector<double>> x0_n;
 
 	//Tensions at extremities points (used in summary file)
-	std::array <double, 2> extrem_tensions;
+	std::array<double, 2> extrem_tensions;
 
 	//Number of nodesets
 	std::forward_list<unsigned int> anchor_nodesets, fairlead_nodesets;
 
 	// Dynamic relaxation data
-	std::vector <double> rho_eq;	///equivalent specific mass for each  line
-	std::vector <double> area_eq;	///equivalent cross section area for each line
+	std::vector<double> rho_eq;	///equivalent specific mass for each  line
+	std::vector<double> area_eq;	///equivalent cross section area for each line
 	double rot_fairlead;			///fairlead rotation
 
 	//============================================================================
@@ -127,8 +127,7 @@ public:
 	--------------*/
 
 	//Stiffness matrix object (analytical or numerical)
-	StiffnessMatrix* stiff_matrix;
-
+	std::unique_ptr<StiffnessMatrix> stiff_matrix;
 	//============================================================================
 
 	/*-----------------------------------------------------

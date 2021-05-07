@@ -184,13 +184,17 @@ void Log::SetError_Impl(Log::Error error)
 	switch (error)
 	{
 	case Error::Reading:
-		reading_error = "\n   + Error at \"" + std::string(last_keyword) + "\" block.";
+		reading_error = "\n   + Error at \"" + std::string(last_keyword) + "\" block";
 		AddError_Impl(reading_error);
 		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during reading process.\nCheck your input file with the hint(s) from warning message(s).");
 		break;
 	case Error::FEM_Generation:
-		AddError_Impl("\n   + Error generating FE model.");
+		AddError_Impl("\n   + Error generating FE model");
 		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during FE model construction. Please, check your input data.");
+		break;
+	case Error::InputModel:
+		AddError_Impl("\n   + Error checking input data");
+		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during input model checking. Please, check your input data.");
 		break;
 	}
 }

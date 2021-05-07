@@ -41,3 +41,4 @@ public:
 	unsigned int header_lines, n_times;
 };
 
+///TODO: unique ptr

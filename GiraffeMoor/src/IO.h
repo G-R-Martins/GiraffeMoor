@@ -49,12 +49,13 @@ public:
 	//Reads input file
 	static bool ReadFile();
 
+	//Check input data before trying to generate the FE model
+	static bool CheckModel();
+
 	//Writes Giraffe input file
 	static void WriteGiraffeModelFile();
 
 	//Reads first level keyword (blue bold words)
 	static bool ReadKeyword(FILE* f, fpos_t& pos, char* word);
 
-	//Checks model
-	//static bool CheckModel();
 };

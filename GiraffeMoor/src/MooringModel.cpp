@@ -15,7 +15,7 @@ constexpr auto PI = 3.1415926535897932384626433832795;
 static double g;
 
 MooringModel::MooringModel()
-	: stiff_matrix(nullptr), cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
+	: cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
 	cur_node_set(1), cur_vessel(0), cur_special_constraint(0), cur_node_set_constraint(1), 
 	cur_constraint(0), cur_load(0), cur_disp(0), cur_rbdata(0), node_set_contact(0), pil_node_set(0),
 	TDZ(false), existSharedLine(false), x_tdp(0.0), x_tdp_ext(0.0), elem_tdp(0), seg_tdp(0), existTDP(true), 
@@ -35,7 +35,6 @@ MooringModel::~MooringModel()
 {
 	//Destroying pointers
 	if (penetration)	delete[] penetration;
-	if (stiff_matrix)	delete stiff_matrix;
 }
 
 bool MooringModel::GenerateGiraffeModel()
@@ -382,7 +381,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					E(0, 0) = h - Hf;
 					E(1, 0) = v - Vf;
 
-					//Matrix dF(2);
 					F = F - (invert2x2(J) * E);
 
 					if (F(0, 0) < 0) F(0, 0) = abs(F(0, 0));
@@ -1826,7 +1824,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//MathCode
 		if (disp.isMathCode)
 		{
-			MathCode* ptr = disp.GetMathCode();
+			auto ptr = disp.GetMathCode();
 
 			//Changes 't0' to real value in the equation(s)
 			ptr->SetEquationInitialTime(start);
@@ -1846,7 +1844,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//Time series
 		else if (disp.isTable)
 		{
-			Table* time_series = disp.GetTimeSeries();
+			auto time_series = disp.GetTimeSeries();
 
 			//Push a line with zeros in front of the table (initial position)
 			if (stiff_matrix && !stiff_matrix->bool_num)
@@ -1872,7 +1870,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//Sine Wave
 		else if (disp.isSineWave)
 		{
-			SineWaveDisplacement* ptr = disp.GetSineWave();
+			auto ptr = disp.GetSineWave();
 
 			//Setting start time (mean drift or time series)
 			ptr->SetStartTime(start);
@@ -1999,7 +1997,7 @@ void MooringModel::GenerateDisplacementFields()
 		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
 		
 		//Pointer to the current line
-		std::unique_ptr<Line> line = std::make_unique<Line>(line_vector[disp_field.GetNumber() - 1]);
+		Line* line = &line_vector[disp_field.GetNumber() - 1];
 		
 		//Displacement description (vessel number and type of displacement)
 		std::string description2add = std::string("\n\t\t- Applying harmonic displacement field at the line number ") + std::to_string(line->number);

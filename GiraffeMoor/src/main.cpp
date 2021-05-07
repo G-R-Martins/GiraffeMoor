@@ -9,7 +9,7 @@
 #include "Summary.h"
 #include "Log.h"
 
-#include <thread>         // std::this_thread::sleep_for
+
 //Global objects
 MooringModel mm;
 GiraffeModel gm;
@@ -25,29 +25,13 @@ void RunGiraffe();
 
 int main(int argc, char* argv[])
 {
-	//char chars[] = { '-', '\\', '|', '/' };
-	//char* strs[] = {
-	//	"Reading input file         ",
-	//	"Reading input file.          ",
-	//	"Reading input file. .         " ,
-	//	"Reading input file. . .        " };
-	//unsigned int i;
-	//using namespace std::chrono_literals;
-	//for (i = 0; ; ++i)
-	//{
-	//	//printf("%c\r", chars[i % sizeof(chars)]);
-	//	printf("%s\r", strs[i % 4]);
-	//	fflush(stdout);
-	//	std::this_thread::sleep_for(150ms);
-	//}
-
 	//Reading input data
 	if (!IO::ReadFile())
 		Log::SetError(Log::Error::Reading);
+	else if	(!IO::CheckModel())
+		Log::SetError(Log::Error::InputModel);
 	else
 	{
-		//std::cout << " Reading input file. . .                         " << '\r' << std::flush;
-		
 		//Creates SummaryFile (with header)
 		Summary::CreateSumFile(folder_name + name_input, version);
 

@@ -38,3 +38,4 @@ public:
 	unsigned int nodeset;
 };
 
+///TODO: unique ptr

@@ -151,3 +151,15 @@ bool MoorSolution::Read(FILE *f)
 	//All ok while reading
 	return true;
 }
+
+//Getters
+const std::vector<SolutionStep>& MoorSolution::GetStepsVec() const
+{
+	return this->solution_steps;
+
+}
+const SolutionStep& MoorSolution::GetStep(const size_t& step) const
+{
+	return this->solution_steps[step];
+
+}

@@ -40,7 +40,7 @@ BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bo
 
 BoolTable::BoolTable(BoolTable &copied)
 {
-	data_table.~vector();
+	data_table.clear();
 	//data_table.erase(data_table.begin(), data_table.end());
 	data_table = copied.data_table;
 	//data_table.resize(copied.data_table.size());

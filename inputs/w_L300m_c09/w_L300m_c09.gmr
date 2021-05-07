@@ -42,13 +42,12 @@ Environment
 
 
 DisplacementFields
-	DispLineID 1 
-		Step 1 	
+	DispLineID 1 Step 1 	
 		Harmonic Amplitude 0.05 Mode 1
 
 
 VesselDisplacements
-	VesselDispID 1
+	VesselDispID 1	
 		Step 2 
 		MathCode 
 			Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), 0)

@@ -32,7 +32,8 @@ public:
 	enum class Error
 	{
 		Reading = -1,
-		FEM_Generation = -2
+		FEM_Generation = -2,
+		InputModel = -3
 	};
 
 

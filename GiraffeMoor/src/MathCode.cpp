@@ -3,7 +3,7 @@
 #include "Log.h"
 
 
-#define MAX_SIZE_LINE 500
+constexpr int MAX_SIZE_LINE = 500;
 
 MathCode::MathCode()
 	: start_time(-1)
@@ -82,10 +82,6 @@ bool MathCode::Read(FILE *f)
 	} while (readOk);
 	
 
-	////Inserts zero inside empty equations
-	//for (std::string& eq : equations)
-	//	if (eq.size() == 0)	eq = "0";
-	
 	return true;
 }
 
@@ -93,12 +89,12 @@ bool MathCode::Read(FILE *f)
 void MathCode::WriteGiraffeModelFile(FILE *f)
 {
 	//fprintf(f, "\tNodalDisplacement\t%d\tNodeSet\t%d\tCS\t%d\tMathCode\n", number, node_set, cs);
-	fprintf(f, "\t\t//X\n\tBegin %s End\n", equations[0].c_str());
-	fprintf(f, "\t\t//Y\n\tBegin %s End\n", equations[1].c_str());
-	fprintf(f, "\t\t//Z\n\tBegin %s End\n", equations[2].c_str());
-	fprintf(f, "\t\t//ROTX\n\tBegin %s End\n", equations[3].c_str());
-	fprintf(f, "\t\t//ROTY\n\tBegin %s End\n", equations[4].c_str());
-	fprintf(f, "\t\t//ROTZ\n\tBegin %s End\n", equations[5].c_str());
+	fprintf(f, "\t\t//X\n\t\tBegin %s End\n", equations[0].c_str());
+	fprintf(f, "\t\t//Y\n\t\tBegin %s End\n", equations[1].c_str());
+	fprintf(f, "\t\t//Z\n\t\tBegin %s End\n", equations[2].c_str());
+	fprintf(f, "\t\t//ROTX\n\t\tBegin %s End\n", equations[3].c_str());
+	fprintf(f, "\t\t//ROTY\n\t\tBegin %s End\n", equations[4].c_str());
+	fprintf(f, "\t\t//ROTZ\n\t\tBegin %s End\n", equations[5].c_str());
 
 }
 
