@@ -10,6 +10,12 @@ public:
 	//Reads input file
 	bool Read(FILE *f);
 
+	//Returns the vector with all solution (anlysis) steps
+	const std::vector<SolutionStep>& GetStepsVec() const;
+
+	//Returns a specific solution (analysis) step
+	const SolutionStep& GetStep(const size_t& step) const;
+
 	//============================================================================
 
 							/*-------
@@ -59,18 +65,19 @@ public:
 	/*-----------
 	Steps options
 	------------*/
-
 	//Steps before analysis
 	unsigned int steps_to_set_model;
 
+	///TODO: make it private
 	//Container with analysis steps
 	std::vector <SolutionStep> solution_steps;
 
 	
-	///
-	/// TODO: use multiple cores 
-	///
-	
+	///TODO: send to another object (GiraffeModel or a new one)
+	/*------------
+	Solver options
+	-------------*/
+		
 	//Number of cores used for Giraffe
 	unsigned int ncores;
 

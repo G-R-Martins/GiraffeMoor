@@ -11,6 +11,7 @@ class DisplacementField : public Displacement
 {
 public:
 	DisplacementField();
+	DisplacementField(unsigned int n_nodes);
 	~DisplacementField();
 
 	//============================================================================

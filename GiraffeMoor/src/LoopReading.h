@@ -239,7 +239,6 @@ namespace LoopReading
 			//Checks for keyword
 			else if (keyword_set.find(std::string_view(str)) == keyword_set.end())
 			{
-				//fsetpos(f, &pos);
 				//Searches for comment and read next word
 				if (str[0] == '/' && !fsetpos(f, &pos) && AuxFunctions::TryComment(f) && !fgetpos(f, &pos)
 					&& fscanf(f, "%s", str) == EOF)

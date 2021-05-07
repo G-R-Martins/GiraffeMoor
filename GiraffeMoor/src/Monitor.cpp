@@ -25,7 +25,7 @@ bool Monitor::Read(FILE *f)
  	fgetpos(f, &pos);
 	if (fscanf(f, "%s %d", str, &sample) != EOF && strcmp(str, "Sample"))
 	{
-		Log::AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered.\n");
+		Log::AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered");
 		fsetpos(f, &pos);
 	}
 

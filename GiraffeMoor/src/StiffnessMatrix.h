@@ -59,7 +59,7 @@ public:
 	double rot_matrix_y;	//Stiffness matrix offset ROTY
 	double rot_matrix_z;	//Stiffness matrix offset ROTZ
 
-	Table* time_series;
+	std::unique_ptr<Table> time_series;
 
 	/*-------------------------
 	Analytical stiffness matrix

@@ -15,7 +15,7 @@ constexpr auto PI = 3.1415926535897932384626433832795;
 static double g;
 
 MooringModel::MooringModel()
-	: stiff_matrix(nullptr), cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
+	: cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
 	cur_node_set(1), cur_vessel(0), cur_special_constraint(0), cur_node_set_constraint(1), 
 	cur_constraint(0), cur_load(0), cur_disp(0), cur_rbdata(0), node_set_contact(0), pil_node_set(0),
 	TDZ(false), existSharedLine(false), x_tdp(0.0), x_tdp_ext(0.0), elem_tdp(0), seg_tdp(0), existTDP(true), 
@@ -35,7 +35,6 @@ MooringModel::~MooringModel()
 {
 	//Destroying pointers
 	if (penetration)	delete[] penetration;
-	if (stiff_matrix)	delete stiff_matrix;
 }
 
 bool MooringModel::GenerateGiraffeModel()
@@ -191,9 +190,6 @@ bool MooringModel::GenerateCatenary()
 		//Forces at the top
 		Matrix F(2);
 
-		//Biggest segment 
-		unsigned int max_nodes = 0, max_elements = 0;
-
 		//segment to generate mesh without considering TDZ
 		unsigned int seg_init = 0;
 
@@ -215,16 +211,15 @@ bool MooringModel::GenerateCatenary()
 		SetLinesConfiguration(line, F, FV, n_segs);
 
 		if (line.percent > 0 && x_tdp > 0 && abs(line.anc_tdp) > 0 && abs(line.tdp_fair) > 0)
-			GenerateCatenaryTDZ(line, n_segs, max_nodes, seg_init);
+			GenerateCatenaryTDZ(line, n_segs, seg_init);
 		else
 			TDZ = false;
 
 		//Confere tamanho dos segmentos depois da TDZ, se existirem ou todos de uma vez, caso não haja TDZ
 		if (!TDZ || seg_init == ++line.tdz->tdz_f.seg)
-			CheckSegmentsSize(line, n_segs, max_nodes, seg_init);
+			CheckSegmentsSize(line, n_segs, seg_init);
 
 		//Displacement field data (coordinates, segments)
-		//Matrix xcat_n(max_nodes, n_segs), zcat_n(max_nodes, n_segs), roty_n(max_nodes, n_segs);
 		std::vector<std::vector<double>> xcat_n, zcat_n, roty_n;
 		xcat_n.resize(n_segs), zcat_n.resize(n_segs), roty_n.resize(n_segs);
 
@@ -313,7 +308,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 
 	//Order of the force initial guess
 	auto [gmin, gmax] = std::minmax_element(line.gamma_s.begin(), line.gamma_s.end());
-	int m = (int)floor(log10(max(fabs(*gmin), fabs(*gmax))));
+	int m = ( int )floor(log10(max(fabs(*gmin), fabs(*gmax))));
 
 	//int m = ( int )floor(log10(*( std::max_element(line.gamma_s.begin(), line.gamma_s.end()) )));
 	
@@ -386,7 +381,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					E(0, 0) = h - Hf;
 					E(1, 0) = v - Vf;
 
-					//Matrix dF(2);
 					F = F - (invert2x2(J) * E);
 
 					if (F(0, 0) < 0) F(0, 0) = abs(F(0, 0));
@@ -568,7 +562,7 @@ void MooringModel::SetLinesConfiguration(Line& line, Matrix& F, std::vector <dou
 	}
 }
 
-void MooringModel::GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& max_nodes, unsigned int& seg_init)
+void MooringModel::GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& seg_init)
 {
 	TDZ = true;
 
@@ -648,8 +642,8 @@ void MooringModel::GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, u
 			int n = segment_property_vector[line.segments[seg].property - 1].type == 't' ? 1 : 2;
 
 			line.segments[seg].n_nodes = n * line.segments[seg].discretization + 1;
-			if (line.segments[seg].n_nodes > max_nodes)
-				max_nodes = line.segments[seg].n_nodes;
+			//if (line.segments[seg].n_nodes > max_nodes)
+				//max_nodes = line.segments[seg].n_nodes;
 
 			line.segments[seg].n_elements = line.segments[seg].discretization;
 			tot_elem += line.segments[seg].discretization;
@@ -703,8 +697,8 @@ void MooringModel::GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, u
 	unsigned int elements_seg_tdz = line.tdz->tdz_a.elements_out + line.tdz->tdz_a.n_elements - 2 + 1 + line.tdz->tdz_f.n_elements - 2 + line.tdz->tdz_f.elements_out;
 
 	line.segments[seg_tdp].n_nodes = n * elements_seg_tdz + 1;
-	if (line.segments[seg_tdp].n_nodes > max_nodes)
-		max_nodes = line.segments[seg_tdp].n_nodes;
+	//if (line.segments[seg_tdp].n_nodes > max_nodes)
+		//max_nodes = line.segments[seg_tdp].n_nodes;
 	line.segments[seg_tdp].n_elements = elements_seg_tdz;
 	tot_elem += elements_seg_tdz;
 
@@ -713,19 +707,23 @@ void MooringModel::GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, u
 		seg_init = ++line.tdz->tdz_f.seg;
 }
 
-void MooringModel::CheckSegmentsSize(Line& line, const unsigned int& n_segs, unsigned int& max_nodes, const unsigned int& seg_init)
+void MooringModel::CheckSegmentsSize(Line& line, const unsigned int& n_segs, const unsigned int& seg_init)
 {
 	for (unsigned int seg = seg_init; seg < n_segs; seg++)
 	{
+		//Nodes of the segment
 		unsigned int n = segment_property_vector[line.segments[seg].property - 1].type == 't' ? 1 : 2;
-
 		line.segments[seg].n_nodes = n * line.segments[seg].discretization + 1;
-		if (line.segments[seg].n_nodes > max_nodes)
-			max_nodes = line.segments[seg].n_nodes;
-
+		//Elements of the segment
 		line.segments[seg].n_elements = line.segments[seg].discretization;
+		
+		//Whole line
 		tot_elem += line.segments[seg].discretization;
+		line.tot_nodes = line.segments[seg].n_nodes;
 	}
+
+	//Exclude transitions between segments
+	line.tot_nodes -= ( unsigned int )line_vector[line.number - 1].segments.size() - 1;
 }
 
 
@@ -1002,8 +1000,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					summ_elem[0] = cur_elem;
 					summ_nodesets[0] = cur_node_set-1;
 
-					init_line = cur_node_mesh;
-					++cur_node_mesh;
+					init_line = ++cur_node_mesh;
 					++node_x0;
 				}
 				else //equal the last node of the last segment
@@ -1114,8 +1111,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					 line.number, line.configuration, existTDP, x_tdp_ext, line.total_length, ( unsigned int )line.segments.size());
 
 	//Mooring line NodeSet
-	sprintf(comment, "Nodes - line %d", line.number);
-	gm.GenerateNodeSet(cur_node_set, nodes_line, init_line, 1, comment);
+	sprintf(comment, "Nodes of line %d - except the extreme points", line.number);
+	gm.GenerateNodeSet(cur_node_set, nodes_line - 2, init_line, 1, comment);
 	++cur_node_set;
 	++cur_cs;
 }
@@ -1166,7 +1163,6 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, const unsigned int& 
 		}
 	}
 
-	//gm.GenerateDisplacementField(++cur_disp, cur_line + 2, 2); 
 	gm.GenerateDisplacementField(++cur_disp, line.cs, 2); 
 
 	//Inserts current displacement field in the displacement vector
@@ -1360,7 +1356,7 @@ void MooringModel::GenerateDynamicRelaxation()
 	moorsolution.TimeRelax = T_s;
 }
 
-bool MooringModel::Look4SharedLine()
+inline bool MooringModel::Look4SharedLine()
 {
 	for (Line& line : line_vector)
 	{
@@ -1399,8 +1395,6 @@ void MooringModel::GenerateVessel()
 			auto& [bool_cad, plat_name] = moorpost.GetName(( size_t )vessel.number);
 			
 
-			///TODO: check inertial data for multiple vessels case
-			//if (!moorpost.platform_names.empty() && bool_cad)
 			gm.GenerateRigidBodyData(++cur_rbdata, vessel.mass, vessel.inertiaTensor, vessel_coord, plat_name);
 			
 			//Rigid body element
@@ -1547,7 +1541,7 @@ void MooringModel::GeneralSetting()
 	gm.post.WriteSpecialConstraints_flag = ( line_vector.size() == 1 ) ? false : true;
 
 	//If there is at least one platform STL, write RenderRigidBodies
-	gm.post.WriteRenderRigidBodies_flag = ( moorpost.platform_names.size() > 0 ) ? true : false;
+	gm.post.WriteRenderRigidBodies_flag = ( !moorpost.platform_names.empty() ) ? true : false;
 
 	//Monitor contact
 	if (gm.monitor.bool_contact_seabed_moor)	gm.monitor.contacts.push_front(1);
@@ -1573,6 +1567,10 @@ void MooringModel::GeneralSetting()
 	//Generate forces
 	if (!moorload_vector.empty())	
 		GenerateForces();
+	
+	//Generate displacement fields (harmonic)
+	if (!disp_field_vector.empty())	
+		GenerateDisplacementFields();
 
 
 	/******************
@@ -1826,7 +1824,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//MathCode
 		if (disp.isMathCode)
 		{
-			MathCode* ptr = disp.GetMathCode();
+			auto ptr = disp.GetMathCode();
 
 			//Changes 't0' to real value in the equation(s)
 			ptr->SetEquationInitialTime(start);
@@ -1846,7 +1844,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//Time series
 		else if (disp.isTable)
 		{
-			Table* time_series = disp.GetTimeSeries();
+			auto time_series = disp.GetTimeSeries();
 
 			//Push a line with zeros in front of the table (initial position)
 			if (stiff_matrix && !stiff_matrix->bool_num)
@@ -1872,7 +1870,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		//Sine Wave
 		else if (disp.isSineWave)
 		{
-			SineWaveDisplacement* ptr = disp.GetSineWave();
+			auto ptr = disp.GetSineWave();
 
 			//Setting start time (mean drift or time series)
 			ptr->SetStartTime(start);
@@ -1987,6 +1985,42 @@ void MooringModel::GenerateForces()
 
 		//Append description of the current step (after 'dynamic' or 'static' description)
 		std::get<2>(Summary::GetSteps()[global_step]) += description2add;
+	}
+}
+
+void MooringModel::GenerateDisplacementFields()
+{
+	for (MoorLineDispFields& disp_field : disp_field_vector)
+	{
+		//Temporary auxiliary variables
+		unsigned int analysis_step = disp_field.GetStep() - 1;
+		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
+		
+		//Pointer to the current line
+		Line* line = &line_vector[disp_field.GetNumber() - 1];
+		
+		//Displacement description (vessel number and type of displacement)
+		std::string description2add = std::string("\n\t\t- Applying harmonic displacement field at the line number ") + std::to_string(line->number);
+
+		//Generate harmonic displacement field for the current line
+		gm.GenerateDisplacementField(++cur_disp, line->cs, global_step + 1, line->tot_nodes);
+
+		unsigned int global_node = line->node_A;
+		for (size_t seg = 0; seg < line->segments.size(); ++seg)
+		{
+			size_t seg_first_node = seg == 0 ? 1 : 0;
+			size_t seg_last_node = line->segments[seg].n_nodes - 1;
+
+			for (size_t node = seg_first_node; node < seg_last_node; ++node)
+				static_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(
+					++global_node,
+					std::array{ 0.0,
+					-disp_field.GetAmplitude() * std::sin(x0_n[seg][node] * PI / line->total_length * disp_field.GetMode()),
+					0.0, 0.0, 0.0 , 0.0 });
+		}
+		
+		//Append description of the current step (after 'dynamic' or 'static' description)
+		std::get<2>(Summary::GetSteps()[global_step]) += description2add;	
 	}
 }
 
@@ -2163,9 +2197,26 @@ void MooringModel::GenerateConstraints()
 		gm.GenerateNodalConstraint(++cur_constraint, nodeset, U, U, U, ROT, ROT, ROT);
 
 
-	//Vessel
+	//Lines
+	for (MoorLineDispFields& disp_field : disp_field_vector)
+	{
+		BoolTable bool_table;
+		
+		//Default conditions (steps to set the FE model)
+		std::list bool_list = { true, true, false };
 
-	//Default constraint (all fixed)
+		//Other steps, until reach the step after the displacement field
+		for (int i = 1; i <= (int)disp_field.GetStep() + 1; ++i)
+			i == disp_field.GetStep() ? bool_list.emplace_back(true) : bool_list.emplace_back(false);
+		bool_table.Multiple_Push_Back(bool_list);
+		
+		gm.GenerateNodalConstraint(++cur_constraint, line_vector[disp_field.GetNumber() - 1].nodeset_B + 1, 
+								   bool_table, bool_table, bool_table, bool_table, bool_table, bool_table);
+	}
+
+	
+	//Vessel
+	///Default constraint (all fixed)
 	if (vessel_constraint.empty())
 	{
 		//Vessel - fixed
@@ -2174,7 +2225,7 @@ void MooringModel::GenerateConstraints()
 		for (Vessel& vessel : vessel_vector)
 			gm.GenerateNodalConstraint(++cur_constraint, vessel.nodeset, U, U, U, ROT, ROT, ROT);
 	}
-	//Initial step to include new constraint(s)
+	///Initial step to include new constraint(s)
 	else
 	{
 		int step0 = 3;

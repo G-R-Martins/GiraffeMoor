@@ -1,3 +1,5 @@
+// w_L300m_c09
+
 Keypoints
 	//Anchor node
 	Keypoint	1	X 0.0	Y 0.0	Z -310.0
@@ -6,51 +8,53 @@ Keypoints
 	//Vessel - artifcial for this case
 	Keypoint	3	X 0.0	Y 0.0	Z 0.0
 
+
 Vessels
 	Vessel	1	PilotNode	3	InertiaTensor	0 0 0 0 0 0	Mass 0
 	
+	
 Lines
-	Line 1 	Fairlead 1 	Fairlead 2 	
-		Length 300	Property 1	Discretization 50
+	Line 1 	Anchor 1 	Fairlead 2 	VesselID 1
+		Length 298.8	Property 1	Discretization 20
+	
 	
 Solution
 	Analysis
-	//Initial offset
+	   //Harmonic field -> imperfection
 		Step 1 static 	Time 1	TimeStep 1	MinTimeStep 1e-3	Sample 1	
-	//Harmonic field -> imperfection
-		Step 2 static 	Time 1	TimeStep 1	MinTimeStep 1e-3	Sample 1	
-	//Parametric excitation
-		Step 3 dynamic 	Time 1	TimeStep  5e-3	MinTimeStep 1e-5	Sample 20	NumericalDamping null
+	   //Oscillation
+		Step 2 dynamic 	Time 2400	TimeStep  5e-2	MinTimeStep 1e-4	Sample 5	NumericalDamping extreme
+	Solver
+		Cores 4 LinSys direct 
 	
 	
 SegmentProperties 
 	SegmentProperty	1 beam	
 		SpecificMass 110.6649134 	Diameter  0.2032 	
-		EA 2.837561882946e+9 	EI 1.1441758902509e+7 	
-		GJ 8.80135300192997e+6 	GA 1.09136995497923e+9 	
+		EA 2.837561882946e+9 	EI 1.1441758902509e+7 	GJ 8.80135300192997e+6 	GA 1.09136995497923e+9 	
 		CDt 0	CDn 1.0	CAt 0.0	CAn	1.0
+	
 	
 Environment
 	Gravity	9.81	RhoFluid 1025	WaterDepth 310
 	Seabed	flat	
-		Stiffness 3e6	Damping 1e2	FrictionCoefficient	0.2
+		Stiffness 3e6	Damping 1e2	FrictionCoefficient	0
 
 
-/////////////////////////////////////////////////////////////////////////
-//	Optional blocks												
-/////////////////////////////////////////////////////////////////////////
+DisplacementFields
+	DispLineID 1 Step 1 	
+		Harmonic Amplitude 0.05 Mode 1
 
-PostProcessing
-	PostFiles ContactSurface
 
-// DisplacementField
-	
-
-/* VesselDisplacements
-	VesselDispID 1
+VesselDisplacements
+	VesselDispID 1	
 		Step 2 
 		MathCode 
-			Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
- */
+			Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), 0)
+
+Monitors
+	Nodes anchors fairleads vessels 
+//		UserDefined = from anchor + 
+
 
 // GiraffeSolver run

@@ -336,6 +336,15 @@ void GiraffeModel::GenerateDisplacementField(const unsigned int& number, const u
 	ptr->solution_step = solution_step;
 	ptr->cs = cs;
 }
+void GiraffeModel::GenerateDisplacementField(const unsigned int& number, const unsigned int& cs, const unsigned int& solution_step, const unsigned int& nodes)
+{
+	displacement_vector.emplace_back(new DisplacementField(nodes));
+	//Pointer to the DisplacementField
+	DisplacementField* ptr = static_cast<DisplacementField*>(displacement_vector.back());
+	ptr->number = number;
+	ptr->solution_step = solution_step;
+	ptr->cs = cs;
+}
 void GiraffeModel::GenerateNodeSet(const unsigned int& number, std::vector<unsigned int>& list, const char* comment)
 {
 	node_set_vector.emplace_back(NodeSet());

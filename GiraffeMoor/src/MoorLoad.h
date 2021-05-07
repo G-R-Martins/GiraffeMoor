@@ -22,7 +22,7 @@ public:
 			/*-------
 			Variables
 			--------*/
-
+	///TODO: unique_ptr
 	//Data type
 	Table* table;
 	MathCode* mathCode;

@@ -18,17 +18,18 @@ GiraffeModel gm;
 std::string name_input;
 std::string folder_name;
 std::string name;	//with directory and extension
-std::string version("0.01.32");
+std::string version("0.01.33");
 
 //Run Giraffe (if is in release mode)
 void RunGiraffe();
-
 
 int main(int argc, char* argv[])
 {
 	//Reading input data
 	if (!IO::ReadFile())
 		Log::SetError(Log::Error::Reading);
+	else if	(!IO::CheckModel())
+		Log::SetError(Log::Error::InputModel);
 	else
 	{
 		//Creates SummaryFile (with header)

@@ -389,3 +389,12 @@ FodyWeavers.xsd
 /inputs/exemplo/time series
 /inputs/exemplo/simulation_report.txt
 /inputs/exemplo/output.inp
+/inputs/par_exc_water
+/inputs/par_exc_air/monitors
+/inputs/par_exc_air/post
+/inputs/par_exc_water_n4
+/inputs/par_exc_air_n5
+/inputs/par_exc_air_n4
+/inputs/par_exc_air_n3
+/inputs/par_exc_air
+/docs/rascunhos.cpp

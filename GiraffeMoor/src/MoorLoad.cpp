@@ -37,7 +37,7 @@ bool MoorLoad::Read(FILE* f)
 	
 	if (description == "vessel")
 		int to_ignore = fscanf(f, "%d", &nodeID);
-	else //if (nodeID != 0 || description != "vessel")
+	else 
 	{
 		//If is an anchor or fairlead node, there is no need to define the segment
 		if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "SegmentID"))

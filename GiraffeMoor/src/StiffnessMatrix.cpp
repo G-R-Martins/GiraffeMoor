@@ -17,11 +17,11 @@ StiffnessMatrix::~StiffnessMatrix()
 {
 	K_tan.flush();
 
-	if (time_series)
+	/*if (time_series)
 	{
 		time_series->table.clear();
 		time_series = nullptr;
-	}
+	}*/
 }
 
 bool StiffnessMatrix::Read(FILE *f)

@@ -18,6 +18,8 @@ public:
 	void Push_Back(const bool& bool_value);
 	void Multiple_Push_Back(const BoolTable& bt);
 	void Multiple_Push_Back(const std::list <bool>& list);
+	void Multiple_Push_Back(const std::forward_list<bool>& list);
+	void Multiple_Push_Back(const bool& bool_value, const unsigned int& n_times);
 	void Pop_Back();
 	int Size();
 

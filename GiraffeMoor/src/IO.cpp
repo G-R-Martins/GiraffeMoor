@@ -40,6 +40,7 @@ bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 	else if (!strcmp(word, "GiraffeSolver"))		cur_level = FirstLevelKeyword::GiraffeSolver;
 	else if (!strcmp(word, "Constraints"))			cur_level = FirstLevelKeyword::Constraints;
 	else if (!strcmp(word, "NodalForces"))			cur_level = FirstLevelKeyword::NodalForces;
+	else if (!strcmp(word, "DisplacementFields"))	cur_level = FirstLevelKeyword::DisplacementFields;
 	//Comment after 
 	else if (word[0] == '/' && 
 			 AuxFunctions::ReadComment(f, word))	cur_level = FirstLevelKeyword::CommentAfterBlock;
@@ -151,7 +152,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           StiffnessMatrix          -+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::StiffnessMatrix:
-			mm.stiff_matrix = new StiffnessMatrix();
+			mm.stiff_matrix = std::make_unique<StiffnessMatrix>();
 			if (!mm.stiff_matrix->Read(f))
 				return false;
 			break;
@@ -224,6 +225,12 @@ bool IO::ReadFile()
 			if (!LoopReading::TryKeyword(mm.segment_set_vector, std::unordered_set<std::string_view>({ "Set" }), f, pos, str))
 				return false;
 			break;
+			
+			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+          DisplacementFields        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		case FirstLevelKeyword::DisplacementFields:
+			if (!LoopReading::TryKeyword(mm.disp_field_vector, std::unordered_set<std::string_view>({ "DispLineID" }), f, pos, str))
+				return false;
+			break;
 
 
 		//Three levels
@@ -263,9 +270,6 @@ bool IO::ReadFile()
 			return false;
 		}
 
-		//Last valid keyword
-		/*if (cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error)
-			Log::SetLastValidKeyword(str);*/
 	}
 END:	fclose(f);
 
@@ -288,11 +292,72 @@ END:	fclose(f);
 
 	mm.penetration = new Table[mm.line_vector.size()];
 
-	
+
 	//All ok while reading
 	return true;
 }
 
+
+//Check input data before trying to generate the FE model
+bool IO::CheckModel()
+{
+	/// <summary>
+	/// 
+	/// Talvez seja interessante criar funções para checar cada caso e colocar tudo em um único loop.
+	/// Ficaria mais inteligível e fácil de ampliar - principalmente se essas funções auxiliares forem templates
+	/// 
+	/// </summary>
+	/// 
+	/// <returns> booleano q indica se o modelo passou por todas as etapas </returns>
+
+	//Track checking status (returned by this function)
+	bool modelOk = true;
+
+	std::map<std::string_view, std::size_t> n_keywords = { 
+		//Mandatory blocks
+		{"Keypoints", mm.keypoint_vector.size()}, {"Lines", mm.line_vector.size()}, {"Vessels", mm.vessel_vector.size()}, 
+		{"SegmentProperties", mm.segment_property_vector.size()}, {"SolSteps", mm.moorsolution.GetStepsVec().size()}, /*nothing to check:*/{"Environment", 1}, {"Solution", 1},
+		//Optional blocks
+		{}
+		};///end of map
+
+	//Checks mandatory keywords
+	//and saves the maximum size (with "-1", to use in further code lines) in the map "n_keywords"
+
+	if (mm.keypoint_vector.front().number != 1 || mm.keypoint_vector.back().number != n_keywords["Keypoints"])				{ Log::AddWarning("\n   + Invalid keypoint numbering");	modelOk = false; }
+	if (mm.segment_property_vector.front().number != 1 || mm.segment_property_vector.back().number == n_keywords["SegProp"]){ Log::AddWarning("\n   + Invalid segment property numbering");	modelOk = false; }
+	if (mm.line_vector.front().number != 1 || mm.line_vector.back().number != n_keywords["Lines"])							{ Log::AddWarning("\n   + Invalid line numbering"); modelOk = false; }
+	else
+	{
+		std::stringstream ss;
+		bool isOk = true;
+
+		std::for_each(mm.line_vector.cbegin(), mm.line_vector.cend(), [&](const Line& line) {
+			if (line.keypoint_A > n_keywords["Keypoints"] || line.keypoint_B > n_keywords["Keypoints"]) { ss << "\n   + Invalid keypoint referenced at line number " << line.number ; isOk = false; }
+			if (!line.usingSegmentSet)
+				std::for_each(line.segments.cbegin(), line.segments.cend(), [&](const LineSegment& seg) {
+				if (seg.property > n_keywords["SegmentProperties"]) { ss << "\n   + Invalid segment property referenced at line number " << line.number ; isOk = false; }; }
+			);//end of nested for_each (segments)
+		});//end of first for_each (lines)
+		
+		if (!isOk)																											{ Log::AddWarning(ss);	modelOk = false; };
+	}
+	if (mm.vessel_vector.front().number != 1 || mm.vessel_vector.back().number == n_keywords["Vessels"])					{ Log::AddWarning("\n   + Invalid vessel numbering");	modelOk = false; }
+	else
+	{
+		std::stringstream ss;
+		bool isOk = true;
+
+		std::for_each(mm.vessel_vector.cbegin(), mm.vessel_vector.cend(), [&](const Vessel& vessel) 
+		{ if (vessel.keypoint > n_keywords["Keypoints"]) { ss << "\n   + Invalid pilot node referenced at vessel number" << vessel.number ; isOk = false; }; }
+		);//end of for_each
+		if (!isOk)																											{ Log::AddWarning(ss);	modelOk = false; }
+	}
+	if (mm.moorsolution.GetStepsVec().front().number != 1 || mm.moorsolution.GetStepsVec().back().number != n_keywords["SolSteps"]) { Log::AddWarning("\n   + Invalid solution steps numbering");	return false; }
+
+
+	return modelOk;
+}
 
 //Writes Giraffe model file
 void IO::WriteGiraffeModelFile()

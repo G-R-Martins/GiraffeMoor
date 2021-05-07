@@ -54,7 +54,7 @@ bool VesselConstraint::Read(FILE *f)
 				constraints[i].push_back(add);
 			}
 			//No constraint defined for the current DOF
-			else if (constraints[i].size() == 0)
+			else if (constraints[i].empty())
 			{
 				std::string warning = "\n   + There is at least one DOF of the vessel number " + std::to_string(number) + "with no constraint defined.";
 				Log::AddWarning(warning);

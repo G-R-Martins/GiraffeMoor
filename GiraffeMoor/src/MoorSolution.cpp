@@ -120,11 +120,11 @@ bool MoorSolution::Read(FILE *f)
 				{
 					return false;
 				}
-				
 			}
 			else if (*it == "Solver")
 			{
-				if (fscanf(f, "%s %d", str, &ncores) && !strcmp(str, "Processors") && //reads the number of cores and next keyword
+				keywords.erase("Solver");
+				if (fscanf(f, "%s %d", str, &ncores) && !strcmp(str, "Cores") && //reads the number of cores and next keyword
 					fscanf(f, "%s", str) && !strcmp(str, "LinSys") &&				  //checks for 'LinSys' keyword
 					fscanf(f, "%s", str))											  //reads the 'LinSys' option
 				{
@@ -150,4 +150,16 @@ bool MoorSolution::Read(FILE *f)
 
 	//All ok while reading
 	return true;
+}
+
+//Getters
+const std::vector<SolutionStep>& MoorSolution::GetStepsVec() const
+{
+	return this->solution_steps;
+
+}
+const SolutionStep& MoorSolution::GetStep(const size_t& step) const
+{
+	return this->solution_steps[step];
+
 }

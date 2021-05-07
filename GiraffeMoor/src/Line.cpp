@@ -6,7 +6,7 @@
 
 Line::Line()
 	: number(0), keypoint_A(0), keypoint_B(0), cs(0), vessel(0), node_A(0), node_B(0), 
-	nodeset_A(0), nodeset_B(0), total_length(0.0), configuration("\0"), 
+	tot_nodes(0), nodeset_A(0), nodeset_B(0), total_length(0.0), configuration("\0"),
 	hasAnchor(true), isShared(false), segment_set(0), usingSegmentSet(false),
 	tdz(nullptr), percent(0.0), anc_tdp(0.0), tdp_fair(0.0)
 {
@@ -22,7 +22,7 @@ Line::~Line()
 Line::Line(Line&& other) noexcept
 	: number(std::move(other.number)), keypoint_A(std::move(other.keypoint_A)), keypoint_B(std::move(other.keypoint_B)),
 	cs(std::move(other.cs)), vessel(std::move(other.vessel)), node_A(std::move(other.node_A)), node_B(std::move(other.node_B)),
-	nodeset_A(std::move(other.nodeset_A)), nodeset_B(std::move(other.nodeset_B)),
+	tot_nodes(std::move(other.tot_nodes)), nodeset_A(std::move(other.nodeset_A)), nodeset_B(std::move(other.nodeset_B)),
 	total_length(std::move(other.total_length)), hasAnchor(std::move(other.hasAnchor)), isShared(std::move(other.isShared)),
 	segment_set(std::move(other.segment_set)), usingSegmentSet(std::move(other.usingSegmentSet)), segments(std::move(other.segments)), 
 	gamma_s(std::move(other.gamma_s)), transition_nodes(std::move(other.transition_nodes)), configuration("\0"), vesselIDs(std::move(other.vesselIDs)),
@@ -42,6 +42,7 @@ Line& Line::operator=(Line&& other) noexcept
 	vessel = std::move(other.vessel);
 	node_A = std::move(other.node_A);
 	node_B = std::move(other.node_B);
+	tot_nodes = std::move(other.tot_nodes);
 	nodeset_A = std::move(other.nodeset_A);
 	nodeset_B = std::move(other.nodeset_B);
 	total_length = std::move(other.total_length);

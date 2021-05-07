@@ -28,6 +28,7 @@ public:
 	unsigned int keypoint_A; //anchor or fairlead
 	unsigned int keypoint_B; //fairlead
 	
+	//Coordinate system number
 	unsigned int cs;
 	
 	//Vessel ID number
@@ -37,6 +38,9 @@ public:
 	unsigned int node_A;		//anchor or fairlead	
 	unsigned int node_B;		//fairlead
 	
+	//Number of total nodes
+	unsigned int tot_nodes;
+
 	//Nodesets of extremity nodes
 	unsigned int nodeset_A;		//anchor or fairlead	
 	unsigned int nodeset_B;		//fairlead
@@ -83,7 +87,7 @@ public:
 	------------------------*/
 	
 	//Pointers to TDZ object
-	TouchdownZone* tdz;
+	std::unique_ptr<TouchdownZone> tdz;
 	
 	//How smallest is the TDP element
 	double percent;

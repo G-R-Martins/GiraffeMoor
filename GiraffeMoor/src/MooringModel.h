@@ -8,6 +8,7 @@
 #include "MoorSolution.h"
 #include "MoorPost.h"
 #include "MoorLoad.h"
+#include "MoorLineDispFields.h"
 
 #include "VesselDisplacement.h"
 #include "AnchorConstraint.h"
@@ -90,24 +91,20 @@ public:
 
 	//Table with values of lines penetration in the seabed 
 	Table* penetration;
-
+	
 	//Auxiliar matrix to mount line mesh
 	std::vector<std::vector<double>> x0_n;
 
 	//Tensions at extremities points (used in summary file)
-	std::array <double, 2> extrem_tensions;
+	std::array<double, 2> extrem_tensions;
 
 	//Number of nodesets
 	std::forward_list<unsigned int> anchor_nodesets, fairlead_nodesets;
 
-	/* Dynamic relaxation data */
-
-	//Equivalent specific mass for each  line
-	std::vector <double> rho_eq;
-	//Equivalent cross section area for each line
-	std::vector <double> area_eq; //equivalent cross section area for each line
-	//Fairlead rotation
-	double rot_fairlead;
+	// Dynamic relaxation data
+	std::vector<double> rho_eq;	///equivalent specific mass for each  line
+	std::vector<double> area_eq;	///equivalent cross section area for each line
+	double rot_fairlead;			///fairlead rotation
 
 	//============================================================================
 
@@ -130,8 +127,7 @@ public:
 	--------------*/
 
 	//Stiffness matrix object (analytical or numerical)
-	StiffnessMatrix* stiff_matrix;
-
+	std::unique_ptr<StiffnessMatrix> stiff_matrix;
 	//============================================================================
 
 	/*-----------------------------------------------------
@@ -170,6 +166,9 @@ public:
 	
 	//Vector with segment sets
 	std::vector<SegmentSet> segment_set_vector;
+
+	//Vector with displacement fields
+	std::vector<MoorLineDispFields> disp_field_vector;
 
 
 	//============================================================================
@@ -216,9 +215,9 @@ public:
 
 	void SetLinesConfiguration(Line& line, Matrix& F, std::vector <double>& FV, const unsigned int& n_segs);
 
-	void GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& max_nodes, unsigned int& seg_init);
+	void GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& seg_init);
 
-	void CheckSegmentsSize(Line& line, const unsigned int& n_segs, unsigned int& max_nodes, const unsigned int& seg_init);
+	void CheckSegmentsSize(Line& line, const unsigned int& n_segs, const unsigned int& seg_init);
 
 	void SetMeshProperties(Line& line, const unsigned int& n_segs);
 
@@ -237,7 +236,7 @@ public:
 
 	void GenerateDynamicRelaxation();
 
-	bool Look4SharedLine();
+	inline bool Look4SharedLine();
 
 	//Generates vessel (node, element, nodeset and fairleads coupling)
 	void GenerateVessel();
@@ -254,11 +253,14 @@ public:
 	//Analysis steps 
 	void GenerateAnalysisSteps(unsigned int& step, double& start);
 
+	//Vessel(s) nodal displacement(s)
 	void GenerateVesselDisplacements(unsigned int& step);
+	
 	//Creates applied forces
 	void GenerateForces();
 
-
+	//Line(s) displacement field(s) defined in the input file
+	void GenerateDisplacementFields();
 
 	//Gera fundo do mar (superficie de contato)
 	void GenerateSeabed();
