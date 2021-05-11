@@ -285,6 +285,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	//Limits to the counters (force initial guess) and error
 	static constexpr int MAX_ITERATIONS_FH0 = 10;
 	static constexpr int MAX_ITERATIONS_FV0 = 1000;
+	static constexpr int MAX_ITERATIONS_NEWTON = 50;
 	static constexpr double error_max = 1e-6;
 
 	//Residue
@@ -305,8 +306,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	auto [gmin, gmax] = std::minmax_element(line.gamma_s.begin(), line.gamma_s.end());
 	int m = ( int )floor(log10(max(fabs(*gmin), fabs(*gmax))));
 
-	//int m = ( int )floor(log10(*( std::max_element(line.gamma_s.begin(), line.gamma_s.end()) )));
-	
 	//Two times = before and after penetration
 	for (aux0 = 1; aux0 <= 2; aux0++)
 	{
@@ -328,7 +327,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					F(1, 0) = aux2 * pow(10.0, m);
 				}
 
-				for (aux3 = 0; aux3 <= 10; aux3++)
+				for (aux3 = 0; aux3 < MAX_ITERATIONS_NEWTON; aux3++)
 				{
 					//Calculating FV for each segment
 					FV[n_segs] = F(1, 0);
