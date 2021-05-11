@@ -50,8 +50,8 @@ public:
 	const unsigned int& GetFileNTimes() const;
 
 
-	unsigned int GetVesselID();
-	unsigned int GetStep();
+	unsigned int GetVesselID() const;
+	unsigned int GetStep() const;
 
 	void SetStartTime(const double& start);
 	void SetStartTableTime(const double& start_time, const size_t& start_line);

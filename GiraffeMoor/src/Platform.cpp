@@ -66,7 +66,7 @@ bool Platform::Read(FILE *f)
 
 
 	//Searches for comment block before "Connectivity" and "ConcentratedMass"
-	AuxFunctions::TryComment(f);
+	AuxFunctions::Read::TryComment(f);
 
 	uset::iterator it;
 	//Loop to read solution parameters
@@ -93,7 +93,7 @@ bool Platform::Read(FILE *f)
 				return true;
 			}
 		}
-		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str));
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str));
 		//Other word -> end loop and backs to IO class
 		else
 		{
@@ -117,6 +117,7 @@ bool Platform::Read(FILE *f)
 //Generates rigid body elements from concentrated mass(es)
 bool Platform::GenerateRigidBodyElements(unsigned int& element, unsigned int& nodeset, unsigned int &rb_data, unsigned int &special_constraint, unsigned int &nodal_constraint) const
 {
+	///TODO: 'GenerateRigidBodyData' para plataformas em EF
 	//Generates rigid bodies data and elements
 	//unsigned int rb_data = 0;
 	for (const Cylinder& cyl : cylinders_container)
@@ -125,7 +126,7 @@ bool Platform::GenerateRigidBodyElements(unsigned int& element, unsigned int& no
 		if (cyl.BoolFirstNodeMass())
 		{
 			//Generates Giraffe RB data
-			gm.GenerateRigidBodyData(++rb_data, cyl.GetFirstNodeMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", cyl.GetName());
+			//gm.GenerateRigidBodyData(++rb_data, cyl.GetFirstNodeMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", cyl.GetName());
 
 			//Generates Giraffe element
 			gm.GenerateRigidBodyElement(element++, rb_data, 1, cyl.GetFirstNode(), cyl.GetName());
@@ -134,7 +135,7 @@ bool Platform::GenerateRigidBodyElements(unsigned int& element, unsigned int& no
 		if (cyl.BoolLastNodeMass())
 		{
 			//Generates Giraffe RB data
-			gm.GenerateRigidBodyData(++rb_data, cyl.GetLastNodeMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", cyl.GetName());
+			//gm.GenerateRigidBodyData(++rb_data, cyl.GetLastNodeMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", cyl.GetName());
 
 			//Generates Giraffe element
 			gm.GenerateRigidBodyElement(element++, rb_data, 1, cyl.GetLastNode(), cyl.GetName());
@@ -145,7 +146,7 @@ bool Platform::GenerateRigidBodyElements(unsigned int& element, unsigned int& no
 	for (const ConcentratedMass& conc_mass : concentrated_mass_container)
 	{
 		//Generates Giraffe RB data
-		gm.GenerateRigidBodyData(++rb_data, conc_mass.GetMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", conc_mass.GetLabel());
+		//gm.GenerateRigidBodyData(++rb_data, conc_mass.GetMass(), { 0.,0.,0.,0.,0.,0. }, { 0.,0.,0. }, "", conc_mass.GetLabel());
 		
 		//Generates Giraffe element
 		gm.GenerateRigidBodyElement(element++, rb_data, 1,

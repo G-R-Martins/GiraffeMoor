@@ -66,9 +66,19 @@ bool SegmentSet::Read(FILE * f)
 }
 
 //Returns the number of 'LineSegment's in the set
-size_t& SegmentSet::SegmentSetSize()
+const size_t& SegmentSet::GetSegmentSetSize() const
 {
 	return this->n_segments;
+}
+
+const size_t& SegmentSet::GetSetID() const
+{
+	return this->ID;
+}
+
+const std::vector<LineSegment>& SegmentSet::GetAllSegment() const
+{
+	return this->segments;
 }
 
 LineSegment& SegmentSet::GetSegment(const size_t& seg)

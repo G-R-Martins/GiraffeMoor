@@ -34,7 +34,7 @@ bool Monitor::Read(FILE *f)
 	 -----------------*/
 	
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	AuxFunctions::TryComment(f);
+	AuxFunctions::Read::TryComment(f);
 
 	uset keywords({ "Nodes", "Elements", "Contacts" });
 	uset::iterator it;
@@ -97,7 +97,7 @@ bool Monitor::Read(FILE *f)
 				}
 			}
 		}
-		else if (try_comment && str[0] == '/' && AuxFunctions::ReadComment(f, str))
+		else if (try_comment && str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 			continue;	//Try to read other keyword after comment
 		//Other word -> backs position go to IO class
 		else

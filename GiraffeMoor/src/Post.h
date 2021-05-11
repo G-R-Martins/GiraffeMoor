@@ -1,4 +1,5 @@
 #pragma once
+#include "CADData.h"
 
 
 class Post
@@ -29,19 +30,24 @@ public:
 					/*-------
 					Variables
 					--------*/
-
-	bool WriteMesh_flag;
-	bool WriteRenderMesh_flag;
-	bool WriteRigidContactSurfaces_flag;
-	bool WriteFlexibleContactSurfaces_flag;
-	bool WriteConstraints_flag;
-	bool WriteForces_flag;
-	bool WriteSpecialConstraints_flag;
-	bool WriteContactForces_flag;
-	bool WriteRenderParticles_flag;
-	bool WriteRenderRigidBodies_flag;
-
 	//Magnification factor of displacements
 	double mag_factor;
+
+	struct WritingOpt
+	{
+		bool mesh_flag;
+		bool renderMesh_flag;
+		bool rigidContactSurfaces_flag;
+		bool flexibleContactSurfaces_flag;
+		bool constraints_flag;
+		bool forces_flag;
+		bool specialConstraints_flag;
+		bool contactForces_flag;
+		bool renderParticles_flag;
+		bool renderRigidBodies_flag;
+	} write;
+
+	//Vector with CADs for post proessing
+	std::vector<CADData> cads_vector;
 };
 

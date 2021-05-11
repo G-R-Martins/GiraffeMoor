@@ -32,7 +32,7 @@ bool MoorSolution::Read(FILE *f)
 	uset::iterator it;
 	
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	AuxFunctions::TryComment(f);
+	AuxFunctions::Read::TryComment(f);
 
 	//Loop to read solution parameters
 	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
@@ -55,7 +55,7 @@ bool MoorSolution::Read(FILE *f)
 					if (sub_keywords.find(std::string(str)) == sub_keywords.end())
 					{
 						//Backs position and tries to read a comment
-						if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
+						if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 						{
 							//Tries again to read second level keyword after a comment
 							if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && sub_keywords.find(std::string(str)) == sub_keywords.end())
@@ -138,7 +138,7 @@ bool MoorSolution::Read(FILE *f)
 				}
 			}
 		}
-		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 			continue;	//Other word -> end loop and backs to IO class
 		else
 		{

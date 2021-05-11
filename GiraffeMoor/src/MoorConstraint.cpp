@@ -38,7 +38,7 @@ bool MoorConstraint::Read(FILE * f)
 			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(mm.anc_constraint, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
 				return false;
 		}
-		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 			continue;
 		//Other word -> end loop and backs to IO class
 		else

@@ -10,6 +10,7 @@ PreCompiled Headers
 #include <fstream>
 #include <chrono>
 #include <algorithm>
+#include <iterator>
 #include <functional>
 #include <utility>
 #include <execution>

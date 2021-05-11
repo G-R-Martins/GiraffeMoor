@@ -4,6 +4,7 @@
 #include "Post.h"
 #include "Monitor.h"
 #include "ConvergenceCriteria.h"
+#include "CADData.h"
 #include "SolverOptions.h"
 #include "CoordinateSystem.h"
 #include "PipeSection.h"
@@ -212,8 +213,12 @@ public:
 	--------------*/
 	
 	//Rigid body data
-	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double,6>& J_G, const std::array<double,3>& G, const std::string& file);
-	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double,6>& J_G, const std::array<double,3>& G, const std::string& file, const std::string& comment);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, std::string&& comment);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& comment);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID, std::string&& comment);
+	void GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID, const std::string& comment);
 	
 	//Coordinate system
 	void GenerateCoordinateSystem(unsigned int number, Matrix& E1, Matrix& E3);
@@ -221,6 +226,7 @@ public:
 	
 	//Solution option
 	void GenerateSolverOptions(unsigned int cores, bool bool_direct);
+
 
 	//Reads GiraffeAddress
 	bool ReadGiraffeAddress(FILE *f);

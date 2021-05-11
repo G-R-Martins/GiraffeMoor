@@ -42,7 +42,30 @@ bool Keypoint::Read(FILE *f)
 }
 
 
-//Overloaded operators
+/*------
+ Getters
+ ------*/
+const unsigned int Keypoint::GetNumber() const
+{
+	return this->number;
+}
+const double Keypoint::GetKeypoint(char coordinate) const
+{
+	switch (coordinate)
+	{
+	case 'x':
+		return this->x;
+	case 'y':
+		return this->y;
+	case 'z':
+		return this->z;
+	}
+}
+
+
+/*-------------------
+ Overloaded operators
+ -------------------*/
 bool operator<(const Keypoint& obj1, const Keypoint& obj2)
 {
 	return obj1.number < obj2.number;

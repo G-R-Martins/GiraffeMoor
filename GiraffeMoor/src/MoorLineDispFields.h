@@ -38,12 +38,12 @@ public:
 	/// Get functions
 	///				 
 
-	unsigned int GetNumber();
-	unsigned int GetStep();
-	bool IsHarmonic();
+	unsigned int GetNumber() const;
+	unsigned int GetStep() const;
+	bool IsHarmonic() const;
 	//bool CheckIfIsExternalFile();
-	double GetAmplitude();
-	unsigned int GetMode();
+	double GetAmplitude() const;
+	unsigned int GetMode() const;
 
 
 	//============================================================================

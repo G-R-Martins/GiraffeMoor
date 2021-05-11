@@ -62,23 +62,23 @@ bool MoorLineDispFields::Read(FILE * f)
  Getters 
  ------*/
 
-unsigned int MoorLineDispFields::GetNumber()
+unsigned int MoorLineDispFields::GetNumber() const
 {
 	return this->number;
 }
-unsigned int MoorLineDispFields::GetStep()
+unsigned int MoorLineDispFields::GetStep() const
 {
 	return this->step;
 }
-bool MoorLineDispFields::IsHarmonic()
+bool MoorLineDispFields::IsHarmonic() const
 {
 	return this->isHarmonic;
 }
-double MoorLineDispFields::GetAmplitude()
+double MoorLineDispFields::GetAmplitude() const
 {
 	return this->amplitude;
 }
-unsigned int MoorLineDispFields::GetMode()
+unsigned int MoorLineDispFields::GetMode() const
 {
 	return this->mode;
 }

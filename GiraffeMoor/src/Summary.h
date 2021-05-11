@@ -5,6 +5,7 @@ class Summary
 {
 private: 
 	Summary();
+	~Summary() = default;
 	/// <summary>
 	///	
 	/// This Singleton manages the summary of the model and
@@ -70,35 +71,32 @@ private:
 public:
 
 	//Create/return Singleton instance
-	static Summary& Summary::getInstance()
-	{
-		static Summary summary;
-		return summary;
-	}
+	static Summary& Summary::getInstance() { static Summary summary; return summary; }
 
 	//Deleting copy and assignment 
 	Summary(const Summary&) = delete;
 	Summary(Summary&&) = delete;
 	Summary& operator=(const Summary&) = delete;
 
-	~Summary() = default;
 	
 	/********************
 	 * Static functions *
 	 ********************/
 
-	static void CreateSumFile(const std::string& fullname, const std::string& version) 
-	{ return getInstance().CreateSumFile_Impl(fullname, version); }
+	static void CreateSumFile(const std::string& fullname, const std::string& version) { 
+		return getInstance().CreateSumFile_Impl(fullname, version); }
 	
-	static void Append2File() { return getInstance().Append2File_Impl(); }
+	static void Append2File() { 
+		return getInstance().Append2File_Impl(); }
 	
 	static void AddLine( const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
 						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
 						 const unsigned int& number, const std::string_view& configuration,
-						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs )
-	{ return getInstance().AddLine_Impl(nodes, elements, nodesets, tensions, number, configuration, TDP, x_tdp, total_length, segs); }
+						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs ) { 
+		return getInstance().AddLine_Impl(nodes, elements, nodesets, tensions, number, configuration, TDP, x_tdp, total_length, segs); }
 	
-	static auto& GetSteps() { return getInstance().GetSteps_Impl(); }
+	static auto& GetSteps() { 
+		return getInstance().GetSteps_Impl(); }
 
 	///
 	///Overloaded operator to print line in the summary file 

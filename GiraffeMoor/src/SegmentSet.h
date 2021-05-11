@@ -7,7 +7,7 @@ class SegmentSet
 private:
 
 	// Set ID number
-	unsigned int ID;
+	size_t ID;
 
 	// Number of segments
 	size_t n_segments;
@@ -26,9 +26,14 @@ public:
 	bool Read(FILE* f);
 
 	//Returns the number of 'LineSegment's in the set
-	size_t& SegmentSetSize();
+	const size_t& GetSegmentSetSize() const;
 
-	//Get a segment from the set
+	const size_t& GetSetID() const;
+
+	//Get the container with segments of the set
+	const std::vector<LineSegment>& GetAllSegment() const;
+		
+	//Get a specific segment from the set
 	LineSegment& GetSegment(const size_t& seg);
 
 
