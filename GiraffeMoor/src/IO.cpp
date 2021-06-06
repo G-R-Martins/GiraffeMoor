@@ -120,8 +120,7 @@ bool IO::ReadFile()
 	{
 		//Last keyword
 		Log::SetLastKeyword(str);
-		if (cur_level != FirstLevelKeyword::CommentAfterBlock &&
-			cur_level != FirstLevelKeyword::Error)
+		if (cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error)
 			Log::SetLastValidKeyword(str);
 
 		switch (cur_level)
@@ -210,7 +209,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+         VesselDisplacements        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::VesselDisplacements:
-			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({ "VesselDispID" }), f, pos, str))
+			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({ "DispVesselID" }), f, pos, str))
 				return false;
 			break;
 
@@ -264,7 +263,6 @@ bool IO::ReadFile()
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 ERROR              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Error:
 			std::string warning = std::string("   + \"") + str + "\" is not a valid keyword!";
-				//+ " Last valid block: \"" + std::string(Log::GetLastValidKeyword()) + "\"";
 			Log::AddWarning(warning);
 
 			return false;
@@ -283,7 +281,6 @@ END:	fclose(f);
 		//Appends missed mandatory keywords
 		for (const std::string_view& missed_block : mandatory_keywords)
 		{
-			//auto warning_keyword = missed_block + "\n";
 			Log::AddWarning(missed_block);
 			Log::AddWarning("\n");
 		}

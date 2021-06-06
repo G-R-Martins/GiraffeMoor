@@ -60,6 +60,30 @@ bool Monitor::Read(FILE *f)
 					else if (!strcmp(str, "fairleads"))		bool_nodes_fairleads = true;
 					else if (!strcmp(str, "anchors"))		bool_nodes_anchors = true;
 					else if (!strcmp(str, "vessels"))		bool_nodes_vessel = true;
+					else if (!strcmp(str, "Sequence"))
+					{
+						if (fscanf(f, "%s", str) == EOF || strcmp(str, "NNodes"))
+						{
+							Log::AddWarning("\n   + Error reading sequence of nodes to monitor\n");
+							return false;
+						}
+						else
+						{
+							seq_nodes.emplace_front();
+							if (fscanf(f, "%d %s %d", &seq_nodes.front().nodes, str, &seq_nodes.front().begin) == EOF || strcmp(str, "Begin")
+								|| fscanf(f, "%s %d", str, &seq_nodes.front().increment) == EOF || strcmp(str, "Increment"))
+							{
+								Log::AddWarning("\n   + Error reading sequence of nodes to monitor\n");
+								return false;
+							}
+						}
+					}
+					else if (!strcmp(str, "List"))
+					{
+						while (!fgetpos(f, &pos) && fscanf(f, "%s", str) && isdigit(str[0]))
+							nodes.emplace_front(atoi(str));
+						fsetpos(f, &pos);
+					}
 					else
 					{
 						fsetpos(f, &pos);
@@ -77,6 +101,30 @@ bool Monitor::Read(FILE *f)
 					else if (!strcmp(str, "fairleads"))		bool_elements_fairleads = true;
 					else if (!strcmp(str, "anchors"))		bool_elements_anchors = true;
 					else if (!strcmp(str, "vessels"))		bool_elements_vessel = true;
+					else if (!strcmp(str, "Sequence"))
+					{
+						if (fscanf(f, "%s", str) == EOF || strcmp(str, "NElements"))
+						{
+							Log::AddWarning("\n   + Error reading sequence of elements to monitor\n");
+							return false;
+						}
+						else
+						{
+							seq_elements.emplace_front();
+							if (fscanf(f, "%d %s %d", &seq_elements.front().elements, str, &seq_elements.front().begin) == EOF || strcmp(str, "Begin")
+								|| fscanf(f, "%s %d", str, &seq_elements.front().increment) == EOF || strcmp(str, "Increment"))
+							{
+								Log::AddWarning("\n   + Error reading sequence of elements to monitor\n");
+								return false;
+							}
+						}
+					}
+					else if (!strcmp(str, "List"))
+					{
+						while (!fgetpos(f, &pos) && fscanf(f, "%s", str) && isdigit(str[0]))
+							elements.emplace_front(atoi(str));
+						fsetpos(f, &pos);
+					}
 					else
 					{
 						fsetpos(f, &pos);
@@ -109,6 +157,10 @@ bool Monitor::Read(FILE *f)
 
 	return true;
 }
+
+
+
+
 
 
 void Monitor::WriteGiraffeModelFile(FILE *f) const

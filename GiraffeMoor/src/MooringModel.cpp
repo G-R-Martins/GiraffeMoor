@@ -1537,6 +1537,31 @@ void MooringModel::GeneralSetting()
 			moorpost.write.flexibleContactSurfaces_flag, moorpost.write.constraints_flag, moorpost.write.forces_flag,
 			moorpost.write.specialConstraints_flag, moorpost.write.contactForces_flag, moorpost.write.renderParticles_flag, moorpost.write.renderRigidBodies_flag};
 
+	//Monitor nodes
+	for (Monitor::SequenceNodes& seq : gm.monitor.seq_nodes)
+	{
+		unsigned int temp = seq.begin;
+		for (unsigned int cont = 0; cont < seq.nodes; ++cont)
+		{
+			gm.monitor.nodes.emplace_front(temp);
+			temp += seq.increment;
+		}
+	}
+	gm.monitor.nodes.sort();
+	gm.monitor.nodes.unique();
+
+	//Monitor elements
+	for (Monitor::SequenceElements& seq : gm.monitor.seq_elements)
+	{
+		unsigned int temp = seq.begin;
+		for (unsigned int cont = 0; cont < seq.elements; ++cont)
+		{
+			gm.monitor.elements.emplace_front(temp);
+			temp += seq.increment;
+		}
+	}
+	gm.monitor.elements.sort();
+	gm.monitor.elements.unique();
 
 	//Monitor contact
 	if (gm.monitor.bool_contact_seabed_moor)	gm.monitor.contacts.push_front(1);
@@ -1793,7 +1818,9 @@ void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
 										   moorsolution.solution_steps[analysis_step].timestep,
 										   moorsolution.solution_steps[analysis_step].max_timestep,
 										   moorsolution.solution_steps[analysis_step].min_timestep, 15, 3, 2, 1.5,
-										   moorsolution.solution_steps[analysis_step].sample, 0.0, 0.0, 0,
+										   moorsolution.solution_steps[analysis_step].sample, 
+										   moorsolution.solution_steps[analysis_step].alpha_ray,
+										   moorsolution.solution_steps[analysis_step].beta_ray, 0,
 										   moorsolution.solution_steps[analysis_step].gamma_new,
 										   moorsolution.solution_steps[analysis_step].beta_new);
 			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Dynamic step"));

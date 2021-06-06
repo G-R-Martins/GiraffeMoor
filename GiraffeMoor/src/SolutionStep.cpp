@@ -5,7 +5,7 @@
 
 SolutionStep::SolutionStep()
 	: number(0), isStatic(true), global_start(0.0), end_time(0.0), timestep(0.0), 
-	max_timestep(0.0), min_timestep(0.0), sample(0), beta_new(0.0), gamma_new(0.0)
+	max_timestep(0.0), min_timestep(0.0), sample(0), beta_new(0.0), gamma_new(0.0), alpha_ray(0.0), beta_ray(0.0)
 {}
 
 SolutionStep::~SolutionStep()
@@ -115,7 +115,7 @@ bool SolutionStep::Read(FILE* f)
 
 		if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
 		{
-			std::string w = "\n   + There is no need to define numerical damping for static analysis of the step number " + std::to_string(number);
+			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
 			Log::AddWarning(w);
 		}
 	}
@@ -168,6 +168,15 @@ bool SolutionStep::Read(FILE* f)
 		std::string w = "\n   + Numerical damping was not defined for the step number " + std::to_string(number) + ". Newmark coeficients were set to zero.";
 		Log::AddWarning(w);
 		fsetpos(f, &pos);
+	}
+	if (fscanf(f, "%s", str) && !strcmp(str, "RayleighDamping") &&
+		fscanf(f, "%s %lf", str, &alpha_ray) && !strcmp(str, "Alpha") && fscanf(f, "%s %lf", str, &beta_ray) && !strcmp(str, "Beta"))
+	{
+		if (isStatic)
+		{
+			std::string w = "\n   + There is no need to define Rayleigh damping for the static analysis of the step number " + std::to_string(number);
+			Log::AddWarning(w);
+		}
 	}
 	else
 		fsetpos(f, &pos);

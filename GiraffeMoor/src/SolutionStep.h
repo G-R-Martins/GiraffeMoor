@@ -32,15 +32,15 @@ public:
 	//Sample -> to save VTK
 	int sample;
 
-	/*--------------------------
-	Numerical damping parameters
+	/*----------------------
+	    Damping parameters
 	  (for dynamic analisys)
-	---------------------------*/
-	//Beta -> Newmark damping
-	double beta_new;
+	------------------------*/
 
-	//Gamma -> Newmark damping
-	double gamma_new;
+	// Newmark damping (numerical damping)
+	double beta_new, gamma_new;
+	// Rayleigh damping 
+	double alpha_ray, beta_ray;
 
 	//============================================================================
 
