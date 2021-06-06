@@ -133,21 +133,16 @@ void MooringModel::CopyData()
 	gm.environment.gravity = MoorEnvironment::gravity;
 	g = MoorEnvironment::gravity;
 	
-	//Gravity bootable
-	BoolTable bool_g;
+	BoolTable bool_g; //Gravity bootable
 	bool_g.Set(1, true);
 	gm.environment.bool_g = bool_g;
 
-	//Rho fluid
 	gm.environment.rhofluid = environment.rhofluid;
-	
-	//Sea current
-	gm.environment.seacurrent_vector.reserve(environment.seacurrent_vector.size());
-	for (SeaCurrent& sea_current : environment.seacurrent_vector)
-		gm.environment.seacurrent_vector.emplace_back(sea_current);
-	
-	//Water depth
+	gm.environment.seacurrent_vector = environment.seacurrent_vector;
 	gm.environment.waterdepth = environment.waterdepth;
+
+	//CADs data to post processing 
+	gm.post.cads_vector = std::move(moorpost.platform_cads);
 }
 
 
@@ -290,6 +285,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	//Limits to the counters (force initial guess) and error
 	static constexpr int MAX_ITERATIONS_FH0 = 10;
 	static constexpr int MAX_ITERATIONS_FV0 = 1000;
+	static constexpr int MAX_ITERATIONS_NEWTON = 50;
 	static constexpr double error_max = 1e-6;
 
 	//Residue
@@ -310,8 +306,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	auto [gmin, gmax] = std::minmax_element(line.gamma_s.begin(), line.gamma_s.end());
 	int m = ( int )floor(log10(max(fabs(*gmin), fabs(*gmax))));
 
-	//int m = ( int )floor(log10(*( std::max_element(line.gamma_s.begin(), line.gamma_s.end()) )));
-	
 	//Two times = before and after penetration
 	for (aux0 = 1; aux0 <= 2; aux0++)
 	{
@@ -333,7 +327,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 					F(1, 0) = aux2 * pow(10.0, m);
 				}
 
-				for (aux3 = 0; aux3 <= 10; aux3++)
+				for (aux3 = 0; aux3 < MAX_ITERATIONS_NEWTON; aux3++)
 				{
 					//Calculating FV for each segment
 					FV[n_segs] = F(1, 0);
@@ -964,9 +958,9 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 						if (!anc_constraint.empty())
 						{
 							for (AnchorConstraint& anchor : anc_constraint)
-								if (line.number == anchor.number)
+								if (line.number == anchor.GetLineNumber())
 								{
-									anchor.nodeset = cur_node_set;
+									anchor.SetNodeSet(cur_node_set);
 									nodeset_found = true;
 									break;
 								}
@@ -1392,10 +1386,11 @@ void MooringModel::GenerateVessel()
 		if (platform_vector.empty())
 		{
 			//Check CAD name for the current vessel
-			auto& [bool_cad, plat_name] = moorpost.GetName(( size_t )vessel.number);
+			auto it_cad = std::find_if(gm.post.cads_vector.begin(), gm.post.cads_vector.end(),
+									  [&](CADData& cadData) { return cadData.GetNumber() == ( size_t )vessel.number; });
+			it_cad._Ptr ? gm.GenerateRigidBodyData(++cur_rbdata, vessel.mass, vessel.inertiaTensor, vessel_coord, it_cad->GetNumber(), std::string("Vessel of platform number ") + std::to_string(vessel.number))
+				: gm.GenerateRigidBodyData(++cur_rbdata, vessel.mass, vessel.inertiaTensor, vessel_coord);
 			
-
-			gm.GenerateRigidBodyData(++cur_rbdata, vessel.mass, vessel.inertiaTensor, vessel_coord, plat_name);
 			
 			//Rigid body element
 			vessel.element = cur_elem;
@@ -1538,10 +1533,35 @@ void MooringModel::GeneralSetting()
 	 *============================*/
 
 	//If there is just one line, do not write rigid member coupling fairlead and vessel
-	gm.post.WriteSpecialConstraints_flag = ( line_vector.size() == 1 ) ? false : true;
+	gm.post.write = { moorpost.write.mesh_flag, moorpost.write.renderMesh_flag, moorpost.write.rigidContactSurfaces_flag,
+			moorpost.write.flexibleContactSurfaces_flag, moorpost.write.constraints_flag, moorpost.write.forces_flag,
+			moorpost.write.specialConstraints_flag, moorpost.write.contactForces_flag, moorpost.write.renderParticles_flag, moorpost.write.renderRigidBodies_flag};
 
-	//If there is at least one platform STL, write RenderRigidBodies
-	gm.post.WriteRenderRigidBodies_flag = ( !moorpost.platform_names.empty() ) ? true : false;
+	//Monitor nodes
+	for (Monitor::SequenceNodes& seq : gm.monitor.seq_nodes)
+	{
+		unsigned int temp = seq.begin;
+		for (unsigned int cont = 0; cont < seq.nodes; ++cont)
+		{
+			gm.monitor.nodes.emplace_front(temp);
+			temp += seq.increment;
+		}
+	}
+	gm.monitor.nodes.sort();
+	gm.monitor.nodes.unique();
+
+	//Monitor elements
+	for (Monitor::SequenceElements& seq : gm.monitor.seq_elements)
+	{
+		unsigned int temp = seq.begin;
+		for (unsigned int cont = 0; cont < seq.elements; ++cont)
+		{
+			gm.monitor.elements.emplace_front(temp);
+			temp += seq.increment;
+		}
+	}
+	gm.monitor.elements.sort();
+	gm.monitor.elements.unique();
 
 	//Monitor contact
 	if (gm.monitor.bool_contact_seabed_moor)	gm.monitor.contacts.push_front(1);
@@ -1798,7 +1818,9 @@ void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
 										   moorsolution.solution_steps[analysis_step].timestep,
 										   moorsolution.solution_steps[analysis_step].max_timestep,
 										   moorsolution.solution_steps[analysis_step].min_timestep, 15, 3, 2, 1.5,
-										   moorsolution.solution_steps[analysis_step].sample, 0.0, 0.0, 0,
+										   moorsolution.solution_steps[analysis_step].sample, 
+										   moorsolution.solution_steps[analysis_step].alpha_ray,
+										   moorsolution.solution_steps[analysis_step].beta_ray, 0,
 										   moorsolution.solution_steps[analysis_step].gamma_new,
 										   moorsolution.solution_steps[analysis_step].beta_new);
 			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Dynamic step"));
@@ -2144,8 +2166,8 @@ void MooringModel::GenerateSeabed()
 		Log::AddWarning("\n   + Post files directory could not be created.");
 
 	//Setting contact surface flag
-	if (!VTKseabedOk && !gm.post.WriteRigidContactSurfaces_flag)
-		gm.post.WriteRigidContactSurfaces_flag = true;
+	if (!VTKseabedOk && !gm.post.write.rigidContactSurfaces_flag)
+		gm.post.write.rigidContactSurfaces_flag = true;
 }
 
 //Generates constraints
@@ -2175,11 +2197,11 @@ void MooringModel::GenerateConstraints()
 			//Copies of the booltables for the first steps
 			BoolTable ROTX2(ROT), ROTY2(ROT), ROTZ2(ROTZ);
 
-			ROTX2.Push_Back(anchor.rotx);
-			ROTY2.Push_Back(anchor.roty);
-			ROTZ2.Push_Back(anchor.rotz);
+			ROTX2.Push_Back(anchor.GetRot('x'));
+			ROTY2.Push_Back(anchor.GetRot('y'));
+			ROTZ2.Push_Back(anchor.GetRot('z'));
 
-			gm.GenerateNodalConstraint(++cur_constraint, anchor.nodeset, U, U, U, ROTX2, ROTY2, ROTZ2);
+			gm.GenerateNodalConstraint(++cur_constraint, anchor.GetNodeSet(), U, U, U, ROTX2, ROTY2, ROTZ2);
 		}
 	}
 	//Anchors with default constraints
@@ -2225,7 +2247,7 @@ void MooringModel::GenerateConstraints()
 		for (Vessel& vessel : vessel_vector)
 			gm.GenerateNodalConstraint(++cur_constraint, vessel.nodeset, U, U, U, ROT, ROT, ROT);
 	}
-	///Initial step to include new constraint(s)
+	///Different constraint(s) defined in the input file
 	else
 	{
 		int step0 = 3;
@@ -2324,7 +2346,7 @@ void MooringModel::GenerateSegments()
 			//Iterates through the 'LineSegment' objects in 'SegmentSet', 
 			//copying it to the 'segments' vector in the current line
 			size_t setID = line.segment_set - 1;
-			for (size_t i = 0; i < segment_set_vector[setID].SegmentSetSize(); ++i)
+			for (size_t i = 0; i < segment_set_vector[setID].GetSegmentSetSize(); ++i)
 				line.segments.emplace_back(segment_set_vector[setID].GetSegment(i));
 		}
 	}

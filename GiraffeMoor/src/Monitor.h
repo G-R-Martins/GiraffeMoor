@@ -21,6 +21,12 @@ public:
 
 	//============================================================================
 
+	/*-------------------------------------
+	  Structs with rules to create monitors
+	 -------------------------------------*/
+	struct SequenceNodes { unsigned int nodes, begin, increment; };
+	struct SequenceElements { unsigned int elements, begin, increment; };
+
 	/*-------
 	Variables
 	--------*/
@@ -31,6 +37,10 @@ public:
 	std::forward_list <unsigned int> contacts;
 	std::forward_list <unsigned int> node_sets;
 	
+	//Containers with structs to create monitors
+	std::forward_list <SequenceNodes> seq_nodes;
+	std::forward_list <SequenceElements> seq_elements;
+
 	//Monitor sample
 	int sample;
 

@@ -44,7 +44,7 @@ bool ConvergenceCriteria::Read(FILE *f)
 			else if (*it == "LagrangeMinimumReference")			lag_min = atof(str);
 			else if (*it == "DivergenceReference")				divergence_ref = atof(str);
 		}
-		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 			continue;
 		//Other word -> backs position go to IO class
 		else

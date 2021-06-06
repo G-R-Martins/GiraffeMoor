@@ -25,14 +25,13 @@ public:
 	
 	//Inserts displacement field (from a matrix of translations) in the vector of displacements
 	void InsertDisplacement(const int& node, Matrix& e_disp);
-
 	void InsertDisplacement(const unsigned int& node, Matrix& e_disp);
 
 	//Inserts displacement field (from a matrix of translations and a matrix of rotations) in the vector of displacements
 	void InsertDisplacement(const int& node, Matrix& e_disp, Matrix& e_rot);
-
 	void InsertDisplacement(const unsigned int& node, Matrix& e_disp, Matrix& e_rot);
 
+	//Inserts displacement field (from an array) in the vector of displacements
 	void InsertDisplacement(const unsigned int& node, std::array<double,6>& e_disp);
 
 	//============================================================================

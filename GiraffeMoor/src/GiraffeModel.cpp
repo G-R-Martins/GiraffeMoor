@@ -210,23 +210,59 @@ void GiraffeModel::GenerateSolverOptions(unsigned int cores, bool bool_direct)
 {
 	solver_opt.SetSolverOptions(cores, bool_direct);
 }
-void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& file)
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G)
 {
 	rbdata_vector.emplace_back();
 	rbdata_vector.back().number = number;
 	rbdata_vector.back().mass = mass;
 	rbdata_vector.back().J_G = J_G;
 	rbdata_vector.back().G = G;
-	rbdata_vector.back().platform_name = file;
 }
-void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& file, const std::string& comment)
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, std::string&& comment)
 {
 	rbdata_vector.emplace_back();
 	rbdata_vector.back().number = number;
 	rbdata_vector.back().mass = mass;
 	rbdata_vector.back().J_G = J_G;
 	rbdata_vector.back().G = G;
-	rbdata_vector.back().platform_name = file;
+	rbdata_vector.back().comment = std::move(comment);
+}
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& comment)
+{
+	rbdata_vector.emplace_back();
+	rbdata_vector.back().number = number;
+	rbdata_vector.back().mass = mass;
+	rbdata_vector.back().J_G = J_G;
+	rbdata_vector.back().G = G;
+	rbdata_vector.back().comment = comment;
+}
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID)
+{
+	rbdata_vector.emplace_back();
+	rbdata_vector.back().number = number;
+	rbdata_vector.back().mass = mass;
+	rbdata_vector.back().J_G = J_G;
+	rbdata_vector.back().G = G;
+	rbdata_vector.back().cad = cadID;
+}
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID, std::string&& comment)
+{
+	rbdata_vector.emplace_back();
+	rbdata_vector.back().number = number;
+	rbdata_vector.back().mass = mass;
+	rbdata_vector.back().J_G = J_G;
+	rbdata_vector.back().G = G;
+	rbdata_vector.back().cad = cadID;
+	rbdata_vector.back().comment = std::move(comment);
+}
+void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const size_t& cadID, const std::string& comment)
+{
+	rbdata_vector.emplace_back();
+	rbdata_vector.back().number = number;
+	rbdata_vector.back().mass = mass;
+	rbdata_vector.back().J_G = J_G;
+	rbdata_vector.back().G = G;
+	rbdata_vector.back().cad = cadID;
 	rbdata_vector.back().comment = comment;
 }
 void GiraffeModel::GenerateNSSSContact(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set, const double& mu, const double& epn, const double& cn, const double& ept, const double& ct, const double& pinball, const double& radius, const unsigned int& max_interactions, BoolTable& bool_table)

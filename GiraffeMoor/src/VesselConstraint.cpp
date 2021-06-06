@@ -74,6 +74,11 @@ bool VesselConstraint::Read(FILE *f)
 Get functions
 -----------*/
 
+unsigned int VesselConstraint::GetVesselID() const
+{
+	return this->number;
+}
+
 unsigned int VesselConstraint::GetSizeX()
 {
 	return ( unsigned int )this->constraints[0].size();

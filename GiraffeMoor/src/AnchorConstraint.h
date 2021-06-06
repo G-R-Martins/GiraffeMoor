@@ -7,9 +7,21 @@ public:
 	AnchorConstraint();
 	~AnchorConstraint();
 	
-
 	//Reads input file
 	bool Read(FILE *f);
+	
+	/*-------
+	  Getters  
+	 -------*/
+
+	unsigned int GetLineNumber() const ;
+	unsigned int GetNodeSet() const;
+	int GetRot(char rot) const;
+
+	void SetNodeSet(const unsigned int& node_set);
+
+private:
+
 
 	/*-------
 	Variables
@@ -26,8 +38,6 @@ public:
 	int rotz;
 
 	
-	//============================================================================
-
 	/*------------------
 	Overloaded operators
 	-------------------*/
@@ -36,6 +46,5 @@ public:
 	friend bool operator> (const AnchorConstraint& anchor1, const AnchorConstraint& anchor2);
 	friend bool operator== (const AnchorConstraint& anchor1, const AnchorConstraint& anchor2);
 	friend bool operator!= (const AnchorConstraint& anchor1, const AnchorConstraint& anchor2);
-	
 };
 

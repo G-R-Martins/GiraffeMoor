@@ -21,6 +21,8 @@ public:
 	Get functions
 	-----------*/
 
+	unsigned int GetVesselID() const;
+	
 	unsigned int GetSizeX();
 	unsigned int GetSizeY();
 	unsigned int GetSizeZ();

@@ -69,7 +69,7 @@ bool VesselDisplacement::Read(FILE* f)
 	//Read from external file (GiraffeMoor check if the file exists and only Giraffe will actually read it)
 	else if (!strcmp(str, "File"))
 	{
-		AuxFunctions::TryComment(f);
+		AuxFunctions::Read::TryComment(f);
 
 		//Read the name of the file with the table data 
 		///file name must be enclosed by quotes
@@ -190,11 +190,11 @@ const unsigned int& VesselDisplacement::GetFileNTimes() const
 {
 	return this->n_times;
 }
-unsigned int VesselDisplacement::GetVesselID()
+unsigned int VesselDisplacement::GetVesselID() const
 {
 	return this->vesselID;
 }
-unsigned int VesselDisplacement::GetStep()
+unsigned int VesselDisplacement::GetStep() const
 {
 	return this->step;
 }

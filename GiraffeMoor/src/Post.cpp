@@ -3,11 +3,11 @@
 #include "Log.h"
 
 
-
 Post::Post()
-	: WriteMesh_flag(true), WriteRenderMesh_flag(false), WriteRigidContactSurfaces_flag(false), WriteFlexibleContactSurfaces_flag(false),
+	: mag_factor(1.0), write{ false, false, false, false, false, false, false, false, false, false }
+	/*WriteMesh_flag(true), WriteRenderMesh_flag(false), WriteRigidContactSurfaces_flag(false), WriteFlexibleContactSurfaces_flag(false),
 	WriteConstraints_flag(false), WriteSpecialConstraints_flag(false), WriteForces_flag(false), WriteContactForces_flag(false),
-	WriteRenderRigidBodies_flag(false), WriteRenderParticles_flag(false), mag_factor(1.0)
+	WriteRenderRigidBodies_flag(false), WriteRenderParticles_flag(false)*/
 {}
 
 Post::~Post()
@@ -16,7 +16,7 @@ Post::~Post()
 void Post::WriteGiraffeModelFile(FILE *f) const
 {
 	fprintf(f, "\tMagFactor\t%.6f\n\tWriteMesh\t%d\n\tWriteRenderMesh\t%d\n\tWriteRigidContactSurfaces\t%d\n\tWriteFlexibleContactSurfaces\t%d\n\tWriteForces\t%d\n\tWriteConstraints\t%d\n\tWriteSpecialConstraints\t%d\n\tWriteContactForces\t%d\n\tWriteRenderRigidBodies\t%d\n\tWriteRenderParticles\t%d\n", 
-		mag_factor, WriteMesh_flag, WriteRenderMesh_flag, WriteRigidContactSurfaces_flag, WriteFlexibleContactSurfaces_flag, WriteForces_flag, WriteConstraints_flag, WriteSpecialConstraints_flag, WriteContactForces_flag, WriteRenderRigidBodies_flag, WriteRenderParticles_flag);
+		mag_factor, write.mesh_flag, write.renderMesh_flag, write.rigidContactSurfaces_flag, write.flexibleContactSurfaces_flag, write.forces_flag, write.constraints_flag, write.specialConstraints_flag, write.contactForces_flag, write.renderRigidBodies_flag, write.renderParticles_flag);
 }
 
 bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)

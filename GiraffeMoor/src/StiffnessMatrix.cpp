@@ -67,7 +67,7 @@ bool StiffnessMatrix::Read(FILE *f)
 			}
 		}
 		//Checks for comment
-		else if (str[0] == '/' && AuxFunctions::ReadComment(f, str));
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str));
 		//Other word -> backs position go to IO class
 		else
 		{

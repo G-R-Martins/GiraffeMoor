@@ -52,3 +52,36 @@ bool AnchorConstraint::Read(FILE *f)
 	//All OK while reading
 	return true;
 }
+
+/*-------
+  Getters
+ -------*/
+
+unsigned int AnchorConstraint::GetLineNumber() const
+{
+	return this->number;
+}
+unsigned int AnchorConstraint::GetNodeSet() const
+{
+	return this->nodeset;
+}
+int AnchorConstraint::GetRot(char rot) const
+{
+	switch (rot)
+	{
+	case 'x':
+		return this->rotx;
+	case 'y':
+		return this->roty;
+	case 'z':
+		return this->rotz;
+	/*default:
+		std::cerr << "Invalid direction to define anchor rotation constraint. It must 'x', 'y' or 'z'"*/
+	}
+}
+
+
+void AnchorConstraint::SetNodeSet(const unsigned int& node_set)
+{
+	this->nodeset = node_set;
+}

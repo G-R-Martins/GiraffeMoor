@@ -17,9 +17,9 @@ namespace LoopReading
 	/// <summary>
 	///	
 	/// There is some functions that might seems to be unecessary repeated.
-	/// This choice was made to avoid some 'if' statements 
-	/// and to clarify when use ordered or unordered containers.
-	///	
+	/// This choice was made to clarify when use ordered or unordered containers
+	/// and to avoid some 'if' statements 
+	/// 
 	/// Some examples are given before every function definition.
 	/// 
 	/// </summary>
@@ -38,7 +38,7 @@ namespace LoopReading
 		if (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF && keyword_set.find(std::string_view(str)) == keyword_set.end())
 		{
 			//Backs position and tries to read a comment
-			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::TryComment(f))
+			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::Read::TryComment(f))
 			{
 				//Tries again to read second level keyword after a comment
 				if (fscanf(f, "%s", str) && keyword_set.find(std::string_view(str)) == keyword_set.end())
@@ -79,7 +79,7 @@ namespace LoopReading
 		if (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF && keyword_set.find(std::string_view(str)) == keyword_set.end())
 		{
 			//Backs position and tries to read a comment
-			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::TryComment(f))
+			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::Read::TryComment(f))
 			{
 				//Tries again to read second level keyword after a comment
 				if (fscanf(f, "%s", str) && keyword_set.find(std::string_view(str)) == keyword_set.end())
@@ -107,7 +107,7 @@ namespace LoopReading
 		if (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF && keyword_set.find(std::string_view(str)) == keyword_set.end())
 		{
 			//Backs position and tries to read a comment
-			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::TryComment(f))
+			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::Read::TryComment(f))
 			{
 				//Tries again to read second level keyword after a comment
 				if (fscanf(f, "%s", str) && keyword_set.find(std::string_view(str)) == keyword_set.end())
@@ -151,7 +151,7 @@ namespace LoopReading
 		if (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF && keyword_set.find(std::string_view(str)) == keyword_set.end())
 		{
 			//Backs position and tries to read a comment
-			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::TryComment(f))
+			if (!fsetpos(f, &pos) && str[0] == '/' && AuxFunctions::Read::TryComment(f))
 			{
 				//Tries again to read second level keyword after a comment
 				if (fscanf(f, "%s", str) && keyword_set.find(std::string_view(str)) == keyword_set.end())
@@ -189,7 +189,7 @@ namespace LoopReading
 			else if (keyword_set.find(std::string_view(str)) == keyword_set.end())
 			{
 				//Searches for comment and read next word
-				if (str[0] == '/' && !fsetpos(f, &pos) && AuxFunctions::TryComment(f) /*comment*/
+				if (str[0] == '/' && !fsetpos(f, &pos) && AuxFunctions::Read::TryComment(f) /*comment*/
 					&& !fgetpos(f, &pos) && fscanf(f, "%s", str) == EOF) /*next word*/
 				{
 					fsetpos(f, &pos);
@@ -205,7 +205,7 @@ namespace LoopReading
 					return true;
 				}
 				//Checks for a first level keyword
-				else if (AuxFunctions::isKeyword(str))
+				else if (AuxFunctions::Read::isKeyword(str))
 				{
 					fsetpos(f, &pos);
 					return true;
@@ -240,7 +240,7 @@ namespace LoopReading
 			else if (keyword_set.find(std::string_view(str)) == keyword_set.end())
 			{
 				//Searches for comment and read next word
-				if (str[0] == '/' && !fsetpos(f, &pos) && AuxFunctions::TryComment(f) && !fgetpos(f, &pos)
+				if (str[0] == '/' && !fsetpos(f, &pos) && AuxFunctions::Read::TryComment(f) && !fgetpos(f, &pos)
 					&& fscanf(f, "%s", str) == EOF)
 				{
 					fsetpos(f, &pos);
@@ -250,7 +250,7 @@ namespace LoopReading
 				else if (keyword_set.find(std::string_view(str)) != keyword_set.end()) 
 					continue /*Do nothing, continue the loop*/;
 				//Checks for a first level keyword
-				else if (AuxFunctions::isKeyword(str))
+				else if (AuxFunctions::Read::isKeyword(str))
 				{
 					fsetpos(f, &pos);
 					return true;

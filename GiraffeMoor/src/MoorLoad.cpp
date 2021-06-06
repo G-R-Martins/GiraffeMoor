@@ -73,7 +73,7 @@ bool MoorLoad::Read(FILE* f)
 	//Read from external file (GiraffeMoor check if the file exists and only Giraffe will actually read it)
 	else if (!strcmp(str, "File"))
 	{
-		AuxFunctions::TryComment(f);
+		AuxFunctions::Read::TryComment(f);
 
 		//Read the name of the file with the table data 
 		///file name must be enclosed by quotes
@@ -105,8 +105,8 @@ bool MoorLoad::Read(FILE* f)
 
 		if (!inp.is_open())
 		{
-			warning = "\n   + Error trying to open the file with nodal load of the " + description;
-			warning = ( description == "vessel" ) ? std::to_string(nodeID) : /* if is a vessel */
+			warning = std::string("\n   + Error trying to open the file with nodal load of the ") + description + " ";
+			warning += ( description == "vessel" ) ? std::to_string(nodeID) : /* if is a vessel */
 				"node of the line " + std::to_string(lineID); /* if is first or last node of the line */
 			Log::AddWarning(warning);
 			return false;

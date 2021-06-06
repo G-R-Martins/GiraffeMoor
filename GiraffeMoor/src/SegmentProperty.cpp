@@ -155,6 +155,11 @@ bool SegmentProperty::Read(FILE *f)
 	return true;
 }
 
+const unsigned int SegmentProperty::GetNumber() const
+{
+	return this->number;
+}
+
 //Writes Giraffe file data
 void SegmentProperty::WriteGiraffeModelFile(FILE *f)
 {

@@ -12,17 +12,18 @@ public:
 	//ID
 	unsigned int number;
 	
-	//Massa
+	//Mass
 	double mass;
 	
-	//Tensor de inércia
+	//Inertia tensor 
 	std::array<double, 6> J_G;
 	
-	//Posição do baricentro
+	//Barycenter position
 	std::array<double, 3> G;
 	
-	//Nome do arquivo CAD que tem a informação geométrica completa para renderização do corpo rígido
-	std::string platform_name;
+	//ID of the CAD used to render the rigid body
+	/// elements of CADData stored in Post::cads_vector 
+	size_t cad;
 
 	//Comment
 	std::string comment;

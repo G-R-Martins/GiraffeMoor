@@ -26,6 +26,7 @@
 #include "MathCode.h"
 #include "Monitor.h"
 #include "ConvergenceCriteria.h"
+#include "CADData.h"
 
 #include "BoolTable.h"
 
@@ -173,7 +174,6 @@ public:
 
 	//============================================================================
 
-	
 	
 public:
 			

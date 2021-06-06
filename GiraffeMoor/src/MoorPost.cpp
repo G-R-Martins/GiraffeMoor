@@ -1,19 +1,9 @@
 #include "PCH.h"
 #include "MoorPost.h"
-#include "GiraffeModel.h"
-#include "AuxFunctions.h"
+#include "LoopReading.h"
 
-//Global object
-extern GiraffeModel gm;
-
-//Static member
-//std::vector<std::string> MoorPost::platform_names;
-std::map<size_t, std::string> MoorPost::platform_names;
 
 MoorPost::MoorPost()
-{}
-
-MoorPost::~MoorPost()
 {}
 
 
@@ -39,7 +29,7 @@ bool MoorPost::Read(FILE *f)
 	 -----------------*/
 
 	//Searches for comment block before keywords
-	AuxFunctions::TryComment(f);
+	AuxFunctions::Read::TryComment(f);
 
 	uset keywords({ "CADs", "PostFiles"});
 	uset::iterator it;
@@ -47,22 +37,18 @@ bool MoorPost::Read(FILE *f)
 	//Loop to read data
 	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
 	{
-		bool try_comment = true;
-
 		it = keywords.find(std::string_view(str));
 		if (it != keywords.end())
 		{
 			if (*it == "CADs")
 			{
 				keywords.erase(*it);
-
-				while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
+				if (!LoopReading::TryNestedKeyword_UnorderedMultiple(platform_cads,
+												   std::unordered_set<std::string_view>{ "PlatformID" },
+												   std::unordered_set<std::string_view>({ "PostFiles"}),
+												   f, pos, str))
 				{
-					if (!strcmp(str, "PlatformID"))
-					{
-						if (fscanf(f, "%s", str) != EOF)
-							platform_names[2] = str;
-					}
+					return false;
 				}
 			}
 			else if (*it == "PostFiles")
@@ -70,22 +56,27 @@ bool MoorPost::Read(FILE *f)
 				keywords.erase(*it);
 				while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
 				{
-					//Check flag
-					if (!strcmp(str, "Forces"))						gm.post.WriteForces_flag = true;
-					else if (!strcmp(str, "ContactForces"))			gm.post.WriteContactForces_flag = true;
-					else if (!strcmp(str, "SpecialConstraints"))	gm.post.WriteSpecialConstraints_flag = true;
-					else if (!strcmp(str, "ContactSurface"))			gm.post.WriteRigidContactSurfaces_flag = true;
+					//Check flag					
+					if (!strcmp(str, "Mesh"))							write.mesh_flag = true;
+					else if (!strcmp(str, "RenderMesh"))				write.renderMesh_flag = true;
+					else if (!strcmp(str, "RigidContactSurfaces"))		write.rigidContactSurfaces_flag = true;
+					else if (!strcmp(str, "FlexibleContactSurfaces"))	write.flexibleContactSurfaces_flag = true;
+					else if (!strcmp(str, "Constraints"))				write.constraints_flag = true;
+					else if (!strcmp(str, "Forces"))					write.forces_flag = true;
+					else if (!strcmp(str, "SpecialConstraints"))		write.specialConstraints_flag = true;
+					else if (!strcmp(str, "ContactForces"))			write.contactForces_flag = true;
+					else if (!strcmp(str, "RenderParticles"))			write.renderParticles_flag = true;
+					else if (!strcmp(str, "RenderRigidBodies"))		write.renderRigidBodies_flag = true;					
 					else
 					{
 						fsetpos(f, &pos);
-						try_comment = false;
 						break;
 					}
 				}
 			}
 		}
 		//Not a keyword
-		else if (try_comment && str[0] == '/' && AuxFunctions::ReadComment(f, str))
+		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
 			continue;	//Try to read other keyword after comment
 		//Other word -> backs position go to IO class
 		else
@@ -95,21 +86,7 @@ bool MoorPost::Read(FILE *f)
 		}
 	}//end while
 
+
+	//All ok while reading
 	return true;
 }
-
-std::tuple<bool, std::string> MoorPost::GetName(size_t plat_num)
-{
-	//Searches for key -> returns an iterator
-	auto it = platform_names.find(plat_num);
-
-	//Key founded
-	if (it != platform_names.end())
-	{
-		return std::make_tuple(true, platform_names[plat_num]);
-	}
-	//Key not founded (invalid value)
-	else
-		return std::make_tuple(false, std::string(""));
-}
-

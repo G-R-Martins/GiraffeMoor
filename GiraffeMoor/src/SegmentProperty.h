@@ -9,6 +9,9 @@ public:
 	//Reads input file
 	bool Read(FILE *f);
 
+	//Get functions
+	const unsigned int GetNumber() const;
+
 	//Writes Giraffe file data
 	void WriteGiraffeModelFile(FILE *f);
 

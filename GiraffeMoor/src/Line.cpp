@@ -234,3 +234,8 @@ bool Line::Read(FILE *f)
 	//All OK while reading
 	return true;
 }
+
+const unsigned int Line::GetNumber() const
+{
+	return this->number;
+}
