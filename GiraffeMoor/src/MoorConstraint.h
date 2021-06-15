@@ -1,27 +1,47 @@
 #pragma once
+//Objects inside containers
+#include "AnchorConstraint.h"
+#include "VesselConstraint.h"
+#include "LineConstraint.h"
 
 
 class MoorConstraint
 {
+private:
+		/*--------
+		|Variables|
+		---------*/
+
+	//Booleans to indicate which container has constraint data
+	bool existAnchorConstraint, existVesselConstraint, existLineConstraint;
+
+	std::vector<AnchorConstraint> anchors;
+	std::vector<VesselConstraint> vessels;
+	std::vector<LineConstraint> lines;
+
+	//==========================================================================================================================
+
 public:
+
 	MoorConstraint();
-	~MoorConstraint();
+	~MoorConstraint() = default;
+	
+		/*--------
+		|Functions|
+		---------*/
 
 	//Reads input file
 	bool Read(FILE* f);
 
-	
-	///TODO: transformar vessel e anchor constraint em subclasses
-	///		 assim como 'Static' e 'Dynamic' com respeito a 'Solution'
-	
-	/*-------
-	Variables
-	--------*/
+	//Check input data readed
+	void CheckModel(bool& modelOk, std::map<std::string_view , std::size_t>& n_keywords);
 
-	////Number of the line (anchor constraint) or vessel (vessel constraint)
-	//unsigned int number;
-	//
-	////Nodeset number
-	//unsigned int nodeset;
+	//Check if exist at least one constraint of the type
+	bool ExistAnchorConstraint(), ExistVesselConstraint(), ExistLineConstraint();
+
+	std::vector<AnchorConstraint>& GetAnchorConstraints() { return  anchors; }
+	std::vector<VesselConstraint>& GetVesselConstraints() { return  vessels; }
+	//==========================================================================================================================
+
 };
 

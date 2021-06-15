@@ -133,4 +133,29 @@ namespace AuxFunctions
 
 	}// End of namespace "Read"
 
+
+	namespace Time
+	{
+		using namespace std::literals::chrono_literals;
+
+		struct Timer
+		{
+			std::chrono::time_point<std::chrono::steady_clock> start;
+			std::chrono::duration<float> duration;
+
+			Timer()
+			{
+				start = std::chrono::high_resolution_clock::now();
+			}
+			~Timer()
+			{
+				duration = std::chrono::high_resolution_clock::now() - start;
+				
+				float ms = duration.count() * 1000.0f;
+				std::cout << "Timer took: " << ms << "ms" << "\n";
+			}
+		};
+
+	}// End of namespace "Time"
+
 }

@@ -68,20 +68,7 @@ public:
 	//Steps before analysis
 	unsigned int steps_to_set_model;
 
-	///TODO: make it private
 	//Container with analysis steps
 	std::vector <SolutionStep> solution_steps;
 
-	
-	///TODO: send to another object (GiraffeModel or a new one)
-	/*------------
-	Solver options
-	-------------*/
-		
-	//Number of cores used for Giraffe
-	unsigned int ncores;
-
-	//Linear system solver option
-	/// if is not direct, it will be defined as 'iterative'
-	bool lin_sys_isDirect;
 };

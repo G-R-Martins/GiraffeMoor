@@ -65,10 +65,10 @@ bool IO::ReadFile()
 	std::cout << "|                                                            |\n";
 	std::cout << "|                                                v. " << version << "  |\n";
 	std::cout << "|____________________________________________________________|\n\n";
-
-	while (!readOK)
+	
+	while ( !readOK )
 	{
-		if (__argc > 1)
+		if ( __argc > 1 )
 			name_input = __argv[1];
 		else
 		{
@@ -88,27 +88,28 @@ bool IO::ReadFile()
 		std::cout << "\n";
 		//tries to read the same location of the executable file of Giraffe
 		f = fopen(name.c_str(), "r");
-		if (f == NULL)
+		if ( f == NULL )
 		{
 			folder_name = "C:/Users/Public/Documents/GiraffeMoor/";
 			struct stat info;
 			//checks if there is a folder called "GiraffeMoor" in this directory
-			if (stat(folder_name.c_str(), &info) != 0)
+			if ( stat(folder_name.c_str(), &info) != 0 )
 				auto return_to_ignore = _mkdir(folder_name.c_str());
 			name = folder_name + name_input + ".gmr";
 			f = fopen(name.c_str(), "r");
-			if (f == NULL)
+			if ( f == NULL )
 				printf("Error reading the input file. Try again.\n");
 			else
 				readOK = true;
 		}
 		else
 		{
-			if (__argc > 1)
+			if ( __argc > 1 )
 				std::cout << "Running file \"" << name_input << ".gmr\" . . .\n\n\n";
 			readOK = true;
 		}
 	}
+	
 
 	char str[1000];
 	fpos_t pos;		//variável que salva ponto do stream de leitura
@@ -116,20 +117,20 @@ bool IO::ReadFile()
 	//Set with mandatory keywords to check if these blocks were defined
 	std::unordered_set<std::string_view> mandatory_keywords({ "Environment", "Keypoints" , "Lines" , "Vessels" , "SegmentProperties" , "Solution" });
 
-	while (ReadKeyword(f, pos, str))
+	while ( ReadKeyword(f, pos, str) )
 	{
 		//Last keyword
 		Log::SetLastKeyword(str);
-		if (cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error)
+		if ( cur_level != FirstLevelKeyword::CommentAfterBlock && cur_level != FirstLevelKeyword::Error )
 			Log::SetLastValidKeyword(str);
 
-		switch (cur_level)
+		switch ( cur_level )
 		{
 		//First level only
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+            Environment           +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Environment:
-			if (!mm.environment.Read(f))
+			if ( !mm.environment.Read(f) )
 				return false;
 			else
 				mandatory_keywords.erase("Environment");
@@ -137,7 +138,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             Solution             +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Solution:
-			if (!mm.moorsolution.Read(f))
+			if ( !mm.moorsolution.Read(f) )
 				return false;
 			else
 				mandatory_keywords.erase("Solution");
@@ -145,32 +146,32 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           PostProcessing          +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::PostProcessing:
-			if (!mm.moorpost.Read(f))
+			if ( !mm.moorpost.Read(f) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           StiffnessMatrix          -+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::StiffnessMatrix:
 			mm.stiff_matrix = std::make_unique<StiffnessMatrix>();
-			if (!mm.stiff_matrix->Read(f))
+			if ( !mm.stiff_matrix->Read(f) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           GiraffeSolver           +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::GiraffeSolver:
-			if (!gm.ReadGiraffeAddress(f))
+			if ( !gm.gir_solver.Read(f) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+              Monitors              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Monitors:
-			if (!gm.monitor.Read(f))
+			if ( !gm.monitor.Read(f) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+     GiraffeConvergenceCriteria     +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::GiraffeConvergenceCriteria:
-			if (!gm.conv_criteria.Read(f))
+			if ( !gm.conv_criteria.Read(f) )
 				return false;
 			break;
 
@@ -179,7 +180,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+              Keypoints             -+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Keypoints:
-			if (!LoopReading::TryKeyword(mm.keypoint_vector, std::unordered_set<std::string_view>({ "Keypoint" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.keypoint_vector, std::unordered_set<std::string_view>({"Keypoint"}), f, pos, str) )
 				return false;
 			else
 				mandatory_keywords.erase("Keypoints");
@@ -187,7 +188,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+               Vessels              +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Vessels:
-			if (!LoopReading::TryKeyword(mm.vessel_vector, std::unordered_set<std::string_view>({ "Vessel" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.vessel_vector, std::unordered_set<std::string_view>({"Vessel"}), f, pos, str) )
 				return false;
 			else
 				mandatory_keywords.erase("Vessels");
@@ -195,7 +196,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+           SegmentProperty          +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::SegmentProperties:
-			if (!LoopReading::TryKeyword(mm.segment_property_vector, std::unordered_set<std::string_view>({ "SegmentProperty" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.segment_property_vector, std::unordered_set<std::string_view>({"SegmentProperty"}), f, pos, str) )
 				return false;
 			else
 				mandatory_keywords.erase("SegmentProperties");
@@ -203,31 +204,31 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             NodalForces            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::NodalForces:
-			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.moorload_vector, std::unordered_set<std::string_view>({ "Node" }), f, pos, str))
+			if ( !LoopReading::TryKeyword_UnorderedMultiple(mm.moorload_vector, std::unordered_set<std::string_view>({"Node"}), f, pos, str) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+         VesselDisplacements        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::VesselDisplacements:
-			if (!LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({ "DispVesselID" }), f, pos, str))
+			if ( !LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({"DispVesselID"}), f, pos, str) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             Constraints            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Constraints:
-			if (!mm.moor_constraint.Read(f))
+			if ( !mm.moor_constraint.Read(f) )
 				return false;
 			break;
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             SegmentSets            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::SegmentSets:
-			if (!LoopReading::TryKeyword(mm.segment_set_vector, std::unordered_set<std::string_view>({ "Set" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.segment_set_vector, std::unordered_set<std::string_view>({"Set"}), f, pos, str) )
 				return false;
 			break;
-			
+
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+          DisplacementFields        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::DisplacementFields:
-			if (!LoopReading::TryKeyword(mm.disp_field_vector, std::unordered_set<std::string_view>({ "DispLineID" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.disp_field_vector, std::unordered_set<std::string_view>({"DispLineID"}), f, pos, str) )
 				return false;
 			break;
 
@@ -236,7 +237,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+                Lines               +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Lines:
-			if (!LoopReading::TryKeyword(mm.line_vector, std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.line_vector, std::unordered_set<std::string_view>({"Line", "MooringLine", "Cable"}), f, pos, str) )
 				return false;
 			else
 				mandatory_keywords.erase("Lines");
@@ -244,7 +245,7 @@ bool IO::ReadFile()
 
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+              Platforms             +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::Platforms:
-			if (!LoopReading::TryKeyword(mm.platform_vector, std::unordered_set<std::string_view>({ "Platform" }), f, pos, str))
+			if ( !LoopReading::TryKeyword(mm.platform_vector, std::unordered_set<std::string_view>({"Platform"}), f, pos, str) )
 				return false;
 			break;
 
@@ -373,20 +374,6 @@ bool IO::CheckModel()
 			}
 		});//end for (vessel displacements)
 	}
-	if (!mm.anc_constraint.empty())
-	{
-		std::for_each(mm.anc_constraint.cbegin(), mm.anc_constraint.cend(), [&](const AnchorConstraint& c) {
-			if (c.GetLineNumber() > n_keywords["Lines"]) { 
-				std::stringstream ss; ss << "\n   + \"" << c.GetLineNumber() << "\" is not a valid line ID to change its anchor constraint" ; Log::AddWarning(ss); modelOk = false; }
-		});
-	}
-	if (!mm.vessel_constraint.empty())
-	{
-		std::for_each(mm.vessel_constraint.cbegin(), mm.vessel_constraint.cend(), [&](const VesselConstraint& c) {
-			if (c.GetVesselID() > n_keywords["Vessels"]) { 
-				std::stringstream ss; ss << "\n   + \"" << c.GetVesselID() << "\" is not a valid vessel ID to change its constraints" ; Log::AddWarning(ss); modelOk = false; }
-		});
-	}
 	if (!mm.moorpost.platform_cads.empty())
 	{
 		std::for_each(mm.moorpost.platform_cads.cbegin(), mm.moorpost.platform_cads.cend(), [&](const CADData& c) {
@@ -405,8 +392,7 @@ bool IO::CheckModel()
 			}
 		});//end for (displacement fields)
 	}
-
-
+	mm.moor_constraint.CheckModel(modelOk, n_keywords);
 
 	return modelOk;
 }
@@ -437,7 +423,7 @@ void IO::WriteGiraffeModelFile()
 	gm.post.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nSolverOptions\n");
-	gm.solver_opt.WriteGiraffeModelFile(f);
+	gm.gir_solver.WriteGiraffeModelFile(f);
 
 	fprintf(f, "\nConvergenceCriteria\n");
 	gm.conv_criteria.WriteGiraffeModelFile(f);

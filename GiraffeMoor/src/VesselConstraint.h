@@ -1,8 +1,7 @@
 #pragma once
-#include "MoorConstraint.h"
 
 
-class VesselConstraint// : public MoorConstraint
+class VesselConstraint
 {
 public:
 	VesselConstraint();
@@ -21,14 +20,12 @@ public:
 	Get functions
 	-----------*/
 
-	unsigned int GetVesselID() const;
+	unsigned int GetNumberID() const;
 	
-	unsigned int GetSizeX();
-	unsigned int GetSizeY();
-	unsigned int GetSizeZ();
-	unsigned int GetSizeRotX();
-	unsigned int GetSizeRotY();
-	unsigned int GetSizeRotZ();
+	unsigned int GetSizeX(), GetSizeY(), GetSizeZ();
+	unsigned int GetSizeRotX(), GetSizeRotY(), GetSizeRotZ();
+
+	const std::list<bool>& GetDoFConstraints(const size_t& dof);
 
 //private:
 

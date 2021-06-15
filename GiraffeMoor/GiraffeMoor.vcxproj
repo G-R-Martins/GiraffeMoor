@@ -171,6 +171,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GiraffeSolver.cpp" />
+    <ClCompile Include="src\LineConstraint.cpp" />
     <ClCompile Include="src\CADData.cpp" />
     <ClCompile Include="src\MoorLineDispFields.cpp" />
     <ClCompile Include="src\SolverOptions.cpp" />
@@ -253,7 +255,10 @@
     <ClCompile Include="src\Summary.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GiraffeSolver.h" />
+    <ClInclude Include="src\LineConstraint.h" />
     <ClInclude Include="src\CADData.h" />
+    <ClInclude Include="src\GiraffeMoor.h" />
     <ClInclude Include="src\MoorLineDispFields.h" />
     <ClInclude Include="src\SolverOptions.h" />
     <ClInclude Include="src\SegmentSet.h" />

@@ -8,7 +8,7 @@ MoorSolution::MoorSolution()
 	: bool_DynamicRelax(false), decrement(0.0), dyn_relax_periods(0), TimeRelax(0), alpha_relax(0.0),
 	bool_ReleaseForces(false), release_timestep(0.0), 
 	seacurrent_timestep(1.0), seacurrent_max_timestep(1.0), seacurrent_min_timestep(0.000001), 
-	steps_to_set_model(0), ncores(1), lin_sys_isDirect(true)
+	steps_to_set_model(0)
 {
 	solution_steps.reserve(4);
 }
@@ -28,7 +28,7 @@ bool MoorSolution::Read(FILE *f)
 	char str[200];			//salva palavras-chave lidas e valores lidos
 	fpos_t pos;
 	
-	uset keywords({ "DynamicRelaxation", "SeaCurrentTime", "Analysis" , "Solver"});
+	uset keywords({ "DynamicRelaxation", "SeaCurrentTime", "Analysis" });
 	uset::iterator it;
 	
 	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
@@ -119,22 +119,6 @@ bool MoorSolution::Read(FILE *f)
 				if (!LoopReading::TryNestedKeyword(solution_steps, uset({ "Step" }), keywords, f, pos, str))
 				{
 					return false;
-				}
-			}
-			else if (*it == "Solver")
-			{
-				keywords.erase("Solver");
-				if (fscanf(f, "%s %d", str, &ncores) && !strcmp(str, "Cores") && //reads the number of cores and next keyword
-					fscanf(f, "%s", str) && !strcmp(str, "LinSys") &&				  //checks for 'LinSys' keyword
-					fscanf(f, "%s", str))											  //reads the 'LinSys' option
-				{
-					if (!strcmp(str, "direct"))			lin_sys_isDirect = true;
-					else if (!strcmp(str, "iterative"))	lin_sys_isDirect = false;
-					else
-					{
-						Log::AddWarning("\n   + Error reading solver option. It must be 'direct' or 'iterative'");
-						return false;
-					}
 				}
 			}
 		}

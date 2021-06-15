@@ -5,7 +5,7 @@
 #include "Monitor.h"
 #include "ConvergenceCriteria.h"
 #include "CADData.h"
-#include "SolverOptions.h"
+#include "GiraffeSolver.h"
 #include "CoordinateSystem.h"
 #include "PipeSection.h"
 #include "Environment.h"
@@ -63,9 +63,7 @@ public:
 							|						|
 							+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-	//Boolean to indicate if Giraffe solver will be called after GiraffeMoor
-	bool run_giraffe;
-
+		
 	/*--------------------
 	Giraffe Model Database
 	---------------------*/
@@ -74,7 +72,7 @@ public:
 	Monitor monitor;
 	Environment environment;
 	ConvergenceCriteria conv_criteria;
-	SolverOptions solver_opt;
+	GiraffeSolver gir_solver;
 
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -224,13 +222,6 @@ public:
 	void GenerateCoordinateSystem(unsigned int number, Matrix& E1, Matrix& E3);
 	void GenerateCoordinateSystem(unsigned int number, const std::array<double, 3>& E1, const std::array<double, 3>& E3);
 	
-	//Solution option
-	void GenerateSolverOptions(unsigned int cores, bool bool_direct);
-
-
-	//Reads GiraffeAddress
-	bool ReadGiraffeAddress(FILE *f);
-
 	//==========================================================================================================================
 	
 };

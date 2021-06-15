@@ -4,9 +4,7 @@
 
 
 GiraffeModel::GiraffeModel()
-{
-	run_giraffe = false;
-}
+{}
 
 GiraffeModel::~GiraffeModel()
 {
@@ -205,10 +203,6 @@ void GiraffeModel::GenerateCoordinateSystem(unsigned int number, const std::arra
 	cs_vector.back().number = number;
 	cs_vector.back().E1 = E1;
 	cs_vector.back().E3 = E3;
-}
-void GiraffeModel::GenerateSolverOptions(unsigned int cores, bool bool_direct)
-{
-	solver_opt.SetSolverOptions(cores, bool_direct);
 }
 void GiraffeModel::GenerateRigidBodyData(const unsigned int& number, const double& mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G)
 {
@@ -507,19 +501,4 @@ void GiraffeModel::GenerateNodalConstraint(const unsigned int& number, const uns
 	ptr->ROTY_table = e_ROTY;
 	ptr->ROTZ_table = e_ROTZ;
 }
-
-bool GiraffeModel::ReadGiraffeAddress(FILE *f)
-{
-	char str[10];
-	if (fscanf(f, "%s", str) != EOF && !strcmp(str, "run"))
-		run_giraffe = true;
-	else
-	{
-		Log::AddWarning("\n   + Error reading keyword to call Giraffe. It must be 'run'.");
-		return false;
-	}
-	
-	return true;
-}
-
 

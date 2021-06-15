@@ -9,6 +9,7 @@
 #include "MoorPost.h"
 #include "MoorLoad.h"
 #include "MoorLineDispFields.h"
+#include "MoorConstraint.h"
 
 #include "VesselDisplacement.h"
 #include "AnchorConstraint.h"
@@ -122,6 +123,8 @@ public:
 	MoorEnvironment environment;
 	MoorSolution moorsolution;
 	MoorPost moorpost;
+	MoorConstraint moor_constraint;
+		
 
 	/*-------------
 	Object pointers
@@ -156,15 +159,6 @@ public:
 	//Deque with vessel displacements
 	std::deque<VesselDisplacement> vessel_disp_vector;
 
-	//Vector with pointers to anchor/vessel constraints
-	MoorConstraint moor_constraint;
-
-	//Vector with anchor constraints objects (constraint data)
-	std::vector<AnchorConstraint> anc_constraint;
-
-	//Vector with vessel constraints objects (constraint data)
-	std::vector<VesselConstraint> vessel_constraint;
-	
 	//Vector with segment sets
 	std::vector<SegmentSet> segment_set_vector;
 

@@ -30,16 +30,14 @@ Lines
 	Line 6	Anchor	12	Fairlead 13	VesselID 2 	SegmentSet 1
 		
 Vessels
-	Vessel	1	PilotNode	7	InertiaTensor	1 2 3 4 5 6	Mass 10
-	Vessel	2	PilotNode	14	InertiaTensor	11 22 33 12 13 23	Mass 100
+	Vessel	1	PilotNode	7	InertiaTensor	0 0 0 0 0 0	Mass 0
+	Vessel	2	PilotNode	14	InertiaTensor	0 0 0 0 0 0	Mass 0
 	
 Solution
 	Analysis
 		Step 1 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 2 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 3 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
-	Solver
-		Cores 1 LinSys direct 
 	
 SegmentProperties 
 	//Mooring
@@ -75,7 +73,31 @@ PostProcessing
 Constraints
 	AnchorConstraints
 		LineID 1 Rotations 0 0 0
+	VesselConstraints
+		VesselID 1	
+			X 1 0 0
+			Y 1 0 0
+			Z 1 1 1
+	LineConstraints
+		LineID 1
+			X 1 0 0
+			Y 0 1 0
+			Z 1 0 1
+			ROTX 1 1 0
+			ROTY 0 0 1
+			ROTZ 1 1 1
+		LineID 3
+			X 1 0 0
+			Y 0 1 0
+			Z 1 0 1
+			ROTX 1 1 0
+			ROTY 0 0 1
+			ROTZ 1 1 1
 
+GiraffeSolver
+	Run true
+	Processors
+		Cores 4 LinSys direct 
 
 
 // VesselDisplacements

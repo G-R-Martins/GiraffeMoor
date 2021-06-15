@@ -2,7 +2,7 @@
 #include "MooringModel.h"
 #include "Summary.h"
 #include "Log.h"
-
+#include "AuxFunctions.h"
 
 //Global object
 extern GiraffeModel gm;
@@ -27,8 +27,6 @@ MooringModel::MooringModel()
 	keypoint_vector.reserve(64);
 	segment_property_vector.reserve(16);
 	platform_vector.reserve(16);
-	anc_constraint.reserve(32);
-	vessel_constraint.reserve(16);
 }
 
 MooringModel::~MooringModel()
@@ -200,9 +198,12 @@ bool MooringModel::GenerateCatenary()
 		//Vertical forces at the end of each segment
 		std::vector <double> FV(( size_t )n_segs + 1);
 
-		if (!SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix))
-			return false;
-
+		{
+			std::cout << "\nSolving equations...\n";
+			AuxFunctions::Time::Timer timer;
+			if ( !SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix) )
+				return false;
+		}
 		SetLinesConfiguration(line, F, FV, n_segs);
 
 		if (line.percent > 0 && x_tdp > 0 && abs(line.anc_tdp) > 0 && abs(line.tdp_fair) > 0)
@@ -955,9 +956,9 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 						bool nodeset_found = false;
 
 						//Checks if there is different constraint for this anchor
-						if (!anc_constraint.empty())
+						if (moor_constraint.ExistAnchorConstraint())
 						{
-							for (AnchorConstraint& anchor : anc_constraint)
+							for (AnchorConstraint& anchor : moor_constraint.GetAnchorConstraints())
 								if (line.number == anchor.GetLineNumber())
 								{
 									anchor.SetNodeSet(cur_node_set);
@@ -1592,11 +1593,6 @@ void MooringModel::GeneralSetting()
 	if (!disp_field_vector.empty())	
 		GenerateDisplacementFields();
 
-
-	/******************
-	 * Solver options *
-	 ******************/
-	gm.GenerateSolverOptions(moorsolution.ncores, moorsolution.lin_sys_isDirect);
 }
 
 void MooringModel::SettingModelSteps(unsigned int& step, double& start)
@@ -2189,10 +2185,10 @@ void MooringModel::GenerateConstraints()
 	ROTZ.Set(2, true, false);
 
 	//With different constraint definitions
-	if (!anc_constraint.empty())
+	if (moor_constraint.ExistAnchorConstraint())
 	{
 		//First, anchors with different constraints
-		for (const AnchorConstraint& anchor : anc_constraint)
+		for (const AnchorConstraint& anchor : moor_constraint.GetAnchorConstraints())
 		{
 			//Copies of the booltables for the first steps
 			BoolTable ROTX2(ROT), ROTY2(ROT), ROTZ2(ROTZ);
@@ -2226,7 +2222,7 @@ void MooringModel::GenerateConstraints()
 		
 		//Default conditions (steps to set the FE model)
 		std::list bool_list = { true, true, false };
-
+	
 		//Other steps, until reach the step after the displacement field
 		for (int i = 1; i <= (int)disp_field.GetStep() + 1; ++i)
 			i == disp_field.GetStep() ? bool_list.emplace_back(true) : bool_list.emplace_back(false);
@@ -2239,7 +2235,7 @@ void MooringModel::GenerateConstraints()
 	
 	//Vessel
 	///Default constraint (all fixed)
-	if (vessel_constraint.empty())
+	if (!moor_constraint.ExistVesselConstraint())
 	{
 		//Vessel - fixed
 		U.Set(1, true);
@@ -2253,11 +2249,11 @@ void MooringModel::GenerateConstraints()
 		int step0 = 3;
 
 		//If there is a dynamic relaxation step
-		if (moorsolution.bool_DynamicRelax) ++step0;
+		if (moorsolution.bool_DynamicRelax)			++step0;
 		//If there is a numerical stiffness matrix
 		if (stiff_matrix && stiff_matrix->bool_num) ++step0;
 		//If there is a sea current 
-		if (environment.seacurrent_exist) ++step0;
+		if (environment.seacurrent_exist)			++step0;
 
 		//Creates bootables
 		BoolTable boolX(true, step0, false), boolY(true, step0, false), boolZ(true, step0, false),
@@ -2277,7 +2273,7 @@ void MooringModel::GenerateConstraints()
 		//Vessels with constraint defined
 		std::unordered_set<unsigned int> constrainted_vessels;
 
-		for (const VesselConstraint& constr : vessel_constraint)
+		for (const VesselConstraint& constr : moor_constraint.GetVesselConstraints())
 		{
 			constrainted_vessels.insert(constr.number);
 			 

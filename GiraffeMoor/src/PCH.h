@@ -8,14 +8,15 @@ PreCompiled Headers
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <chrono>
 #include <algorithm>
 #include <iterator>
 #include <functional>
 #include <utility>
+#include <chrono>
 #include <execution>
 #include <memory>
-
+#include <thread>
+#include <future>
 
 //Data structures
 #include <string>

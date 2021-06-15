@@ -1,17 +1,17 @@
 #include "PCH.h"
-#include "VesselConstraint.h"
+#include "LineConstraint.h"
 #include "Log.h"
 
 
-VesselConstraint::VesselConstraint()
+LineConstraint::LineConstraint()
 	: number(0), constraints(6)
 {}
 
-VesselConstraint::~VesselConstraint()
+LineConstraint::~LineConstraint()
 {}
 
 //Reads input file
-bool VesselConstraint::Read(FILE *f)
+bool LineConstraint::Read(FILE* f)
 {
 	//Keeps readed words and numbers
 	char str[200];
@@ -22,7 +22,7 @@ bool VesselConstraint::Read(FILE *f)
 	//Tries to read the first coordinate keyword
 	if (fscanf(f, "%d %s", &number, str) == EOF)
 	{
-		Log::AddWarning("\n   + Error reading vessel ID at 'VesselConstraint' block.");
+		Log::AddWarning("\n   + Error reading vessel ID at 'LineConstraint' block.");
 		return false;
 	}
 
@@ -77,49 +77,56 @@ bool VesselConstraint::Read(FILE *f)
 
 	if ( !to_constraint.empty() )
 	{
-		std::string warning = "\n   + There is(are) " + std::to_string(to_constraint.size()) + 
-			" DoF(s) with any constraint defined for the vessel number " + std::to_string(number) + 
-			"\n     Please, check your Giraffe input file and make sure you are getting the desirable constraints.";
+		std::string warning = "\n   + There is(are) " + std::to_string(to_constraint.size()) + " DoF(s) with any constraint defined.\n     Please, check your Giraffe input file and make sure you are getting the desirable constraints.";
 		Log::AddWarning(warning);
 	}
 
 	return true;
 }
 
+
 /*-----------
 Get functions
 -----------*/
 
-unsigned int VesselConstraint::GetNumberID() const
+unsigned int LineConstraint::GetNumberID() const
 { return this->number; }
 
 //Number constraints at the DoF
-unsigned int VesselConstraint::GetSizeX()
+unsigned int LineConstraint::GetSizeX()
 { return (unsigned int)this->constraints[0].size(); }
-unsigned int VesselConstraint::GetSizeY()
+unsigned int LineConstraint::GetSizeY()
 { return (unsigned int)constraints[1].size(); }
-unsigned int VesselConstraint::GetSizeZ()
+unsigned int LineConstraint::GetSizeZ()
 { return (unsigned int)this->constraints[2].size(); }
-unsigned int VesselConstraint::GetSizeRotX()
+unsigned int LineConstraint::GetSizeRotX()
 { return (unsigned int)this->constraints[3].size(); }
-unsigned int VesselConstraint::GetSizeRotY()
+unsigned int LineConstraint::GetSizeRotY()
 { return (unsigned int)this->constraints[4].size(); }
-unsigned int VesselConstraint::GetSizeRotZ()
+unsigned int LineConstraint::GetSizeRotZ()
 { return (unsigned int)this->constraints[5].size(); }
 
 //Get the container with constraints for a specific DoF
-const std::list <bool>& VesselConstraint::GetDoFConstraints(const size_t& dof)
+const std::vector <bool>& LineConstraint::GetDoFConstraints(const size_t& dof)
 { return this->constraints[dof]; }
 
 
 /*------------------
 Overloaded operators
 -------------------*/
-bool operator<(const VesselConstraint& vessel1, const VesselConstraint& vessel2)
-{ return vessel1.number < vessel2.number; }
-bool operator>(const VesselConstraint& vessel1, const VesselConstraint& vessel2)
-{ return !(vessel1 < vessel2); }
-bool operator==(const VesselConstraint& vessel1, const VesselConstraint& vessel2)
-{ return vessel1.number == vessel2.number; }
-bool operator!=(const VesselConstraint& vessel1, const VesselConstraint& vessel2)
-{ return !(vessel1 == vessel2); }
+bool operator<(const LineConstraint& line1, const LineConstraint& line2)
+{
+	return line1.number < line2.number;
+}
+bool operator>(const LineConstraint& line1, const LineConstraint& line2)
+{
+	return !(line1 < line2);
+}
+bool operator==(const LineConstraint& line1, const LineConstraint& line2)
+{
+	return line1.number == line2.number;
+}
+bool operator!=(const LineConstraint& line1, const LineConstraint& line2)
+{
+	return !(line1 == line2);
+}
