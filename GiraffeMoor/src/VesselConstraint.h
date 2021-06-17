@@ -3,6 +3,22 @@
 
 class VesselConstraint
 {
+private:
+
+	//==========================================================================================================================
+
+	/*--------
+	|Variables|
+	---------*/
+
+	//Vessel constraint ID number
+	unsigned int number; 
+
+	//General container
+	std::vector	<std::list <bool>> constraints;
+
+	//==========================================================================================================================
+
 public:
 	VesselConstraint();
 	~VesselConstraint();
@@ -25,24 +41,10 @@ public:
 	unsigned int GetSizeX(), GetSizeY(), GetSizeZ();
 	unsigned int GetSizeRotX(), GetSizeRotY(), GetSizeRotZ();
 
-	const std::list<bool>& GetDoFConstraints(const size_t& dof);
+	std::list<bool>const & GetDoFConstraints(const size_t& dof);
 
-//private:
-
-	//==========================================================================================================================
-
-					/*--------
-					|Variables|
-					---------*/
-
-	//Vessel constraint ID number
-	unsigned int number; 
-	
-	//General container
-	std::vector	<std::list <bool>> constraints;
 
 	//==========================================================================================================================
-
 	/*------------------
 	Overloaded operators
 	-------------------*/

@@ -40,13 +40,14 @@ BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bo
 
 BoolTable::BoolTable(BoolTable &copied)
 {
-	data_table.clear();
-	//data_table.erase(data_table.begin(), data_table.end());
 	data_table = copied.data_table;
-	//data_table.resize(copied.data_table.size());
-	//for (int i = 0; i < copied.data_table.size(); i++)
-	//	data_table[i] = copied.data_table[i];
 }
+
+BoolTable::BoolTable(const std::list<bool>& list)
+{ this->Multiple_Push_Back(list); }
+
+BoolTable::BoolTable(const std::forward_list<bool>&list)
+{ this->Multiple_Push_Back(list); }
 
 //Writes output file
 void BoolTable::Write(FILE *f) const

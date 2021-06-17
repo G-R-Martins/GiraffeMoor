@@ -68,9 +68,9 @@ void MoorConstraint::CheckModel(bool& modelOk, std::map<std::string_view, std::s
 	if (existAnchorConstraint)
 	{
 		std::for_each(anchors.cbegin(), anchors.cend(), [&](const AnchorConstraint& c) {
-			if (c.GetLineNumber() > n_keywords["Lines"]) { 
+			if (c.GetNumberID() > n_keywords["Lines"]) { 
 				std::stringstream ss; 
-				ss << "\n   + \"" << c.GetLineNumber() << "\" is not a valid line ID to change its anchor constraint" ; 
+				ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid line ID to change its anchor constraint" ; 
 				Log::AddWarning(ss); modelOk = false; }
 		});
 	}

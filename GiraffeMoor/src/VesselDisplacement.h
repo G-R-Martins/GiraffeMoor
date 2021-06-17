@@ -20,10 +20,12 @@ private:
 public:
 	//Boolean to indicate the type of the displacement
 	bool isTable, isSineWave, isMathCode, fromFile;
-	unsigned int header_lines; //in the external csv/txt file 
-	unsigned int n_times;      //lines in the csv/txt file
 
 private:
+	//External files
+	unsigned int header_lines; //in the external csv/txt file 
+	unsigned int n_times;      //lines in the csv/txt file
+	
 	//Pointers to vessel displacement (Table, SineWaveDisplacement or MathCode)
 	Table* time_series;
 	SineWaveDisplacement* sineWaveDisp;

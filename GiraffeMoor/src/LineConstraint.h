@@ -13,7 +13,7 @@ private:
 	unsigned int number; 
 
 	//General container
-	std::vector	<std::vector <bool>> constraints;
+	std::vector	<std::list <bool>> constraints;
 
 public:
 	LineConstraint();
@@ -37,7 +37,7 @@ public:
 	unsigned int GetSizeX(), GetSizeY(), GetSizeZ();
 	unsigned int GetSizeRotX(), GetSizeRotY(), GetSizeRotZ();
 
-	const std::vector<bool>& GetDoFConstraints(const size_t& dof);
+	std::list<bool> const& GetDoFConstraints(const size_t& dof);
 
 	//==========================================================================================================================
 

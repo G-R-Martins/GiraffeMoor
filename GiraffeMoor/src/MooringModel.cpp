@@ -959,7 +959,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 						if (moor_constraint.ExistAnchorConstraint())
 						{
 							for (AnchorConstraint& anchor : moor_constraint.GetAnchorConstraints())
-								if (line.number == anchor.GetLineNumber())
+								if (line.number == anchor.GetNumberID())
 								{
 									anchor.SetNodeSet(cur_node_set);
 									nodeset_found = true;
@@ -2214,22 +2214,52 @@ void MooringModel::GenerateConstraints()
 	for (const unsigned int& nodeset : fairlead_nodesets)
 		gm.GenerateNodalConstraint(++cur_constraint, nodeset, U, U, U, ROT, ROT, ROT);
 
-
 	//Lines
-	for (MoorLineDispFields& disp_field : disp_field_vector)
+	if ( moor_constraint.ExistLineConstraint() )
 	{
-		BoolTable bool_table;
-		
 		//Default conditions (steps to set the FE model)
-		std::list bool_list = { true, true, false };
-	
-		//Other steps, until reach the step after the displacement field
-		for (int i = 1; i <= (int)disp_field.GetStep() + 1; ++i)
-			i == disp_field.GetStep() ? bool_list.emplace_back(true) : bool_list.emplace_back(false);
-		bool_table.Multiple_Push_Back(bool_list);
-		
-		gm.GenerateNodalConstraint(++cur_constraint, line_vector[disp_field.GetNumber() - 1].nodeset_B + 1, 
-								   bool_table, bool_table, bool_table, bool_table, bool_table, bool_table);
+		std::list bool_list = {true, true, false};
+		//Check for other steps after coupling fairleads
+		if ( moorsolution.steps_to_set_model > 3 )
+		{
+			for ( unsigned int i = 3; i < moorsolution.steps_to_set_model; ++i )
+				bool_list.push_back(false);
+		}
+
+		for ( LineConstraint& constr : moor_constraint.GetLineConstraints() )
+		{
+			//Booltables
+			std::vector<BoolTable> bt_vec(6);
+			std::fill(bt_vec.begin(), bt_vec.end(), bool_list);
+
+			//Booltables
+			for ( size_t i = 0; i < 6; i++ )
+				bt_vec[i].Multiple_Push_Back(constr.GetDoFConstraints(i));
+
+			gm.GenerateNodalConstraint(++cur_constraint, line_vector[constr.GetNumberID() - 1].nodeset_B + 1,
+									   bt_vec[0], bt_vec[1], bt_vec[2], bt_vec[3], bt_vec[4], bt_vec[5]);
+		}
+	}
+	else
+	{
+		for ( MoorLineDispFields& disp_field : disp_field_vector )
+		{
+			BoolTable bool_table;
+
+			//Default conditions (steps to set the FE model)
+			std::list bool_list = {true, true, false};
+			if ( moorsolution.steps_to_set_model > 3 )
+				for ( unsigned int i = 3; i < moorsolution.steps_to_set_model; ++i )
+					bool_list.push_back(false);
+
+			//Other steps, until reach the step after the displacement field
+			for ( unsigned int i = 1; i <= disp_field.GetStep() + 1; ++i )
+				i == disp_field.GetStep() ? bool_list.emplace_back(true) : bool_list.emplace_back(false);
+			bool_table.Multiple_Push_Back(bool_list);
+
+			gm.GenerateNodalConstraint(++cur_constraint, line_vector[disp_field.GetNumber() - 1].nodeset_B + 1,
+									   bool_table, bool_table, bool_table, bool_table, bool_table, bool_table);
+		}
 	}
 
 	
@@ -2255,7 +2285,7 @@ void MooringModel::GenerateConstraints()
 		//If there is a sea current 
 		if (environment.seacurrent_exist)			++step0;
 
-		//Creates bootables
+		//Creates booltables
 		BoolTable boolX(true, step0, false), boolY(true, step0, false), boolZ(true, step0, false),
 			boolROTX(true, step0, false), boolROTY(true, step0, false), boolROTZ(true, step0, false);
 
@@ -2273,9 +2303,9 @@ void MooringModel::GenerateConstraints()
 		//Vessels with constraint defined
 		std::unordered_set<unsigned int> constrainted_vessels;
 
-		for (const VesselConstraint& constr : moor_constraint.GetVesselConstraints())
+		for (VesselConstraint& constr : moor_constraint.GetVesselConstraints())
 		{
-			constrainted_vessels.insert(constr.number);
+			constrainted_vessels.insert(constr.GetNumberID());
 			 
 			//BoolTables for the current vessel 
 			BoolTable vessel_X(boolX), vessel_Y(boolY), vessel_Z(boolZ),
@@ -2284,15 +2314,17 @@ void MooringModel::GenerateConstraints()
 			//Booltables
 			for (size_t i = 0; i < 6; i++)
 			{
-				if (i == 0)			vessel_X.Multiple_Push_Back(constr.constraints[i]);
-				else if (i == 1)	vessel_Y.Multiple_Push_Back(constr.constraints[i]);
-				else if (i == 2)	vessel_Z.Multiple_Push_Back(constr.constraints[i]);
-				else if (i == 3)	vessel_ROTX.Multiple_Push_Back(constr.constraints[i]);
-				else if (i == 4)	vessel_ROTY.Multiple_Push_Back(constr.constraints[i]);
-				else if (i == 5)	vessel_ROTZ.Multiple_Push_Back(constr.constraints[i]);
+				auto const& c = constr.GetDoFConstraints(i);
+				if (i == 0)			vessel_X.Multiple_Push_Back(c);
+				else if (i == 1)	vessel_Y.Multiple_Push_Back(c);
+				else if (i == 2)	vessel_Z.Multiple_Push_Back(c);
+				else if (i == 3)	vessel_ROTX.Multiple_Push_Back(c);
+				else if (i == 4)	vessel_ROTY.Multiple_Push_Back(c);
+				else if (i == 5)	vessel_ROTZ.Multiple_Push_Back(c);
 			}
 
-			gm.GenerateNodalConstraint(++cur_constraint, vessel_vector[constr.number - 1].nodeset, vessel_X, vessel_Y, vessel_Z, vessel_ROTX, vessel_ROTY, vessel_ROTZ);
+			gm.GenerateNodalConstraint(++cur_constraint, vessel_vector[constr.GetNumberID() - 1].nodeset, 
+									   vessel_X, vessel_Y, vessel_Z, vessel_ROTX, vessel_ROTY, vessel_ROTZ);
 		}
 
 		//Iterate through the vessels while still exist vessels to constraint

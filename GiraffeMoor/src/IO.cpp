@@ -175,6 +175,12 @@ bool IO::ReadFile()
 				return false;
 			break;
 
+			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             Constraints            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		case FirstLevelKeyword::Constraints:
+			if ( !mm.moor_constraint.Read(f) )
+				return false;
+			break;
+
 
 		//Two levels
 
@@ -211,12 +217,6 @@ bool IO::ReadFile()
 			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+         VesselDisplacements        +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		case FirstLevelKeyword::VesselDisplacements:
 			if ( !LoopReading::TryKeyword_UnorderedMultiple(mm.vessel_disp_vector, std::unordered_set<std::string_view>({"DispVesselID"}), f, pos, str) )
-				return false;
-			break;
-
-			/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+             Constraints            +-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-		case FirstLevelKeyword::Constraints:
-			if ( !mm.moor_constraint.Read(f) )
 				return false;
 			break;
 

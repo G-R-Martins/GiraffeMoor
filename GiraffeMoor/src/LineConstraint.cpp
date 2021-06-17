@@ -64,7 +64,8 @@ bool LineConstraint::Read(FILE* f)
 				else if ( constraints[dof].empty() )
 				{
 					std::string warning = std::string("\n   + Any constraint was defined for the DoF '") + 
-						std::string(*it_dof) +  "' of the vessel number " + std::to_string(number) + "\n     Please, check your Giraffe input file.";
+						std::string(*it_dof) +  "' of the line number " + std::to_string(number) + 
+						"\n       Please, check your Giraffe input file.";
 					Log::AddWarning(warning);
 				}
 				//It can be other keyword
@@ -77,7 +78,9 @@ bool LineConstraint::Read(FILE* f)
 
 	if ( !to_constraint.empty() )
 	{
-		std::string warning = "\n   + There is(are) " + std::to_string(to_constraint.size()) + " DoF(s) with any constraint defined.\n     Please, check your Giraffe input file and make sure you are getting the desirable constraints.";
+		std::string warning = "\n   + There is(are) " + std::to_string(to_constraint.size()) + 
+			" DoF(s) with any constraint defined for the line number " + std::to_string(number) + 
+			".\n       Make sure you are getting the desirable constraints.";
 		Log::AddWarning(warning);
 	}
 
@@ -107,7 +110,7 @@ unsigned int LineConstraint::GetSizeRotZ()
 { return (unsigned int)this->constraints[5].size(); }
 
 //Get the container with constraints for a specific DoF
-const std::vector <bool>& LineConstraint::GetDoFConstraints(const size_t& dof)
+std::list <bool> const& LineConstraint::GetDoFConstraints(const size_t& dof)
 { return this->constraints[dof]; }
 
 
@@ -115,18 +118,11 @@ const std::vector <bool>& LineConstraint::GetDoFConstraints(const size_t& dof)
 Overloaded operators
 -------------------*/
 bool operator<(const LineConstraint& line1, const LineConstraint& line2)
-{
-	return line1.number < line2.number;
-}
+{ return line1.number < line2.number; }
 bool operator>(const LineConstraint& line1, const LineConstraint& line2)
-{
-	return !(line1 < line2);
-}
+{ return !(line1 < line2); }
+
 bool operator==(const LineConstraint& line1, const LineConstraint& line2)
-{
-	return line1.number == line2.number;
-}
+{ return line1.number == line2.number; }
 bool operator!=(const LineConstraint& line1, const LineConstraint& line2)
-{
-	return !(line1 == line2);
-}
+{ return !(line1 == line2); }

@@ -11,24 +11,16 @@ AnchorConstraint::~AnchorConstraint()
 
 //Overloaded operators
 bool operator< (const AnchorConstraint& anchor1, const  AnchorConstraint& anchor2)
-{
-	return anchor1.number < anchor2.number;
-}
+{ return anchor1.number < anchor2.number; }
 
 bool operator> (const AnchorConstraint& anchor1, const  AnchorConstraint& anchor2)
-{
-	return anchor1.number > anchor2.number;
-}
+{ return !(anchor1 < anchor2); }
 
 bool operator== (const AnchorConstraint& anchor1, const  AnchorConstraint& anchor2)
-{
-	return anchor1.number == anchor2.number;
-}
+{ return anchor1.number == anchor2.number; }
 
 bool operator!= (const AnchorConstraint& anchor1, const  AnchorConstraint& anchor2)
-{
-	return anchor1.number != anchor2.number;
-}
+{ return !(anchor1 == anchor2); }
 
 //Reads input file
 bool AnchorConstraint::Read(FILE *f)
@@ -57,7 +49,7 @@ bool AnchorConstraint::Read(FILE *f)
   Getters
  -------*/
 
-unsigned int AnchorConstraint::GetLineNumber() const
+unsigned int AnchorConstraint::GetNumberID() const
 {
 	return this->number;
 }

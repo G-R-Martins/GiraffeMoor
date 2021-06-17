@@ -64,7 +64,8 @@ bool VesselConstraint::Read(FILE *f)
 				else if ( constraints[dof].empty() )
 				{
 					std::string warning = std::string("\n   + Any constraint was defined for the DoF '") + 
-						std::string(*it_dof) +  "' of the vessel number " + std::to_string(number) + "\n     Please, check your Giraffe input file.";
+						std::string(*it_dof) +  "' of the vessel number " + std::to_string(number) +
+						"\n       Please, check your Giraffe input file.";
 					Log::AddWarning(warning);
 				}
 				//It can be other keyword
@@ -74,12 +75,11 @@ bool VesselConstraint::Read(FILE *f)
 		}
 	}
 
-
 	if ( !to_constraint.empty() )
 	{
 		std::string warning = "\n   + There is(are) " + std::to_string(to_constraint.size()) + 
-			" DoF(s) with any constraint defined for the vessel number " + std::to_string(number) + 
-			"\n     Please, check your Giraffe input file and make sure you are getting the desirable constraints.";
+			" DoF(s) with any constraint defined for the vessel number " + std::to_string(number) +
+			".\n       Make sure you are getting the desirable constraints.";
 		Log::AddWarning(warning);
 	}
 
@@ -108,7 +108,7 @@ unsigned int VesselConstraint::GetSizeRotZ()
 { return (unsigned int)this->constraints[5].size(); }
 
 //Get the container with constraints for a specific DoF
-const std::list <bool>& VesselConstraint::GetDoFConstraints(const size_t& dof)
+std::list <bool>const & VesselConstraint::GetDoFConstraints(const size_t& dof)
 { return this->constraints[dof]; }
 
 

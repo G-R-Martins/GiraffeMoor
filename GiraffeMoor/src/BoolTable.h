@@ -9,6 +9,9 @@ public:
 	BoolTable(const bool& bool_init, const int& bool_init_steps);
 	BoolTable(const bool& bool_init, const int& bool_init_steps, const bool& generate_opposite);
 	BoolTable(BoolTable &copied);
+	BoolTable(const std::list <bool>& list);
+	BoolTable(const std::forward_list<bool>& list);
+	
 	~BoolTable();
 
 	void Write(FILE *f) const;		//Writes BoolTable

@@ -4,7 +4,7 @@
 |                                                       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-File created on: Jun 15, 2021 at 16h46min 
+File created on: Jun 17, 2021 at 19h36min 
 
 1) Lines
 	Line 1
@@ -104,5 +104,7 @@ File created on: Jun 15, 2021 at 16h46min
 	[4] 3.000e+00s - 4.000e+00s : Establishing sea current
 	[5] 4.000e+00s - 5.000e+00s : Static step
 	[6] 5.000e+00s - 7.000e+00s : Static step
+		- Applying time series to vessel 1
+		- Displacement of the vessel 1 with MathCode
 	[7] 7.000e+00s - 9.000e+00s : Static step
 

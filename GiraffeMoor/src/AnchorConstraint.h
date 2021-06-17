@@ -13,7 +13,7 @@ public:
 	  Getters  
 	 -------*/
 
-	unsigned int GetLineNumber() const ;
+	unsigned int GetNumberID() const ;
 	unsigned int GetNodeSet() const;
 	int GetRot(char rot) const;
 
