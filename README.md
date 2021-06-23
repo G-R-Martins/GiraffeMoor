@@ -8,30 +8,6 @@ For more information about `Giraffe Project`, refer to [Prof. Alfredo Gay Neto's
 [Giraffe users' manual](http://sites.poli.usp.br/p/alfredo.gay/giraffe/GIRAFFE_Manual.pdf) 
 and some [tutorials](http://sites.poli.usp.br/p/alfredo.gay/giraffe/GIRAFFE_Tutorials.pdf) are also available.
 
-## Some disclaimers...
-
-  - IDE and OS supported: 
-    
-    Currently, GiraffeMoor is build and test only with [Microsoft Visual Studio](https://visualstudio.microsoft.com/) and Windows platform. 
-    I plan to expand to Linux and Mac, support other compilers, and do other stuff, but this is far from be the priority at this moment.
-  
-  - Coding style:
-    
-    The code is an academic program and nowadays maintained only by me - a civil engineer and MSc student, not exactly a brilliant programmer, 
-    and that has had the first contact with the C/C++ languages with this program. Of course, I'm still studying the language/tools and I 
-    plan to "update the code" to modern C++ style, not because it's "better" or "I must write in a C++ style" as some StackOverflow users say, but to learn and
-    practice different things. 
-    
-    *PS: Actually, I've been doing this for some time ~depending on my free time~. Check the [projects](https://github.com/G-R-Martins/GiraffeMoor/projects) 
-    in this repository and **don't hesitate to make suggestions and corrections, please!***
-  
-  - External dependencies:
-  
-    Although - for now - `GiraffeMoor` performs considerable simple operations (such as "small" matrix multiplication and inversion) it uses a powerful 
-    and fast library, which one may think is a little overkill and/or prefer other simpler libraries (like [Armadillo](http://arma.sourceforge.net)), or even a personal implementation.
-    Of course, it would be simpler to build and link the program without external dependencies, but `GiraffeMoor` may - and probably will - have other features, 
-    and have a library like MKL on hand can be helpful. 
-
 
 ## Dependencies
 
@@ -66,3 +42,27 @@ You can build the solution with [CMake](https://cmake.org/) following these step
   5. Finally, just go to `Build >> Build solution` (or type `Ctrl+Shift+B`).
 
   
+## Some disclaimers...
+
+  - IDE and OS supported: 
+    
+    Currently, GiraffeMoor is build and test only with [Microsoft Visual Studio](https://visualstudio.microsoft.com/) and Windows platform. 
+    I plan to expand to Linux and Mac, support other compilers, and do other stuff, but this is far from be the priority at this moment.
+  
+  - Coding style:
+    
+    The code is an academic program and nowadays maintained only by me - a civil engineer and MSc student, not exactly a brilliant programmer, 
+    and that has had the first contact with the C/C++ languages with this program. Of course, I'm still studying the language/tools and I 
+    plan to "update the code" to modern C++ style, not because it's "better" or "I must write in a C++ style" as some StackOverflow users say, but to learn and
+    practice different things. 
+    
+    *PS: Actually, I've been doing this for some time ~depending on my free time~. Check the [projects](https://github.com/G-R-Martins/GiraffeMoor/projects) 
+    in this repository and **don't hesitate to make suggestions and corrections, please!***
+  
+  - External dependencies:
+  
+    Although - for now - `GiraffeMoor` performs considerable simple operations (such as "small" matrix multiplication and inversion) it uses a powerful 
+    and fast library, which one may think is a little overkill and/or prefer other simpler libraries (like [Armadillo](http://arma.sourceforge.net)), or even a personal implementation.
+    Of course, it would be simpler to build and link the program without external dependencies, but `GiraffeMoor` may - and probably will - have other features, 
+    and have a library like MKL on hand can be helpful. 
+
