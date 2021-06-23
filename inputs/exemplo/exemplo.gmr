@@ -121,6 +121,8 @@ VesselDisplacements
 			// Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
 
 
+StiffnessMatrix
+	Analytical	true
 
 // NodalForces
 	// Node vessel 1 Step 1
