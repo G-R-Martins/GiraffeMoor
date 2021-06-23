@@ -42,8 +42,9 @@ Thus, it is very simple to setup it:
   1. Download oneAPI [here](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html#gs.40957n);
   2. Install and make sure to mark `Intel® oneAPI Math Kernel Library` option.
   
-And that is it! Now you can use all the tools from this API, not only oneMKL and not only for this application. OneAPI has an extension for 
-Visual Studio that simplifies the use, thus you don't have to explicitly link the .lib/.dll files, all you have to do is to include MKL headers in your source files.
+And that is it!
+If you aren't familiar with this tool, OneAPI known that oneAPI has an extension for Visual Studio that simplifies a lot its use! 
+You don't have to explicitly link the .lib/.dll files to your projects, all you have to do is tell VS you are using oneMKL and include the headers in your source files.
 
 
 ## Building
