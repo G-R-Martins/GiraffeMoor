@@ -361,47 +361,16 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/inputs/500m/500m.gmr
-/inputs/Giraffe_old.exe
-/inputs/GiraffeMoor.exe
 /inputs/Giraffe.exe
 /inputs/exemplo/post
-/inputs/500m/post
-/inputs/500m/monitors
-/inputs/fpso/monitors
-/inputs/fpso/post
-/inputs/w_L300m_c09/monitors
-/inputs/w_L300m_c09/post
-/inputs/w_L300m_c09/w_L300m_c09.sum
-/inputs/w_L300m_c09/w_L300m_c09.inp
-/inputs/w_L300m_c09/simulation_report.txt
-/inputs/w_L300m_c09/output.inp
-/inputs/fpso/simulation_report.txt
-/inputs/fpso/output.inp
-/inputs/fpso/fpso.sum
-/inputs/fpso/fpso.inp
-/inputs/exemplo/exemplo.inp
-/inputs/500m/simulation_report.txt
-/inputs/500m/output.inp
-/inputs/500m/500m.inp
 /inputs/exemplo/monitors
-/inputs/exemplo/time series/teste.csv
 /inputs/exemplo/time series
+/inputs/exemplo/CAD
 /inputs/exemplo/simulation_report.txt
 /inputs/exemplo/output.inp
-/inputs/par_exc_water
-/inputs/par_exc_air/monitors
-/inputs/par_exc_air/post
-/inputs/par_exc_water_n4
-/inputs/par_exc_air_n5
-/inputs/par_exc_air_n4
-/inputs/par_exc_air_n3
-/inputs/par_exc_air
-/docs/rascunhos.cpp
-/inputs/exemplo/CAD
-/GiraffeMoor/exemplo/post
-/GiraffeMoor/exemplo
-/inputs/decaimento_air
-/inputs/decaimento_air
-/inputs/decaimento_water_Cd0
-/inputs/decaimento_air_v2
+/inputs/500m
+/inputs/fpso
+/inputs/oc4
+/inputs/paper_GMoor
+/docs/temp
+/build

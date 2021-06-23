@@ -30,16 +30,14 @@ Lines
 	Line 6	Anchor	12	Fairlead 13	VesselID 2 	SegmentSet 1
 		
 Vessels
-	Vessel	1	PilotNode	7	InertiaTensor	1 2 3 4 5 6	Mass 10
-	Vessel	2	PilotNode	14	InertiaTensor	11 22 33 12 13 23	Mass 100
+	Vessel	1	PilotNode	7	InertiaTensor	0 0 0 0 0 0	Mass 0
+	Vessel	2	PilotNode	14	InertiaTensor	0 0 0 0 0 0	Mass 0
 	
 Solution
 	Analysis
 		Step 1 static 	Time	1	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 2 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
 		Step 3 static 	Time	2	TimeStep 0.5  MinTimeStep	1e-4	Sample  1
-	Solver
-		Cores 1 LinSys direct 
 	
 SegmentProperties 
 	//Mooring
@@ -75,34 +73,56 @@ PostProcessing
 Constraints
 	AnchorConstraints
 		LineID 1 Rotations 0 0 0
+	VesselConstraints
+		VesselID 1	
+			X 1 0 0
+			Y 1 0 0
+			Z 1 1 1
+	LineConstraints
+		LineID 1
+			X 1 0 0
+			Y 0 1 0
+			ROTY 0 0 1
+			ROTZ 1 1 1
+		LineID 3
+			X 1 0 0
+			Y 0 1 0
+			Z 1 0 1
+			ROTX 1 1 0
+			ROTY 0 0 1
 
+GiraffeSolver
+	// Run true
+	Processors
+		Cores 4 LinSys direct 
 
-
-// VesselDisplacements
-	 // // VesselDispID	1 
-		// // Step	2 
-		// // File "teste.csv" HeaderLines 1 NTimes 11
-		 // // TimeSeries
-			 // // 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
-			 // // .10	-1.1494725	0	0.0361393	0	0.0165411	0
-			 // // 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
-			 // // 0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
-			 // // 0.25	-1.1548849	0	0.0954679	0	0.0159384	0
-			 // // 0.30	-1.1543812	0	0.1150724	0	0.0157026	0
+VesselDisplacements
+	 DispVesselID	1 
+		Step	2 
+		 TimeSeries
+			 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
+			 .10	-1.1494725	0	0.0361393	0	0.0165411	0
+			 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
+			 0.20	-1.1542335	0	0.0757647	0	0.0161569	0 
+			 0.25	-1.1548849	0	0.0954679	0	0.0159384	0
+			 0.30	-1.1543812	0	0.1150724	0	0.0157026	0
 			 // // 0.35	-1.1527220	0	0.1345593	0	0.0154496	0
 			 // // 0.40	-1.1499079	0	0.1539098	0	0.0151799	0
 			 // // 0.45	-1.1459411	0	0.1731050	0	0.0148935	0
 			 // // 0.50	-1.1408247	0	0.1921265	0	0.0145909	0
-	 // // VesselDispID	1 
-		 // // Step	2
-		 // // MathCode
-			// // Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
-	 // VesselDispID	2 
+	 DispVesselID	2 
+		 Step	1
+		 MathCode
+			Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
+	 // DispVesselID	2 
 		 // Step	3
+		// File "teste.csv" HeaderLines 1 NTimes 11
 		 // MathCode
 			// Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
 
 
+StiffnessMatrix
+	Analytical	true
 
 // NodalForces
 	// Node vessel 1 Step 1
