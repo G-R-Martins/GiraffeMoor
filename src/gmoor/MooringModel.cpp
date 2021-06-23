@@ -2113,14 +2113,17 @@ void MooringModel::GenerateSeabed()
 	//Boolean to indicate if seabed/water surface VTK files were created
 	bool VTKseabedOk = false, VTKwaterOk;
 
+
+
 	//Creates post files directory and seabed and water surface vtk files
-	if (CreateDirectory(surfaces_folder.c_str(), NULL) || ( ERROR_ALREADY_EXISTS == GetLastError() ))
+	if ( !std::filesystem::is_directory(surfaces_folder) &&	  ///check if exist
+		!std::filesystem::create_directory(surfaces_folder) ) ///if not, try to create it
+		Log::AddWarning("\n   + Post files directory could not be created."); ///ERROR
+	else
 	{
 		VTKseabedOk = gm.post.CreateSeabedVTK(surfaces_folder, { 2.0 * xmin, 2.0 * fabs(xmax) }, { 2.0 * ymin, 2.0 * fabs(ymax) }, -environment.GetWaterDepth());
 		VTKwaterOk = gm.post.CreateWaterVTK(surfaces_folder, { 2.0 * xmin, 2.0 * fabs(xmax) }, { 2.0 * ymin, 2.0 * fabs(ymax) });
 	}
-	else //ERROR
-		Log::AddWarning("\n   + Post files directory could not be created.");
 
 	//Setting contact surface flag
 	if (!VTKseabedOk && !gm.post.write.rigidContactSurfaces_flag)

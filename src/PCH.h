@@ -36,7 +36,7 @@ PreCompiled Headers
 //System
 //#include <sys/stat.h>
 //#include <direct.h>
-#include <Windows.h>
+//#include <Windows.h>
 
 
 //GiraffeMoor classes
