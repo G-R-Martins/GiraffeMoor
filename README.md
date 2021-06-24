@@ -1,7 +1,7 @@
 # GiraffeMoor
 
 **GiraffeMoor** is a preprocessor tool for the FEM platform **Giraffe** (acronym of “Generic Interface Readily Accessible for Finite Elements”), 
-started by [Prof. Alfredo Gay Neto](http://sites.poli.usp.br/p/alfredo.gay/#me-section) at the [University of São Paulo](https://www5.usp.br/#english), Brazil. 
+started by [Prof. Alfredo Gay Neto](https://github.com/alfredogneto) at the [University of São Paulo](https://www5.usp.br/#english), Brazil. 
 The main goal of **GiraffeMoor** is to generate FEM models of mooring systems with very few information and invoke **Giraffe** to solve it.
 
 For more information about `Giraffe Project`, refer to [Prof. Alfredo Gay Neto's personal page](http://sites.poli.usp.br/p/alfredo.gay) and publications.
@@ -20,7 +20,7 @@ Thus, it is very simple to setup it:
   
 And that is it!
 If you aren't familiar with this tool, OneAPI known that oneAPI has an extension for Visual Studio that simplifies a lot its use! 
-You don't have to explicitly link the lib/dll files to your projects, all you have to do is tell VS you are using oneMKL and include the headers in your source files.
+You don't have to explicitly link the lib/dll to your projects, all you have to do is tell VS you are using oneMKL and include the headers in your source files.
 
 
 ## Building
