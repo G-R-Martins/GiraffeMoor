@@ -28,12 +28,14 @@ You don't have to explicitly link the lib/dll files to your projects, all you ha
 You can build the solution with [CMake](https://cmake.org/) following these steps:
 
   1. Clone [this repository](https://github.com/G-R-Martins/GiraffeMoor);
-    - For example, from command line, go to desirable directory and type: 
+  
+   - For example, from command line, go to desirable directory and type: 
+  
   ```
   git clone https://github.com/G-R-Martins/GiraffeMoor
   ```
   3. Open the command prompt and go to the repository root folder; 
-  4. Create a folder to build the solution and invoke CMake from there:
+  5. Create a folder to build the solution and invoke CMake from there:
   ```
   mkdir build
   cd build 
