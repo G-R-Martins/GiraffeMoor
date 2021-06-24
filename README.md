@@ -36,10 +36,10 @@ You can build the solution with [CMake](https://cmake.org/) following these step
   ```
   3. Open the command prompt and go to the repository root folder; 
   5. Create a folder to build the solution and invoke CMake from there:
-  ```
+  ```cmd
   mkdir build
   cd build 
-  cmake ..
+  cmake ..\
   ```
   4. Now, you have to include oneMKL:
   - In the Visual Studio solution explorer, rigt click in the `GiraffeMoor project` and hit `properties` (or select this project in the VS solution explorer 
