@@ -2,10 +2,8 @@
 #include "MoorLoad.h"
 #include "Log.h"
 #include "AuxFunctions.h"
+#include "IO.h" //to get the folder name
 
-
-//Global variable
-extern std::string folder_name;
 
 MoorLoad::MoorLoad()
 	: nodeID(0), segmentID(1), lineID(0), step(-1),
@@ -100,7 +98,7 @@ bool MoorLoad::Read(FILE* f)
 		}
 
 		//Tries to open the file before continue
-		std::string full_file_name = folder_name + "time series/" + std::string(file_name);
+		std::string full_file_name = IO::folder_name + "time series/" + std::string(file_name);
 		std::ifstream inp(full_file_name);
 
 		if (!inp.is_open())

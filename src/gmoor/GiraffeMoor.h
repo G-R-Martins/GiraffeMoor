@@ -15,18 +15,19 @@
 extern MooringModel mm;
 extern GiraffeModel gm;
 
-//Global variables
-extern std::string name_input;
-extern std::string folder_name;
-extern std::string version;
-
 
 namespace GiraffeMoor
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	
+/// <summary>
+///		
+/// 	Namespace to organize the application execution,
+///		I/O, and logging
+///		
+/// </summary>
+
+
+	//Function header
+	static void RunGiraffe();
 
 	void Run()
 	{
@@ -38,7 +39,7 @@ namespace GiraffeMoor
 		else
 		{
 			//Creates SummaryFile (with header)
-			Summary::CreateSumFile(folder_name + name_input, version);
+			Summary::CreateSumFile(IO::folder_name + IO::input_name, IO::version);
 
 			//Creates FEM model
 			if ( mm.GenerateGiraffeModel() )
@@ -49,7 +50,8 @@ namespace GiraffeMoor
 				//GIRAFFE input file
 				IO::WriteGiraffeModelFile();
 
-#if _DEBUG == 0
+#ifdef NDEBUG
+				IO::WriteGiraffeModelFile();
 				RunGiraffe();
 #endif
 			}
@@ -65,10 +67,10 @@ namespace GiraffeMoor
 		if (gm.gir_solver.GetRunOption())
 		{
 			system("CLS");
-			std::string GiraffeFile = "Giraffe.exe " + name_input;
+			std::string GiraffeFile = "Giraffe.exe " + IO::input_name;
 			system(GiraffeFile.c_str());
 		}
 		else //only prints this message if Giraffe solver is not called
 			Log::AddFinalMessage("\n\nGiraffeMoor execution has finished successfully!");
 	}
-}
+} //end GiraffeMoor namspace

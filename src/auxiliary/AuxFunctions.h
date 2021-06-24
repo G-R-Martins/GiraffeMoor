@@ -3,28 +3,29 @@
 
 namespace AuxFunctions
 {
-
+/// <summary>
+///		
+///		This namespace has 2 namespaces: 
+///			- Read: additional functions, mainly to read commend and keywords
+///			- Time: useful to measure/compare time
+///		
+/// </summary>
+	
 	namespace Read
 	{
-/* * * * * * * * * * * * * * * * * * * * * * * * * * *
- *					                                 *
- *   Functions to read comments and check keywords   *
- *					                                 *
- * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-/// <summary>
-///	
-/// In this namespace some auxiliary functions to the 'LoopReading' 
-/// are defined, which goals are to read comment and check for valid keyword.
-/// 
-/// </summary>
+	/// <summary>
+	///		
+	///		In this namespace some auxiliary functions to the 'LoopReading' 
+	///		are defined, its goal is to read comment and check for valid keyword.
+	///		
+	/// </summary>
 
 
-/*-+-+-+-+-+-*
- *  Headers  *
- *-+-+-+-+-+-*/
+	/*-+-+-+-+-+-*
+	 *  Headers  *
+	 *-+-+-+-+-+-*/
 
-	/*Reads comments
+		/*Reads comments
 		Returns the stream at the initial point after comment reading*/
 		static bool Comment(FILE* f, char* s);
 
@@ -136,6 +137,13 @@ namespace AuxFunctions
 
 	namespace Time
 	{
+	/// <summary>
+	///		
+	/// 	This namespace has only the a struct 'Timer'
+	///		to measure execution time of a specific escope
+	/// 
+	/// </summary>
+		
 		using namespace std::literals::chrono_literals;
 
 		struct Timer

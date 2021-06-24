@@ -12,15 +12,9 @@
 extern MooringModel mm;
 extern GiraffeModel gm;
 
-//Global variables
-extern std::string name_input;
-extern std::string folder_name;
-extern std::string name; //with directory and extension
-extern std::string version;
-
 //Static variable
 FirstLevelKeyword IO::cur_level = FirstLevelKeyword::None;
-
+std::string IO::folder_name, IO::input_name, IO::name, IO::version("0.02.01");
 
 bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 {
@@ -67,27 +61,28 @@ bool IO::ReadFile()
 	std::cout << "|                        GiraffeMoor                         |\n";
 	std::cout << "|               University of Sao Paulo - Brazil             |\n";
 	std::cout << "|                                                            |\n";
-	std::cout << "|                                                v. " << version << "  |\n";
+	std::cout << "|                                                v. " << IO::version << "  |\n";
 	std::cout << "|____________________________________________________________|\n\n";
 	
 	while ( !readOK )
 	{
+		using namespace std::string_literals;
+		using namespace std::string_view_literals;
 		if ( __argc > 1 )
-			name_input = __argv[1];
+			input_name = __argv[1];
 		else
 		{
 			std::cout << "Enter the name of the input file: ";
-			std::getline(std::cin, name_input);
+			std::getline(std::cin, input_name);
 		}
 
 #if _DEBUG == 1
-		folder_name = "../inputs/"; // folder with inputs in the project directory
+		folder_name = "../inputs/" + std::string(input_name) + "/"; // folder with inputs in the project directory
 #else
-		folder_name = "./";	//folder in the same location of the executable
+		folder_name = "./" + input_name + "/";	//folder in the same location of the executable
 #endif
 
-		folder_name += name_input + "/";
-		name += folder_name + name_input + ".gmr";
+		name = folder_name + input_name + ".gmr";
 
 		std::cout << "\n";
 		//tries to read the same location of the executable file of Giraffe
@@ -100,7 +95,7 @@ bool IO::ReadFile()
 			if ( !std::filesystem::is_directory(folder_name) )
 				std::filesystem::create_directory(folder_name);
 
-			name = folder_name + name_input + ".gmr";
+			name = folder_name + input_name + ".gmr";
 			f = fopen(name.c_str(), "r");
 			if ( f == NULL )
 				std::cout << "Error reading the input file. Try again.\n";
@@ -110,7 +105,7 @@ bool IO::ReadFile()
 		else
 		{
 			if ( __argc > 1 )
-				std::cout << "Running file \"" << name_input << ".gmr\" . . .\n\n\n";
+				std::cout << "Running file \"" << input_name << ".gmr\" . . .\n\n\n";
 			readOK = true;
 		}
 	}
@@ -406,12 +401,12 @@ bool IO::CheckModel()
 void IO::WriteGiraffeModelFile()
 {
 	FILE *f;
-	std::string name_giraffe = folder_name + name_input + ".inp";
+	std::string name_giraffe = folder_name + input_name + ".inp";
 	f = fopen(name_giraffe.c_str(), "w");
 
 	fprintf(f, "///////////////////////////////////////////////////////////////////////////\n");
 	fprintf(f, "//                                                                       //\n");
-	fprintf(f, "//   GIRAFFE input file generated automatically by GIRAFFEMoor v%s  //\n", version.c_str());
+	fprintf(f, "//   GIRAFFE input file generated automatically by GIRAFFEMoor v%sv  //\n", std::string(version).c_str());
 	fprintf(f, "//                                                                       //\n");
 	fprintf(f, "///////////////////////////////////////////////////////////////////////////\n\n");
 

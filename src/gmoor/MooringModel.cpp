@@ -2,12 +2,13 @@
 #include "MooringModel.h"
 #include "Summary.h"
 #include "Log.h"
+#include "IO.h"
 #include "AuxFunctions.h"
 
+//max/min difinitions
 #ifndef max
 #define max(a,b)	(((a) > (b)) ? (a) : (b))
 #endif
-
 #ifndef min
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
@@ -16,9 +17,6 @@
 //Global object
 extern GiraffeModel gm;
  
-//Global variable(s)
-extern std::string folder_name;
-
 //Constants variables
 constexpr auto PI = 3.1415926535897932384626433832795;
 static double g;
@@ -208,7 +206,7 @@ bool MooringModel::GenerateCatenary()
 		std::vector <double> FV(( size_t )n_segs + 1);
 
 		{
-			std::cout << "\nSolving equations...\n";
+			std::cout << "\nSolving equations for the line " << line.number << "...\n";
 			AuxFunctions::Time::Timer timer;
 			if ( !SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix) )
 				return false;
@@ -2069,14 +2067,8 @@ void MooringModel::GenerateSeabed()
 	environment.GetSeabed().pilot_node = pil;
 
 	//Establishing oscillatory surface
-	std::vector <unsigned int> list = { 1 }; //For now, there is only one surface (the flat seabed)
-	
 	gm.GenerateOscillatorySurf(1, 0.0, 0.0, 0.0, l1, l2, 0.0, 0.0, 1.0, 1.0, 1, pil);
-
-	//Establishing surface set
-	gm.GenerateSurfaceSet(1, list);
-
-	///TODO: check order of contacts generation
+	gm.GenerateSurfaceSet(1, {1});
 
 	//Contact booltables
 	BoolTable bool_c, bool_c2;
@@ -2107,13 +2099,9 @@ void MooringModel::GenerateSeabed()
 	}
 
 
-	//Name of the folder with post files
-	std::string surfaces_folder = folder_name + "post/";
-
-	//Boolean to indicate if seabed/water surface VTK files were created
-	bool VTKseabedOk = false, VTKwaterOk;
-
-
+	//Folder with post files
+	std::string surfaces_folder = IO::folder_name + "post/";
+	bool VTKseabedOk = false, VTKwaterOk; //indicate if seabed/water surface VTK files were created
 
 	//Creates post files directory and seabed and water surface vtk files
 	if ( !std::filesystem::is_directory(surfaces_folder) &&	  ///check if exist

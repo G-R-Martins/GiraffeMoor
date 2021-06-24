@@ -19,9 +19,9 @@ void Post::WriteGiraffeModelFile(FILE *f) const
 		mag_factor, write.mesh_flag, write.renderMesh_flag, write.rigidContactSurfaces_flag, write.flexibleContactSurfaces_flag, write.forces_flag, write.constraints_flag, write.specialConstraints_flag, write.contactForces_flag, write.renderRigidBodies_flag, write.renderParticles_flag);
 }
 
-bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)
+bool Post::CreateSeabedVTK(std::string_view folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)
 {
-	std::ofstream vtk_file(folder + "seabed.vtk", std::ios::out | std::ios::binary);
+	std::ofstream vtk_file(std::basic_string(folder) + "seabed.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
 		Log::AddWarning("\n   + Seabed vtk file could not be created. Using Giraffe 'ContactSurfaces' instead.");
@@ -47,9 +47,9 @@ bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, c
 	return true;
 }	
 
-bool Post::CreateWaterVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y)
+bool Post::CreateWaterVTK(std::string_view folder, const std::array<double, 2>& x, const std::array<double, 2>& y)
 {
-	std::ofstream vtk_file(folder + "water.vtk", std::ios::out | std::ios::binary);
+	std::ofstream vtk_file(std::basic_string(folder) + "water.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
 		Log::AddWarning("\n   + Water surface vtk file could not be created");

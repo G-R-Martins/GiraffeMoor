@@ -3,26 +3,32 @@
 
 class Summary
 {
+/// <summary>
+/// 
+///		This Singleton manages the model summary.
+///			-> creates '*.sum' file
+///		
+///		
+///		The lines summary is made with two auxiliary structs:
+///			- LineExtremities: which handle the summary of extremities 
+///		                       nodes (e.g.: anchors and fairleads)
+///			- SummLines: which include general information (e.g.: length)
+///		                 and condenses the 'LineExtremities' data in a 'std::pair'
+///			This section has also a overloading of the operator '<<' to print out
+///		 
+/// </summary>
+
+
+	//Singleton private constructor
 	Summary();
 	~Summary() = default;
-	/// <summary>
-	///	
-	/// This Singleton manages the summary of the model and
-	/// the creation and edition of the '.sum' file.
-	/// 
-	/// 
-	/// The lines summary is made with two auxiliary structs:
-	///		- LineExtremities: which handle the summary of extremities 
-	///                        nodes (e.g.: anchors and fairleads)
-	///		- SummLines: which include general information (e.g.: length)
-	///                  and condenses the 'LineExtremities' data in a 'std::pair'
-	///		This section has also a overloading of the operator '<<' to print out
-	/// </summary>
 
 
-	/*************
-	 * Variables * 
-	 *************/
+					/*+-+-+-+-+-+-+-+
+					|               |
+					|   Variables   |
+					|               |
+					+-+-+-+-+-+-+-+-*/
 
 	//Name of the summary file (with extension)
 	std::string summ_name;
@@ -53,12 +59,16 @@ class Summary
 		[ double, double, string ]  ->  [ initial time, end time, description ] */
 	std::vector<std::tuple<double, double, std::string>> steps;
 	
-	/*************
-	 * Functions * 
-	 *************/
+
+					/*+-+-+-+-+-+-+-+
+					|               |
+					|   Functinos   |
+					|               |
+					+-+-+-+-+-+-+-+-*/
 
 	//Implementations of corresponding static functions
 	void CreateSumFile_Impl(const std::string& name_with_folder, const std::string& version);
+	void CreateSumFile_Impl(const std::string& name_with_folder, std::string_view version);
 	void Append2File_Impl();
 	void AddLine_Impl(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
 						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
@@ -79,11 +89,14 @@ public:
 	Summary& operator=(const Summary&) = delete;
 
 	
-	/********************
-	 * Static functions *
-	 ********************/
-
+	///
+	/// Static functions
+	///
+	
 	static void CreateSumFile(const std::string& fullname, const std::string& version) { 
+		return getInstance().CreateSumFile_Impl(fullname, version); }
+	
+	static void CreateSumFile(const std::string& fullname, std::string_view version) { 
 		return getInstance().CreateSumFile_Impl(fullname, version); }
 	
 	static void Append2File() { 
@@ -97,6 +110,7 @@ public:
 	
 	static auto& GetSteps() { 
 		return getInstance().GetSteps_Impl(); }
+
 
 	///
 	///Overloaded operator to print line in the summary file 

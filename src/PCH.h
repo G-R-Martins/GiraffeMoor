@@ -32,13 +32,6 @@ PreCompiled Headers
 #include <forward_list>
 #include <tuple>
 
-
-//System
-//#include <sys/stat.h>
-//#include <direct.h>
-//#include <Windows.h>
-
-
 //GiraffeMoor classes
 #include "Matrix.h"
 #include "Table.h"

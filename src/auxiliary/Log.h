@@ -3,14 +3,31 @@
 
 class Log
 {
-	Log(); 
-	/// <summary>
-	///	
-	/// This Singleton manages the log of the model,
-	/// including the output to console.
-	/// 
-	/// </summary>	
+/// <summary>
+/// 
+///		This Singleton manages the log of the model.
+///		
+///		Nowadays, there is only outputs to the console, 
+///		but a log file is planned. 
+///		
+///		There are 3 different logs:
+///			1. Warnings: 
+///				- may be accompanied by errors or not
+///			2. Errors
+///				- throw an error message and finish the 
+///				execution at the first error founded
+///				- thus, in the next execution one can 
+///				get another error
+///			3. Final message
+///				- some message is always printed
+///				- if the Giraffe is called in the console
+///				this message is shown after its execution is finished
+///		 
+/// </summary>
 	
+	//Singleton private constructor
+	Log(); 
+
 public:
 	
 	//Create/return Singleton instance
@@ -36,10 +53,10 @@ public:
 	};
 
 
-	/********************
-	 * Static functions *
-	 ********************/
-
+	///
+	/// Static functions 
+	///
+	
 	//Add error to the string
 	static void AddError(const std::string_view& toAdd) { return getInstance().AddError_Impl(toAdd); }
 	static void AddError(const std::stringstream& toAdd) { return getInstance().AddError_Impl(toAdd); }
@@ -84,27 +101,24 @@ public:
 
 private:
 
-	/*************
-	 * Variables *
-	 *************/
+					/*+-+-+-+-+-+-+-+
+					|               |
+					|   Variables   |
+					|               |
+					+-+-+-+-+-+-+-+-*/
 
-	bool existError;
-	bool existWarning;
+	bool existError, existWarning;
+	unsigned int contErrors,  contWarnings;
 
-	unsigned int contErrors;
-	unsigned int contWarnings;
-
-	std::string error;
-	std::string warning;
-	std::string final_message;
-
-	std::string_view last_keyword;
-	std::string_view last_valid_keyword;
+	std::string error, warning, final_message;
+	std::string_view last_keyword, last_valid_keyword;
 
 
-	/*************
-	 * Functions *
-	 *************/
+					/*+-+-+-+-+-+-+-+
+					|               |
+					|   Variables   |
+					|               |
+					+-+-+-+-+-+-+-+-*/
 
 	///				  
 	/// Implementations of corresponding static functions

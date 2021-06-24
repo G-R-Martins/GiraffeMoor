@@ -3,15 +3,16 @@
 //Namespace with GiraffeMoor database headers and global functions (like 'Run')
 #include "GiraffeMoor.h"
 
-//Global objects
+
+//Global objects (databases)
 MooringModel mm;
 GiraffeModel gm;
 
 //Global variables
-std::string name_input;
-std::string folder_name;
-std::string name;	//with directory and extension
-std::string version("0.01.34");
+//std::string name_input;
+////std::string folder_name;
+//std::string name;	//with directory and extension
+//std::string version("0.02.00");
 
 
 int main(int argc, char* argv[])
