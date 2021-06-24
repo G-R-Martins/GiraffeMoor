@@ -9,8 +9,6 @@ class Environment
 	double rhofluid;
 	double waterdepth;
 
-	//============================================================================
-
 	/*-----
 	Objects
 	------*/
@@ -29,8 +27,6 @@ public:
 	Environment();
 	~Environment();
 
-	//============================================================================
-
 	/*-------
 	Functions
 	--------*/
@@ -39,9 +35,9 @@ public:
 	void WriteGiraffeModelFile(FILE *f);
 
 
-	/**
-	 **   Set/Get functions 
-	 **/
+	///
+	///  Set/Get functions 
+	///
 
 	//Set variables
 	void SetGravity(double g);

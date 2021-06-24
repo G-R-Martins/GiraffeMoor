@@ -3,7 +3,6 @@
 
 
 Pipe::Pipe()
-	: label("")
 {
 	nodes.resize(3);
 }

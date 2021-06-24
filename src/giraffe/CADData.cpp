@@ -21,7 +21,6 @@ bool CADData::Read(FILE* f)
 		}
 		else
 			name = temp_name;
-
 	}
 	else
 	{

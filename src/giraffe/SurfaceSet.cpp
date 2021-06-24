@@ -6,6 +6,10 @@ SurfaceSet::SurfaceSet()
 	: number(0)
 {}
 
+SurfaceSet::SurfaceSet(unsigned int n, std::vector<unsigned int> surf)
+	: number(n), surfaces(surf)
+{}
+
 
 SurfaceSet::~SurfaceSet()
 {}

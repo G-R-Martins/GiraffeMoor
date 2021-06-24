@@ -16,12 +16,6 @@ StiffnessMatrix::StiffnessMatrix()
 StiffnessMatrix::~StiffnessMatrix()
 {
 	K_tan.flush();
-
-	/*if (time_series)
-	{
-		time_series->table.clear();
-		time_series = nullptr;
-	}*/
 }
 
 bool StiffnessMatrix::Read(FILE *f)
@@ -327,4 +321,24 @@ void StiffnessMatrix::check_Ktan()
 				K_tan(i, j) = 0.0;
 		}
 	}
+}
+
+void StiffnessMatrix::FprintKtan(const std::string& file)
+{
+	this->K_tan.fprint(file.c_str());
+}
+
+unsigned int StiffnessMatrix::GetStep() const
+{
+	return this->stiff_matrix_step;
+}
+
+bool StiffnessMatrix::ExistNumericalStiffMat() const
+{
+	return this->bool_num;
+}
+
+bool StiffnessMatrix::ExistAnalyticalStiffMat() const
+{
+	return this->bool_ana;
 }

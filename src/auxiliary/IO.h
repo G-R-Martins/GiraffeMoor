@@ -6,7 +6,7 @@ enum class FirstLevelKeyword
 	None = 0,				//Initial value
 	EndOfFile = -1,			//End
 	Error = -100,			//Invalid keyword
-	CommentAfterBlock = 1,	//Comment after a block with only first level keyword
+	CommentAfterBlock = 1,	//Comment after a block with only first level keyword (this can, and will, be improved changing the logic of the reading process)
 
 	//Mandatory keywords
 	Environment = 10, Keypoints, Lines, Vessels, SegmentProperties, Solution,

@@ -3,10 +3,10 @@
 
 
 Truss::Truss()
-	: label("")
 {
 	nodes.resize(2);
 }
+
 
 Truss::~Truss()
 {}

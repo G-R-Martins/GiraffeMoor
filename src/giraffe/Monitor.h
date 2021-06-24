@@ -21,9 +21,9 @@ public:
 
 	//============================================================================
 
-	/*-------------------------------------
-	  Structs with rules to create monitors
-	 -------------------------------------*/
+	/*------------------------------------------
+	  Structs with guidelines to create monitors
+	 ------------------------------------------*/
 	struct SequenceNodes { unsigned int nodes, begin, increment; };
 	struct SequenceElements { unsigned int elements, begin, increment; };
 

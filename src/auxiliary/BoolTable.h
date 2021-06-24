@@ -3,6 +3,8 @@
 
 class BoolTable
 {
+	std::vector<bool> data_table;
+
 public:
 	BoolTable();
 	//"Bool_init_steps" with "bool_init" and a step (to the end) with the opposite of "bool_init"
@@ -25,8 +27,5 @@ public:
 	void Multiple_Push_Back(const bool& bool_value, const unsigned int& n_times);
 	void Pop_Back();
 	int Size();
-
-private:
-	std::vector<bool> data_table;
 };
 

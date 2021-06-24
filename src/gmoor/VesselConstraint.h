@@ -15,8 +15,6 @@ public:
 	VesselConstraint();
 	~VesselConstraint();
 
-	//==========================================================================================================================
-
 					/*--------
 					|Functions|
 					---------*/
@@ -24,9 +22,9 @@ public:
 	//Reads input file
 	bool Read(FILE *f);
 
-	/*-----------
-	Get functions
-	-----------*/
+	/// 
+	/// Get functions
+	/// 
 
 	unsigned int GetNumberID() const;
 	

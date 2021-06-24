@@ -47,11 +47,5 @@ public:
 	friend bool operator>(const SegmentSet& segset1, const SegmentSet& segset2);
 	friend bool operator==(const SegmentSet& segset1, const SegmentSet& segset2);
 	friend bool operator!=(const SegmentSet& segset1, const SegmentSet& segset2);
-	////Move
-	//SegmentSet& operator=(SegmentSet&& other) noexcept = default;
-	////Copy assignment
-	//SegmentSet& operator=(const SegmentSet& other) = default;
-
-
 };
 

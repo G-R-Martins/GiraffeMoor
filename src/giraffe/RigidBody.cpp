@@ -6,7 +6,6 @@ RigidBody::RigidBody()
 {
 	nodes.resize(1);
 }
-
 RigidBody::~RigidBody()
 {
 }

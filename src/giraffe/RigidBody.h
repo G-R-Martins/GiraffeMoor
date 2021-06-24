@@ -2,8 +2,7 @@
 #include "Element.h"
 
 
-class RigidBody :
-	public Element
+class RigidBody : public Element
 {
 public:
 	RigidBody();
@@ -11,8 +10,5 @@ public:
 
 	//Writes Giraffe file
 	void WriteGiraffeModelFile(FILE *f) override;
-
-	//Label (comment)
-	std::string label;
 };
 

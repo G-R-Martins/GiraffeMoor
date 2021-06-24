@@ -8,6 +8,6 @@ public:
 	virtual ~Constraint();
 	virtual void WriteGiraffeModelFile(FILE *f) = 0;
 
-	unsigned int number;				//ID do elemento
+	unsigned int number;				//element ID
 };
 

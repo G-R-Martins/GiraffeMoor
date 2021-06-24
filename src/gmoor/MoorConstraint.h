@@ -38,7 +38,5 @@ public:
 	std::vector<AnchorConstraint>& GetAnchorConstraints() { return  anchors; }
 	std::vector<VesselConstraint>& GetVesselConstraints() { return  vessels; }
 	std::vector<LineConstraint>& GetLineConstraints() { return  lines; }
-	//==========================================================================================================================
-
 };
 

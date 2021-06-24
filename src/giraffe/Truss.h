@@ -2,8 +2,7 @@
 #include "Element.h"
 
 
-class Truss :
-	public Element
+class Truss : public Element
 {
 public:
 	Truss();
@@ -12,8 +11,6 @@ public:
 	//Writes Giraffe file
 	void WriteGiraffeModelFile(FILE *f) override;
 
-	//Label (comment)
-	std::string label;
 };
 
 

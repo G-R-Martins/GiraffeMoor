@@ -3,22 +3,22 @@
 
 class ConvergenceCriteria
 {
-	double force_tol;		//Fator aplicado à norma do vetor de forças do sistema para estabelecer critério de convergência
-	double moment_tol;		//Fator aplicado à norma do vetor de momentos do sistema para estabelecer critério de convergência
+	double force_tol;		//Factor applied to the system force vector norm to establish convergence criterion
+	double moment_tol;		//Factor applied to the system moment vector norm to establish convergence criterion
 	
-	double force_min;		//Valor de força considerado pequeno - usado quando há somente forças nulas - valor dimensional
-	double moment_min;		//Valor de momento considerado pequeno - usado quando há somente momentos nulos - valor dimensional
-	double constraint_min;	//Valor de erro de constraint, considerado pequeno - sempre é utilizado quando há joints
+	double force_min;		//Force value considered small - used when there are only zero forces - dimensional value
+	double moment_min;		//Small moment value - used when there are only null moments - dimensional value
+	double constraint_min;	//Constraint error value, considered small - always used when there are joints
 
-	double disp_tol;		//Fator aplicado à norma do vetor de deslocamentos incrementais do sistema para estabelecer critério de convergência
-	double rot_tol;			//Fator aplicado à norma do vetor de rotações incrementais do sistema para estabelecer critério de convergência
-	double lag_tol;			//Fator aplicado à norma do vetor de multiplicadores de lagrange do sistema para estabelecer critério de convergência
+	double disp_tol;		//Factor applied to the system's incremental displacement vector norm to establish convergence criterion
+	double rot_tol;			//Factor applied to the system's incremental rotation vector norm to establish convergence criterion 
+	double lag_tol;			//Factor applied to the system lagrange multiplier vector norm to establish convergence criterion
 
-	double disp_min;		//Valor de deslocamento considerado pequeno - usado quando há somente deslocamentos nulos - valor dimensional
-	double rot_min;			//Valor de rotação considerado pequeno - usado quando há somente rotações nulos - valor dimensional
-	double lag_min;			//Valor de multiplicador de lagrange considerado pequeno - usado quando há somente multiplicadores de lagrange nulos - valor dimensional
+	double disp_min;		//Offset value considered small - used when there are only null offsets - dimensional value
+	double rot_min;			//Rotation value considered small - used when there are only null rotations - dimensional value 
+	double lag_min;			//Lagrange multiplier value considered small - used when there are only null lagrange multipliers - dimensional value 
 
-	double divergence_ref;	//Valor bastante elevado que indica divergência do modelo
+	double divergence_ref;	//Very high value indicating model divergence
 
 	//============================================================================
 
@@ -26,11 +26,9 @@ public:
 	ConvergenceCriteria();
 	~ConvergenceCriteria();
 
-	//============================================================================
-
-	/*-------
-	Functions
-	---------*/
+	/// 
+	/// Functions
+	/// 
 
 	//Reads input file
 	bool Read(FILE *f);	

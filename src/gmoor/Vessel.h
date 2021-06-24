@@ -36,10 +36,7 @@ class Vessel
 	std::array<double, 6> inertiaTensor;
 
 
-	/* ---------------------------------------------
-	 Container with nodes to couple vessel and lines 
-	 ----------------------------------------------*/
-	
+	//Container with nodes to couple vessel and lines 
 	std::unordered_set<unsigned int> nodes_rigid_nodeset;
 
 	//============================================================================
@@ -58,7 +55,9 @@ public:
 	//Add node to the rigid nodeset
 	void AddNode2RigidNodeset(unsigned int n);
 
-	//Set functions
+	///
+	/// Set functions
+	///
 	void SetNumber(unsigned int num);
 	void SetKeypoint(unsigned int kp);
 	void SetNode(unsigned int n);
@@ -69,7 +68,9 @@ public:
 	void SetInertiaTensor(const std::array<double, 6>& tensor);
 	void SetNodesRigidNodeset(const std::unordered_set<unsigned int>& nodes);
 
-	//Get functions
+	///
+	/// GSet functions
+	///
 	unsigned int GetNumber() const;
 	unsigned int GetKeypoint() const;
 	unsigned int GetNode() const;
@@ -82,6 +83,8 @@ public:
 	std::unordered_set<unsigned int> const& GetNodesRigidNodeset() const;
 	std::unordered_set<unsigned int>& GetNodesRigidNodeset();
 
+
+	//============================================================================
 
 	/*------------------
 	Overloaded operators

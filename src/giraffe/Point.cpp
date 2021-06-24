@@ -6,6 +6,10 @@ Point::Point()
 	: number(0), coordinates(Matrix(3))
 {}
 
+Point::Point(const unsigned int& n, Matrix & pos)
+	: number(n), coordinates(pos)
+{}
+
 Point::~Point()
 {}
 

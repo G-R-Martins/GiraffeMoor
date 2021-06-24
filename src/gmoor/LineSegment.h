@@ -12,8 +12,8 @@ class LineSegment
 	unsigned int discretization;
 	
 	//Number of nodes
-	unsigned int n_nodes;		//nodes_segs
-	unsigned int n_elements;	//elements_segs;
+	unsigned int n_nodes;
+	unsigned int n_elements;
 
 	//============================================================================
 
@@ -23,7 +23,6 @@ public:
 	LineSegment(const LineSegment&) = default;
 	~LineSegment();
 
-	//============================================================================
 
 	//Reads input file
 	bool Read(FILE *f);

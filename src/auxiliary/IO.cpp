@@ -350,7 +350,7 @@ bool IO::CheckModel()
 		);//end of for_each
 		if (!isOk)																											{ Log::AddWarning(ss);	modelOk = false; }
 	}
-	if (mm.moorsolution.GetStepsVec().front().number != 1 || mm.moorsolution.GetStepsVec().back().number != n_keywords["SolSteps"]) { Log::AddWarning("\n   + Invalid solution steps numbering");	modelOk = false; }
+	if (mm.moorsolution.GetStepsVec().front().GetNumber() != 1 || mm.moorsolution.GetStepsVec().back().GetNumber() != n_keywords["SolSteps"]) { Log::AddWarning("\n   + Invalid solution steps numbering");	modelOk = false; }
 	
 	//Checks optional keywords
 	if (!mm.segment_set_vector.empty())

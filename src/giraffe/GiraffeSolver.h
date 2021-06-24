@@ -23,9 +23,9 @@ public:
 
 	//=========================================================================================
 
-	/*-------------
-	  I/O Funtions
-	 -------------*/
+	///
+	/// I/O Funtions
+	///
 
 	//Read input file
 	bool Read(FILE* f);
@@ -33,9 +33,10 @@ public:
 	//Writes Giraffe input file (.inp)
 	void WriteGiraffeModelFile(FILE* f) const;
 
-	/*------------------
-	  Set/Get functions
-	 ------------------*/
+	///
+	/// Set/Get functions
+	///
+	
 	//Set options with readed date
 	void SetSolverOptions(unsigned int cores, bool bool_direct);
 	//Get Giraffe solver boolena

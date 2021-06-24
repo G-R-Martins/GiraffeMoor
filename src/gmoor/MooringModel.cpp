@@ -497,7 +497,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 	}
 
 	//Line contribution to the stiffness matrix
-	if (stiff_matrix && stiff_matrix->bool_ana)
+	if (stiff_matrix && stiff_matrix->ExistAnalyticalStiffMat())
 	{
 		std::vector<double> eul_ang = { 0, 0, 0 };
 
@@ -1730,7 +1730,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 
 	/*If there is no vessel time series, but offsets for calculate numerical stiffness matrix were defined,
 		a displacement block must be created*/
-	if (stiff_matrix && stiff_matrix->time_series)
+	if (stiff_matrix && stiff_matrix->ExistNumericalStiffMat())
 	{
 		////With multiples vessels -> displaces the origin node
 		//if (!vessel_vector.size())
@@ -1751,31 +1751,31 @@ void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
 	for (size_t analysis_step = 0; analysis_step < moorsolution.solution_steps.size(); analysis_step++)
 	{
 		///"global_start" might be used to apply vessel displacements and/or nodal loads
-		moorsolution.solution_steps[analysis_step].global_start = start;
-		dt = moorsolution.solution_steps[analysis_step].end_time;
+		moorsolution.solution_steps[analysis_step].SetGlobalStart(start);
+		dt = moorsolution.solution_steps[analysis_step].GetEndTime();
 		
 		//Static step
-		if (moorsolution.solution_steps[analysis_step].isStatic)
+		if (moorsolution.solution_steps[analysis_step].CheckIfIsStatic())
 		{
 			gm.GenerateStaticSolutionStep(++step, start, start + dt,
-										  moorsolution.solution_steps[analysis_step].timestep,
-										  moorsolution.solution_steps[analysis_step].max_timestep,
-										  moorsolution.solution_steps[analysis_step].min_timestep, 20, 2, 4, 1.5,
-										  moorsolution.solution_steps[analysis_step].sample);
+										  moorsolution.solution_steps[analysis_step].GetTimestep(),
+										  moorsolution.solution_steps[analysis_step].GetMaxTimestep(),
+										  moorsolution.solution_steps[analysis_step].GetMinTimestep(), 20, 2, 4, 1.5,
+										  moorsolution.solution_steps[analysis_step].GetSample());
 			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Static step"));
 		}
 		//Dynamic step
 		else 
 		{
 			gm.GenerateDynamicSolutionStep(++step, start, start + dt,
-										   moorsolution.solution_steps[analysis_step].timestep,
-										   moorsolution.solution_steps[analysis_step].max_timestep,
-										   moorsolution.solution_steps[analysis_step].min_timestep, 15, 3, 2, 1.5,
-										   moorsolution.solution_steps[analysis_step].sample, 
-										   moorsolution.solution_steps[analysis_step].alpha_ray,
-										   moorsolution.solution_steps[analysis_step].beta_ray, 0,
-										   moorsolution.solution_steps[analysis_step].gamma_new,
-										   moorsolution.solution_steps[analysis_step].beta_new);
+										   moorsolution.solution_steps[analysis_step].GetTimestep(),
+										   moorsolution.solution_steps[analysis_step].GetMaxTimestep(),
+										   moorsolution.solution_steps[analysis_step].GetMinTimestep(), 15, 3, 2, 1.5,
+										   moorsolution.solution_steps[analysis_step].GetSample(), 
+										   moorsolution.solution_steps[analysis_step].GetAlpha_ray(),
+										   moorsolution.solution_steps[analysis_step].GetBeta_ray(), 0,
+										   moorsolution.solution_steps[analysis_step].GetGamma_new(),
+										   moorsolution.solution_steps[analysis_step].GetBeta_new());
 			Summary::GetSteps().emplace_back(std::make_tuple(start, start + dt, "Dynamic step"));
 		}
 		//Update initial time
@@ -1791,7 +1791,7 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 		size_t ID = ( size_t )disp.GetVesselID() - 1;
 		unsigned int analysis_step = disp.GetStep() - 1;
 		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
-		double start = moorsolution.solution_steps[analysis_step].global_start;
+		double start = moorsolution.solution_steps[analysis_step].GetGlobalStart();
 
 		//Displacement description (vessel number and type of displacement)
 		std::string description2add;
@@ -1822,17 +1822,17 @@ void MooringModel::GenerateVesselDisplacements(unsigned int& step)
 			auto time_series = disp.GetTimeSeries();
 
 			//Push a line with zeros in front of the table (initial position)
-			if (stiff_matrix && !stiff_matrix->bool_num)
+			if (stiff_matrix && !stiff_matrix->ExistNumericalStiffMat())
 				time_series->SetLineFront(start, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
 			//Row of the table that starts to increment to match with Giraffe time
 			size_t i = 0;
 
 			//With stiffness matrix offsets
-			if (stiff_matrix && stiff_matrix->bool_num)
+			if (stiff_matrix && stiff_matrix->ExistNumericalStiffMat())
 				i = environment.CheckIfExistSeaCurrent() ? 26 : 25;
 			//Without stiffness matrix offsets
-			else if (!stiff_matrix || ( stiff_matrix && !stiff_matrix->bool_num ))
+			else if (!stiff_matrix || ( stiff_matrix && !stiff_matrix->ExistNumericalStiffMat() ))
 				i = 1;
 
 			for (; i < time_series->table.size(); i++)
@@ -1870,7 +1870,7 @@ void MooringModel::GenerateForces()
 		//Temporary auxiliary variables
 		unsigned int analysis_step = load.GetStep() - 1;
 		unsigned int global_step = moorsolution.steps_to_set_model + analysis_step;
-		double start = moorsolution.solution_steps[analysis_step].global_start;
+		double start = moorsolution.solution_steps[analysis_step].GetGlobalStart();
 		size_t line = load.GetLineID() - 1;
 		unsigned int node = load.GetNodeID() - 1;
 		unsigned int nodeset;
@@ -2076,9 +2076,9 @@ void MooringModel::GenerateSeabed()
 	bool_c2.Clear();
 
 	//Establishing contact
-	if (stiff_matrix && stiff_matrix->bool_num && environment.GetSeabed().mu > 0)
+	if (stiff_matrix && stiff_matrix->ExistNumericalStiffMat() && environment.GetSeabed().mu > 0)
 	{
-		for (unsigned int step = 1; step < stiff_matrix->stiff_matrix_step; step++)
+		for (unsigned int step = 1; step < stiff_matrix->GetStep(); step++)
 		{
 			bool_c.Push_Back(true);
 			bool_c2.Push_Back(false);
@@ -2233,7 +2233,7 @@ void MooringModel::GenerateConstraints()
 		//If there is a dynamic relaxation step
 		if (moorsolution.bool_DynamicRelax)			++step0;
 		//If there is a numerical stiffness matrix
-		if (stiff_matrix && stiff_matrix->bool_num) ++step0;
+		if (stiff_matrix && stiff_matrix->ExistNumericalStiffMat()) ++step0;
 		//If there is a sea current 
 		if (environment.CheckIfExistSeaCurrent())			++step0;
 

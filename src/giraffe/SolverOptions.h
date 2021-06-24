@@ -3,8 +3,6 @@
 
 class SolverOptions
 {
-private:
-
 	unsigned int n_cores;
 	bool isDirect;
 

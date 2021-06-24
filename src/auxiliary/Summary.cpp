@@ -188,7 +188,7 @@ void Summary::Append2File_Impl()
 
 	//=======================================================================
 	//Check if the analytical stiffness matrix of the system was calculated
-	if (mm.stiff_matrix && mm.stiff_matrix->bool_ana)
+	if (mm.stiff_matrix && mm.stiff_matrix->ExistAnalyticalStiffMat())
 	{
 	//Stiffness matrix header
 		sum_file << ++cur_section << ") Analytical stiffness matrix\n";
@@ -198,7 +198,7 @@ void Summary::Append2File_Impl()
 
 		//Check residuos and print to file
 		mm.stiff_matrix->check_Ktan();
-		mm.stiff_matrix->K_tan.fprint(summ_name.c_str());
+		mm.stiff_matrix->FprintKtan(summ_name.c_str());
 	}
 	else
 		//Close file

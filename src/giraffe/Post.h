@@ -19,10 +19,10 @@ public:
 
 	// Creates seabed VTK file
 
-	bool CreateSeabedVTK(std::string_view folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
+	bool CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
 	
 	//Creates water surface VTK file
-	bool CreateWaterVTK(std::string_view folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
+	bool CreateWaterVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
 
 
 	//============================================================================

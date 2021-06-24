@@ -2,8 +2,7 @@
 #include "Solution.h"
 
 
-class Static :
-	public Solution
+class Static : public Solution
 {
 public:
 	Static();

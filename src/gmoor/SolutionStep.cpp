@@ -185,3 +185,66 @@ bool SolutionStep::Read(FILE* f)
 	//All ok while reading
 	return true;
 }
+
+void SolutionStep::SetGlobalStart(double time)
+{ this->global_start = time; }
+
+unsigned int SolutionStep::GetNumber() const
+{
+	return this->number;
+}
+
+double SolutionStep::GetGlobalStart() const
+{
+	return this->global_start;
+}
+
+double SolutionStep::GetEndTime() const
+{
+	return this->end_time;
+}
+
+double SolutionStep::GetTimestep() const
+{
+	return this->timestep;
+}
+
+double SolutionStep::GetMaxTimestep() const
+{
+	return this->max_timestep;
+}
+
+double SolutionStep::GetMinTimestep() const
+{
+	return this->min_timestep;
+}
+
+int SolutionStep::GetSample() const
+{
+	return this->sample;
+}
+
+double SolutionStep::GetBeta_new() const
+{
+	return this->beta_new;
+}
+
+double SolutionStep::GetGamma_new() const
+{
+	return this->gamma_new;
+}
+
+double SolutionStep::GetAlpha_ray() const
+{
+	return this->alpha_ray;
+}
+
+double SolutionStep::GetBeta_ray() const
+{
+	return this->beta_ray;
+}
+
+bool SolutionStep::CheckIfIsStatic() const
+{
+	return this->isStatic;
+}
