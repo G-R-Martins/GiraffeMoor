@@ -11,11 +11,8 @@ SameDisplacement::~SameDisplacement()
 	bool_table.Clear();
 }
 
-void SameDisplacement::WriteGiraffeModelFile(FILE *f)
+void SameDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSameDisplacement\t%d\tNodes\t%d\t%d\t",
-		number,
-		node_A,
-		node_B);
-	bool_table.Write(f);
+	fout << "\tSameDisplacement " << number <<
+		"\tNodes " << node_A << " " << node_B << " " << bool_table;
 }

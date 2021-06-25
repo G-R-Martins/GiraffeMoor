@@ -125,7 +125,7 @@ namespace AuxFunctions
 				|| !strcmp(word, "Vessels") || !strcmp(word, "SegmentProperties") || !strcmp(word, "Solution") ||
 				/*Optional*/ !strcmp(word, "SegmentSets") || !strcmp(word, "VesselDisplacements") || !strcmp(word, "Platforms") || !strcmp(word, "StiffnessMatrix")
 				|| !strcmp(word, "Monitors") || !strcmp(word, "PostProcessing") || !strcmp(word, "GiraffeConvergenceCriteria")
-				|| !strcmp(word, "GiraffeSolver") || !strcmp(word, "Constraints") || !strcmp(word, "NodalForces"))
+				|| !strcmp(word, "GiraffeSolver") || !strcmp(word, "Constraints") || !strcmp(word, "NodalForces") || !strcmp(word, "DisplacementFields"))
 				return true;
 			//Other word
 			else

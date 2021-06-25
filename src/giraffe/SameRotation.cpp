@@ -12,11 +12,8 @@ SameRotation::~SameRotation()
 	bool_table.Clear();
 }
 
-void SameRotation::WriteGiraffeModelFile(FILE *f)
+void SameRotation::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSameRotation\t%d\tNodes\t%d\t%d\t",
-		number,
-		node_A,
-		node_B);
-	bool_table.Write(f);
+	fout << "\tSameRotation " << number <<
+		"\tNodes " << node_A << " " << node_B << " " << bool_table;
 }

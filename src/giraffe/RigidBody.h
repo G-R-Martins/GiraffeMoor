@@ -9,6 +9,6 @@ public:
 	~RigidBody();
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 };
 

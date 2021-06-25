@@ -159,40 +159,36 @@ bool Monitor::Read(FILE *f)
 }
 
 
-
-
-
-
-void Monitor::WriteGiraffeModelFile(FILE *f) const
+void Monitor::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSample\t%d\n",sample);
+	fout << "\tSample "<< sample << "\n";
 	if (!nodes.empty())
 	{
-		fprintf(f, "\tMonitorNodes\t");
+		fout << "\tMonitorNodes\t";
 		for (const int& node : nodes)
-			fprintf(f, "%d ", node);
-		fprintf(f, "\n");
+			fout << node << " ";
+		fout << "\n";
 	}
 	if (!elements.empty())
 	{
-		fprintf(f, "\tMonitorElements\t");
+		fout << "\tMonitorElements\t";
 		for (const int& elem : elements)
-			fprintf(f, "%d ", elem);
-		fprintf(f, "\n");
+			fout << elem << " ";
+		fout << "\n";
 	}
 	if (!contacts.empty())
 	{
-		fprintf(f, "\tMonitorContacts\t");
+		fout << "\tMonitorContacts\t";
 		for (const int& cont : contacts)
-			fprintf(f, "%d ", cont);
-		fprintf(f, "\n");
+			fout << cont << " ";
+		fout << "\n";
 	}
 	if (!node_sets.empty())
 	{
-		fprintf(f, "\tMonitorNodeSets\t");
+		fout << "\tMonitorNodeSets\t";
 		for (const int& NS : node_sets)
-			fprintf(f, "%d ", NS);
-		fprintf(f, "\n");
+			fout << NS << " ";
+		fout << "\n";
 	}
 	
 }

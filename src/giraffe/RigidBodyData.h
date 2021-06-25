@@ -7,7 +7,7 @@ public:
 	~RigidBodyData();
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) const;
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 	
 	//ID
 	unsigned int number;

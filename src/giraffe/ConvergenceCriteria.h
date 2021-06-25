@@ -34,8 +34,7 @@ public:
 	bool Read(FILE *f);	
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) const;
-
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 };
 

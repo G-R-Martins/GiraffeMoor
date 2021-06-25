@@ -14,10 +14,10 @@ SurfaceSet::SurfaceSet(unsigned int n, std::vector<unsigned int> surf)
 SurfaceSet::~SurfaceSet()
 {}
 
-void SurfaceSet::WriteGiraffeModelFile(FILE *f) const
+void SurfaceSet::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSurfaceSet\t%d\tSurfaces\t%d\tList\t", number, (int)surfaces.size());
-	for (int i = 0; i < (int)surfaces.size(); i++)
-		fprintf(f, "%d\t", i + 1);
-	fprintf(f, "\n");
+	fout << "\tSurfaceSet " << number << "\tSurfaces " << surfaces.size() << "\tList ";
+	for ( size_t i = 0; i < surfaces.size(); ++i )
+		fout << i + 1 << " ";
+	fout << "\n";
 }

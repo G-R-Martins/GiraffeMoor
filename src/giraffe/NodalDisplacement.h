@@ -13,7 +13,7 @@ public:
 	NodalDisplacement(const std::string& f_name, const unsigned int& h_lines, const unsigned int& ntimes);
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 	
 	//============================================================================
 

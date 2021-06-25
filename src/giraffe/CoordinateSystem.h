@@ -20,7 +20,7 @@ public:
 					+----------*/
 	
 	//Writes Giraffe model
-	void WriteGiraffeModelFile(FILE *f);
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	///
 	/// Set/Get functions

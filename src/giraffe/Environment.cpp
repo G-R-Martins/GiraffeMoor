@@ -11,17 +11,17 @@ Environment::Environment()
 Environment::~Environment()
 {}
 
-void Environment::WriteGiraffeModelFile(FILE *f)
+void Environment::WriteGiraffeModelFile(std::ostream& fout) const
 {
-//	fprintf(f, "\nEnvironment\n");
-	fprintf(f, "\tGravityData\tG\t%.6e\t%.6e\t%.6e\t", 0.0, 0.0, -gravity);
-	bool_g.Write(f);
-	fprintf(f, "\tOceanData\tRhoFluid\t%.6e\tSurfacePosition\t%.6e\t%.6e\t%.6e\n\tSeaCurrent\tN\t%d\t",
-		rhofluid, 0.0, 0.0, 0.0, (int)seacurrent_vector.size());
-	bool_current.Write(f);
-	for (int i = 0; i < seacurrent_vector.size(); i++)
+	fout << "\tGravityData\tG " << 0.0 << " " << 0.0 << " " << -gravity << " " << bool_g <<
+		"\tOceanData\tRhoFluid " << rhofluid << "\tSurfacePosition " << 0.0 << " " << 0.0 << " " << 0.0 <<
+		"\n\tSeaCurrent\tN " << seacurrent_vector.size() << " " << bool_current;
+	for (size_t i = 0; i < seacurrent_vector.size(); ++i)
 	{
-		fprintf(f, "\t\tDepth\t%lf\tSpeed\t%lf\tAngle\t%lf\n", seacurrent_vector[i].depth, seacurrent_vector[i].speed, seacurrent_vector[i].azimuth);
+		fout << "\t\tDepth " << seacurrent_vector[i].depth <<
+			"\tSpeed " << seacurrent_vector[i].speed << 
+			"\tAngle " << seacurrent_vector[i].azimuth << 
+			"\n";
 	}
 }
 

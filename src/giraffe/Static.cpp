@@ -11,8 +11,16 @@ Static::~Static()
 {}
 
 //Writes output file
-void Static::WriteGiraffeModelFile(FILE *f)
+void Static::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tStatic\t%d\tEndTime\t%.6e\tTimeStep\t%.6e\tMaxTimeStep\t%.6e\tMinTimeStep\t%.6e\tMaxIt\t%d\tMinIt\t%d\tConvIncrease\t%d\tIncFactor\t%.6e\tSample\t%d\n",
-		solution_number, end_time, i_time_step, max_time_step, min_time_step, max_it, min_it, conv_increase, inc_factor, sample);
+	fout << "\tStatic " << solution_number <<
+		std::setprecision(6) <<
+		"\tEndTime " << end_time <<
+		"\tTimeStep " << i_time_step <<
+		"\tMaxTimeStep " << max_time_step <<
+		"\tMinTimeStep " << min_time_step <<
+		"\tMaxIt " << max_it << "\tMinIt " << min_it <<
+		"\tConvIncrease " << conv_increase << 
+		"\tIncFactor " << inc_factor <<
+		"\tSample " << sample << "\n";
 }

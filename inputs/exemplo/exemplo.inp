@@ -1,8 +1,8 @@
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-//   GIRAFFE input file generated automatically by GIRAFFEMoor v0.02.01v  //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//                                                                         //
+//   GIRAFFE input file generated automatically by GIRAFFEMoor v0.03.00-a  //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
 
 
 /*Units:
@@ -15,13 +15,13 @@
 */
 
 SolutionSteps	7
-	Static	1	EndTime	1.000000e+00	TimeStep	1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-04	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	100
-	Static	2	EndTime	2.000000e+00	TimeStep	1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-04	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	100
-	Static	3	EndTime	3.000000e+00	TimeStep	1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-05	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	100
-	Static	4	EndTime	4.000000e+00	TimeStep	1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-06	MaxIt	20	MinIt	2	ConvIncrease	3	IncFactor	1.500000e+00	Sample	100
-	Static	5	EndTime	5.000000e+00	TimeStep	5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	1
-	Static	6	EndTime	7.000000e+00	TimeStep	5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	1
-	Static	7	EndTime	9.000000e+00	TimeStep	5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt	20	MinIt	2	ConvIncrease	4	IncFactor	1.500000e+00	Sample	1
+	Static	1	EndTime	1.000000e+00	TimeStep 1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-04	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 100
+	Static	2	EndTime	2.000000e+00	TimeStep 1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-04	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 100
+	Static	3	EndTime	3.000000e+00	TimeStep 1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-05	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 100
+	Static	4	EndTime	4.000000e+00	TimeStep 1.000000e+00	MaxTimeStep	1.000000e+00	MinTimeStep	1.000000e-06	MaxIt 20	MinIt 2	ConvIncrease 3	IncFactor 1.500000e+00	Sample 100
+	Static	5	EndTime	5.000000e+00	TimeStep 5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 1
+	Static	6	EndTime	7.000000e+00	TimeStep 5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 1
+	Static	7	EndTime	9.000000e+00	TimeStep 5.000000e-01	MaxTimeStep	5.000000e-01	MinTimeStep	1.000000e-04	MaxIt 20	MinIt 2	ConvIncrease 4	IncFactor 1.500000e+00	Sample 1
 
 Monitor
 	Sample	1

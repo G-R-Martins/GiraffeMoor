@@ -32,7 +32,7 @@ public:
 	--------*/
 
 	//Writes input file
-	void WriteGiraffeModelFile(FILE *f);
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 
 	///

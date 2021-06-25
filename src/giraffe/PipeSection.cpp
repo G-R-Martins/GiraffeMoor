@@ -16,8 +16,20 @@ PipeSection::~PipeSection()
 {}
 
 //Writes Giraffe file data
-void PipeSection::WriteGiraffeModelFile(FILE *f)
+void PipeSection::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tPS\t%d\tEA\t%.6e\tEI\t%.6e\tGJ\t%.6e\tGA\t%.6e\tRho\t%.6e\tCDt\t%.6e\tCDn\t%.6e\tCAt\t%.6e\tCAn\t%.6e\tDe\t%.6e\tDi\t%.6e\n", 
-		number, EA, EI, GJ, GA, rho, CDt, CDn, CAt, CAn, diameter, 0.0);
+	fout << std::setprecision(6) <<
+		"\tPS " << number <<
+		"\tEA " << EA <<
+		"\tEI " << EI <<
+		"\tGJ " << GJ <<
+		"\tGA " << GA <<
+		"\tRho " << rho <<
+		"\tCDt " << CDt <<
+		"\tCDn " << CDn <<
+		"\tCAt " << CAn <<
+		"\tCAn " << CAt <<
+		"\tDe " << diameter <<
+		"\tDi " << 0.0 <<
+		"\n";
 }

@@ -13,10 +13,20 @@ Post::Post()
 Post::~Post()
 {}
 
-void Post::WriteGiraffeModelFile(FILE *f) const
+void Post::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tMagFactor\t%.6f\n\tWriteMesh\t%d\n\tWriteRenderMesh\t%d\n\tWriteRigidContactSurfaces\t%d\n\tWriteFlexibleContactSurfaces\t%d\n\tWriteForces\t%d\n\tWriteConstraints\t%d\n\tWriteSpecialConstraints\t%d\n\tWriteContactForces\t%d\n\tWriteRenderRigidBodies\t%d\n\tWriteRenderParticles\t%d\n", 
-		mag_factor, write.mesh_flag, write.renderMesh_flag, write.rigidContactSurfaces_flag, write.flexibleContactSurfaces_flag, write.forces_flag, write.constraints_flag, write.specialConstraints_flag, write.contactForces_flag, write.renderRigidBodies_flag, write.renderParticles_flag);
+	fout << "\tMagFactor " << mag_factor <<
+		std::setprecision(6) <<
+		"\n\tWriteMesh " << write.mesh_flag <<
+		"\n\tWriteRenderMesh " << write.renderMesh_flag <<
+		"\n\tWriteRigidContactSurfaces " << write.rigidContactSurfaces_flag <<
+		"\n\tWriteFlexibleContactSurfaces " << write.flexibleContactSurfaces_flag <<
+		"\n\tWriteForces " << write.forces_flag <<
+		"\n\tWriteConstraints " << write.constraints_flag <<
+		"\n\tWriteSpecialConstraints " << write.specialConstraints_flag <<
+		"\n\tWriteContactForces " << write.contactForces_flag <<
+		"\n\tWriteRenderRigidBodies " << write.renderRigidBodies_flag <<
+		"\n\tWriteRenderParticles " << write.renderParticles_flag << "\n";
 }
 
 bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)

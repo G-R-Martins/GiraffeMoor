@@ -12,7 +12,7 @@ public:
 
 	//IO
 	bool Read(FILE* f);
-	void WriteGiraffeModelFile(FILE* f);
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	/*-------
 	  Getters

@@ -9,7 +9,7 @@ public:
 	~SameDisplacement();
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 
 	unsigned int node_A;
 	unsigned int node_B;

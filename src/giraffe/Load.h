@@ -3,6 +3,7 @@
 
 class Load
 {
+protected:
 	//Load ID
 	unsigned int number;
 
@@ -41,7 +42,7 @@ public:
 				|Virtual functions|
 				-----------------*/
 
-	virtual void WriteGiraffeModelFile(FILE* f) = 0;
+	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
 
 };
 

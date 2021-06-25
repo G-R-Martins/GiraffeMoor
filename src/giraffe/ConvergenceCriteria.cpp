@@ -57,23 +57,21 @@ bool ConvergenceCriteria::Read(FILE *f)
 	return true;
 }
 
-void ConvergenceCriteria::WriteGiraffeModelFile(FILE *f) const
+void ConvergenceCriteria::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	
-	fprintf(f, "\tForceTolerance\t%.6e\n", force_tol);
-	fprintf(f, "\tMomentTolerance\t%.6e\n", moment_tol);
 
-	fprintf(f, "\tForceMinimumReference\t%.6e\n", force_min);
-	fprintf(f, "\tMomentMinimumReference\t%.6e\n", moment_min);
-	fprintf(f, "\tConstraintMinimumReference\t%.6e\n", constraint_min);
-
-	fprintf(f, "\tDisplacementTolerance\t%.6e\n", disp_tol);
-	fprintf(f, "\tRotationTolerance\t%.6e\n", rot_tol);
-	fprintf(f, "\tLagrangeTolerance\t%.6e\n", lag_tol);
-
-	fprintf(f, "\tDisplacementMinimumReference\t%.6e\n", disp_min);
-	fprintf(f, "\tRotationMinimumReference\t%.6e\n", rot_min);
-	fprintf(f, "\tLagrangeMinimumReference\t%.6e\n", lag_min);
-
-	fprintf(f, "\tDivergenceReference\t%.6e\n", divergence_ref);
+	fout << std::setprecision(6) <<
+		"\tForceTolerance " << force_tol <<
+		"\n\tMomentTolerance " << moment_tol <<
+		"\n\tForceMinimumReference " << force_min <<
+		"\n\tMomentMinimumReference " << moment_min <<
+		"\n\tConstraintMinimumReference " << constraint_min <<
+		"\n\tDisplacementTolerance " << disp_tol <<
+		"\n\tRotationTolerance " << rot_tol <<
+		"\n\tLagrangeTolerance " << lag_tol <<
+		"\n\tDisplacementMinimumReference " << disp_min <<
+		"\n\tRotationMinimumReference " << rot_min <<
+		"\n\tLagrangeMinimumReference " << lag_min <<
+		"\n\tDivergenceReference " << divergence_ref <<
+		"\n";
 }

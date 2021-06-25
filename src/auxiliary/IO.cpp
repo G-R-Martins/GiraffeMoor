@@ -1,4 +1,4 @@
-#include "PCH.h"
+ï»¿#include "PCH.h"
 #include "IO.h"
 //Database headers
 #include "MooringModel.h"
@@ -8,13 +8,17 @@
 #include "Log.h"
 
 
+//It changes the folder to search for input file
+#define _DEV_
+
 //Global objects
 extern MooringModel mm;
 extern GiraffeModel gm;
 
 //Static variable
 FirstLevelKeyword IO::cur_level = FirstLevelKeyword::None;
-std::string IO::folder_name, IO::input_name, IO::name, IO::version("0.02.01");
+std::string IO::folder_name, IO::input_name, IO::name, IO::version("0.03.00-a ");
+
 
 bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 {
@@ -53,21 +57,20 @@ bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 //Reads GiraffeMoor input file
 bool IO::ReadFile()
 {
-	//Reading the input file name
+
+	//Reading the input file 
 	bool readOK = false;
 	FILE* f = NULL;
-	std::cout << " ____________________________________________________________ \n";
-	std::cout << "|                                                            |\n";
-	std::cout << "|                        GiraffeMoor                         |\n";
-	std::cout << "|               University of Sao Paulo - Brazil             |\n";
-	std::cout << "|                                                            |\n";
-	std::cout << "|                                                v. " << IO::version << "  |\n";
-	std::cout << "|____________________________________________________________|\n\n";
+	std::cout << " ______________________________________________________________ \n";
+	std::cout << "|                                                              |\n";
+	std::cout << "|                        GiraffeMoor                           |\n";
+	std::cout << "|               University of Sao Paulo - Brazil               |\n";
+	std::cout << "|                                                              |\n";
+	std::cout << "|                                                v. " << IO::version << " |\n";
+	std::cout << "|______________________________________________________________|\n\n";
 	
 	while ( !readOK )
 	{
-		using namespace std::string_literals;
-		using namespace std::string_view_literals;
 		if ( __argc > 1 )
 			input_name = __argv[1];
 		else
@@ -76,10 +79,10 @@ bool IO::ReadFile()
 			std::getline(std::cin, input_name);
 		}
 
-#if _DEBUG == 1
-		folder_name = "../inputs/" + std::string(input_name) + "/"; // folder with inputs in the project directory
+#ifdef _DEV_
+		folder_name = "../inputs/" + input_name + "/";	// folder with inputs in the project directory
 #else
-		folder_name = "./" + input_name + "/";	//folder in the same location of the executable
+		folder_name = "./" + input_name + "/";			//folder in the same location of the executable
 #endif
 
 		name = folder_name + input_name + ".gmr";
@@ -112,10 +115,11 @@ bool IO::ReadFile()
 	
 
 	char str[1000];
-	fpos_t pos;		//variável que salva ponto do stream de leitura
+	fpos_t pos;		//variÃ¡vel que salva ponto do stream de leitura
 
 	//Set with mandatory keywords to check if these blocks were defined
-	std::unordered_set<std::string_view> mandatory_keywords({ "Environment", "Keypoints" , "Lines" , "Vessels" , "SegmentProperties" , "Solution" });
+	std::unordered_set<std::string_view> mandatory_keywords({ "Environment", "Keypoints" , "Lines" , 
+															"Vessels" , "SegmentProperties" , "Solution" });
 
 	while ( ReadKeyword(f, pos, str) )
 	{
@@ -301,8 +305,8 @@ bool IO::CheckModel()
 {
 	/// <summary>
 	/// 
-	/// Talvez seja interessante criar funções para checar cada caso e colocar tudo em um único loop.
-	/// Ficaria mais inteligível e fácil de ampliar - principalmente se essas funções auxiliares forem templates
+	/// Talvez seja interessante criar funÃ§Ãµes para checar cada caso e colocar tudo em um Ãºnico loop.
+	/// Ficaria mais inteligÃ­vel e fÃ¡cil de ampliar - principalmente se essas funÃ§Ãµes auxiliares forem templates
 	/// 
 	/// </summary>
 	/// 
@@ -400,103 +404,105 @@ bool IO::CheckModel()
 //Writes Giraffe model file
 void IO::WriteGiraffeModelFile()
 {
-	FILE *f;
-	std::string name_giraffe = folder_name + input_name + ".inp";
-	f = fopen(name_giraffe.c_str(), "w");
+	//Giraffe input file
+	std::ofstream fgir(folder_name + input_name + ".txt", std::ofstream::out);
 
-	fprintf(f, "///////////////////////////////////////////////////////////////////////////\n");
-	fprintf(f, "//                                                                       //\n");
-	fprintf(f, "//   GIRAFFE input file generated automatically by GIRAFFEMoor v%sv  //\n", std::string(version).c_str());
-	fprintf(f, "//                                                                       //\n");
-	fprintf(f, "///////////////////////////////////////////////////////////////////////////\n\n");
+	fgir << "/////////////////////////////////////////////////////////////////////////////\n";
+	fgir << "//                                                                         //\n";
+	fgir << "//   GIRAFFE input file generated automatically by GIRAFFEMoor v" << version << " //\n";
+	fgir << "//                                                                         //\n";
+	fgir << "/////////////////////////////////////////////////////////////////////////////\n\n";
 
-	fprintf(f, "\n/*Units:\n\tTime: s\n\tMass: kg\n\tLinear: m\n\tForce: N\n\tRotation: rad\n\tAzimuth: degree\n*/\n");
+	fgir << "\n/*Units:\n\tTime: s\n\tMass: kg\n\tLinear: m\n\tForce: N\n\tRotation: rad\n\tAzimuth: degree\n*/\n";
 
-	fprintf(f, "\nSolutionSteps\t%zd\n", gm.solution_vector.size());
-	for (Solution* sol : gm.solution_vector)
-		sol->WriteGiraffeModelFile(f);
+	//Use scientific notation to float points
+	fgir.setf(std::ofstream::scientific);
 
-	fprintf(f, "\nMonitor\n");
-	gm.monitor.WriteGiraffeModelFile(f);
+	fgir << "\nSolutionSteps\t" << gm.solution_vector.size() << "\n";
+	for ( Solution* sol : gm.solution_vector )
+		sol->WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nPostFiles\n");
-	gm.post.WriteGiraffeModelFile(f);
+	fgir << "\nMonitor\n";
+	gm.monitor.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nSolverOptions\n");
-	gm.gir_solver.WriteGiraffeModelFile(f);
+	fgir << "\nPostFiles\n";
+	gm.post.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nConvergenceCriteria\n");
-	gm.conv_criteria.WriteGiraffeModelFile(f);
+	fgir << "\nSolverOptions\n";
+	gm.gir_solver.WriteGiraffeModelFile(fgir);
 
-	/***********************
-	 * SORT NODESET VECTOR *
-	 ***********************/
+	fgir << "\nConvergenceCriteria\n";
+	gm.conv_criteria.WriteGiraffeModelFile(fgir);
+
+	/************************
+	 * SORT NODE SET VECTOR *
+	 ************************/
 	std::sort(gm.node_set_vector.begin(), gm.node_set_vector.end());
 
-	fprintf(f, "\nNodeSets\t%zd\n", gm.node_set_vector.size());
-	for (NodeSet& ns : gm.node_set_vector)
-		ns.WriteGiraffeModelFile(f);
+	fgir << "\nNodeSets\t" << gm.node_set_vector.size() << "\n";
+	for ( NodeSet& ns : gm.node_set_vector )
+		ns.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nPipeSections\t%zd\n", gm.pipe_section_vector.size());
-	for (PipeSection& ps : gm.pipe_section_vector)
-		ps.WriteGiraffeModelFile(f);
+	fgir << "\nPipeSections\t" << gm.pipe_section_vector.size() << "\n";
+	for ( PipeSection& ps : gm.pipe_section_vector )
+		ps.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nRigidBodyData\t%zd\n", gm.rbdata_vector.size());
-	for (RigidBodyData& rbdata : gm.rbdata_vector)
-		rbdata.WriteGiraffeModelFile(f);
+	fgir << "\nRigidBodyData\t" << gm.rbdata_vector.size() << "\n";
+	for ( RigidBodyData& rbdata : gm.rbdata_vector )
+		rbdata.WriteGiraffeModelFile(fgir);
 
-	if (!gm.post.cads_vector.empty())
+	if ( !gm.post.cads_vector.empty() )
 	{
-		fprintf(f, "\nCADData\t%zd\n", gm.post.cads_vector.size());
-		for (CADData& cad : gm.post.cads_vector)
-			cad.WriteGiraffeModelFile(f);
+		fgir << "\nCADData\t" << gm.post.cads_vector.size() << "\n";
+		for ( CADData& cad : gm.post.cads_vector )
+			cad.WriteGiraffeModelFile(fgir);
 	}
 
-	fprintf(f, "\nConstraints\t%zd\n", gm.constraint_vector.size());
-	for (Constraint* constraint : gm.constraint_vector)
-		constraint->WriteGiraffeModelFile(f);
+	fgir << "\nConstraints\t" << gm.constraint_vector.size() << "\n";
+	for ( Constraint* constraint : gm.constraint_vector )
+		constraint->WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nEnvironment\n");
-	gm.environment.WriteGiraffeModelFile(f);
+	fgir << "\nEnvironment\n";
+	gm.environment.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nContacts\t%zd\n", gm.contact_vector.size());
-	for (Contact* cont : gm.contact_vector)
-		cont->WriteGiraffeModelFile(f);
+	fgir << "\nContacts\t" << gm.contact_vector.size() << "\n";
+	for ( Contact* cont : gm.contact_vector )
+		cont->WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nSurfaces\t%zd\n", gm.oscillatory_vector.size());
-	for (OscillatorySurf& osc_surf : gm.oscillatory_vector)
-		osc_surf.WriteGiraffeModelFile(f);
+	fgir << "\nSurfaces\t" << gm.oscillatory_vector.size() << "\n";
+	for ( OscillatorySurf& osc_surf : gm.oscillatory_vector )
+		osc_surf.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nSurfaceSets\t%zd\n", gm.surface_set_vector.size());
-	for (SurfaceSet& surf_set : gm.surface_set_vector)
-		surf_set.WriteGiraffeModelFile(f);
+	fgir << "\nSurfaceSets\t" << gm.surface_set_vector.size() << "\n";
+	for ( SurfaceSet& surf_set : gm.surface_set_vector )
+		surf_set.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nCoordinateSystems\t%zd\n", gm.cs_vector.size());
-	for (CoordinateSystem& cood_sys : gm.cs_vector)
-		cood_sys.WriteGiraffeModelFile(f);
+	fgir << "\nCoordinateSystems\t" << gm.cs_vector.size() << "\n";
+	for ( CoordinateSystem& cood_sys : gm.cs_vector )
+		cood_sys.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nSpecialConstraints\t%zd\n", gm.special_constraint_vector.size());
-	for (SpecialConstraint*  spec_constr : gm.special_constraint_vector)
-		spec_constr->WriteGiraffeModelFile(f);
+	fgir << "\nSpecialConstraints\t" << gm.special_constraint_vector.size() << "\n";
+	for ( SpecialConstraint* spec_constr : gm.special_constraint_vector )
+		spec_constr->WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nElements\t%zd\n", gm.element_vector.size());
-	for (Element* element : gm.element_vector)
-		element->WriteGiraffeModelFile(f);
+	fgir << "\nElements\t" << gm.element_vector.size() << "\n";
+	for ( Element* element : gm.element_vector )
+		element->WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nNodes\t%zd\n", gm.node_vector.size());
-	for (Node& node : gm.node_vector)
-		node.WriteGiraffeModelFile(f);
+	fgir << "\nNodes\t" << gm.node_vector.size() << "\n";
+	for ( Node& node : gm.node_vector )
+		node.WriteGiraffeModelFile(fgir);
 
-	fprintf(f, "\nDisplacements\t%zd\n", gm.displacement_vector.size());
-	for (Displacement* disp  :gm.displacement_vector)
-		disp->WriteGiraffeModelFile(f);
+	fgir << "\nDisplacements\t" << gm.displacement_vector.size() << "\n";
+	for ( Displacement* disp : gm.displacement_vector )
+		disp->WriteGiraffeModelFile(fgir);
 
-	if (!gm.load_vector.empty())
+	if ( !gm.load_vector.empty() )
 	{
-		fprintf(f, "\nLoads\t%zd\n", gm.load_vector.size());
-		for (Load* load : gm.load_vector)
-			load->WriteGiraffeModelFile(f);
+		fgir << "\nLoads\t" << gm.load_vector.size() << "\n";
+		for ( Load* load : gm.load_vector )
+			load->WriteGiraffeModelFile(fgir);
 	}
 
-	fclose(f);
+	fgir.close();
 }

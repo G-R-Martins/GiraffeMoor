@@ -30,16 +30,15 @@ public:
 
 	//Get number of lines
 	unsigned int GetLines() const;
-	
-	//Writes table in the Giraffe file
-	void Write(FILE *f) const;
 
 	//Reads input file
 	bool Read(FILE *f);
 	
+	//Writes table in the Giraffe file
+	friend std::ostream& operator<<(std::ostream& out, Table* tabPtr);
+	
 	//============================================================================
 
 	//Deque with data
-	//std::deque<std::array<double,7>> table;
 	std::deque<std::array<double,7>> table;
 };

@@ -45,7 +45,7 @@ public:
 	bool Read(FILE *f);
 	
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 
 	//Generates math code
 	void GenerateMathCode();

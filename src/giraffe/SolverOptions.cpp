@@ -17,14 +17,10 @@ void SolverOptions::SetSolverOptions(unsigned int cores, bool bool_direct)
 }
 
 
-void SolverOptions::WriteGiraffeModelFile(FILE* f) const
+void SolverOptions::WriteGiraffeModelFile(std::ostream& fout) const
 {
-
-	if (fprintf(f, "\tProcessors %d\tLinSys ", n_cores))
-	{
-		if (isDirect)	fprintf(f, "Direct\n");
-		else			fprintf(f, "Iterative\n");
-
-	}
-
+	fout << "\tProcessors " << n_cores <<
+		"\tLinSys ";
+	isDirect ? fout << "Direct\n" : 
+		fout <<"Iterative\n";
 }

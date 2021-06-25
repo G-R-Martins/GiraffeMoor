@@ -8,7 +8,7 @@ public:
 	virtual ~Solution();
 
 	//Interface
-	virtual void WriteGiraffeModelFile(FILE *f) = 0;
+	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
 	
 	//============================================================================
 

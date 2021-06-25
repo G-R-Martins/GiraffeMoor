@@ -241,7 +241,6 @@ std::ostream& operator<<(std::ostream& out, const Summary::SummLines& line)
 //Formating output
 	out.setf(std::ofstream::scientific);
 	out.setf(std::ofstream::internal);
-	//out.precision(precision);//	std::setprecision(6);
 	out.fill(' ');
 
 //Table with data	

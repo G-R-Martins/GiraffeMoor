@@ -21,7 +21,7 @@ public:
 	--------*/
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 	
 	//Inserts displacement field (from a matrix of translations) in the vector of displacements
 	void InsertDisplacement(const int& node, Matrix& e_disp);

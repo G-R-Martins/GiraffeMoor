@@ -43,18 +43,6 @@ void Table::SetStartTime(const double& start_time, const size_t& start_line)
 }
 
 
-void Table::Write(FILE *f) const
-{
-	//Escrita da tabela
-	for (int i = 0; i < (int)table.size(); i++)
-	{
-		fprintf(f, "\t%.6e", table[i][0]);
-		for (int j = 1; j < 7; j++)
-			fprintf(f, "\t%.6e", table[i][j]);
-		fprintf(f, "\n");
-	}
-}
-
 unsigned int Table::GetLines() const
 {
 	return static_cast< unsigned int >(table.size());
@@ -90,32 +78,21 @@ bool Table::Read(FILE *f)
 		}
 	}
 
-	//fscanf(f, "%s", s);
-	//int col = 0;
-	//int lin = 0;
-	//while (!flag_not_digit)
-	//{
-	//	if (col == 0)
-	//		table.emplace_back(std::array<double, 7 >{0.0});
-	//	
-	//	table[lin][col]=atof(s);
-	//	//Próxima leitura
-	//	fgetpos(f, &pos);
-	//	if (fscanf(f, "%s", s) == EOF)
-	//		return true;
-	//	if (!isdigit(s[0]) && s[0] != '-' && s[0] != '.')
-	//		flag_not_digit = true;
-	//	else
-	//	{
-	//		if (col != 6)
-	//			++col;
-	//		else
-	//		{
-	//			++lin;
-	//			col = 0;
-	//		}
-	//	}
-	//}
 	fsetpos(f, &pos);
 	return true;
+}
+
+std::ostream& operator<<(std::ostream& out, Table* tabPtr)
+{
+	//Writes table
+	for (size_t i = 0; i < tabPtr->table.size(); ++i)
+	{
+		out << "\t" << tabPtr->table[i][0];
+		for ( int j = 1; j < 7; ++j )
+			out << "\t" << tabPtr->table[i][j];
+		out << "\n";
+	}
+
+
+	return out;
 }

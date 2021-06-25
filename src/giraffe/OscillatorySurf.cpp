@@ -9,8 +9,19 @@ OscillatorySurf::OscillatorySurf()
 OscillatorySurf::~OscillatorySurf()
 {}
 
-void OscillatorySurf::WriteGiraffeModelFile(FILE *f) const
+void OscillatorySurf::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tRigidOscillatorySurface_1\t%d\tA1\t%.6e\tA2\t%.6e\tA12\t%.6e\tLambda1\t%.6e\tLambda2\t%.6e\tPhi1\t%.6e\tPhi2\t%.6e\tWaves1\t%.6e\tWaves2\t%.6e\tCS\t%d\tPilotNode\t%d\n", 
-		number, A1, A2, A12, lambda1, lambda2, phi1, phi2, waves1, waves2, cs, pilot_node);
+	fout << "\tRigidOscillatorySurface_1 " << number <<
+		"\tA1 " << A1 <<
+		"\tA2 " << A2 <<
+		"\tA12 " << A12 <<
+		"\tLambda1 " << lambda1 <<
+		"\tLambda2 " << lambda2 <<
+		"\tPhi1 " << phi1 <<
+		"\tPhi2 " << phi2 <<
+		"\tWaves1" << waves1 <<
+		"\tWaves2 " << waves2 <<
+		"\tCS " << cs <<
+		"\tPilotNode " << pilot_node <<
+		"\n";
 }

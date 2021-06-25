@@ -86,15 +86,28 @@ bool MathCode::Read(FILE *f)
 }
 
 //Writes Giraffe file
-void MathCode::WriteGiraffeModelFile(FILE *f)
+std::ostream& operator<<(std::ostream& out, const MathCode& mc)
 {
-	//fprintf(f, "\tNodalDisplacement\t%d\tNodeSet\t%d\tCS\t%d\tMathCode\n", number, node_set, cs);
-	fprintf(f, "\t\t//X\n\t\tBegin %s End\n", equations[0].c_str());
-	fprintf(f, "\t\t//Y\n\t\tBegin %s End\n", equations[1].c_str());
-	fprintf(f, "\t\t//Z\n\t\tBegin %s End\n", equations[2].c_str());
-	fprintf(f, "\t\t//ROTX\n\t\tBegin %s End\n", equations[3].c_str());
-	fprintf(f, "\t\t//ROTY\n\t\tBegin %s End\n", equations[4].c_str());
-	fprintf(f, "\t\t//ROTZ\n\t\tBegin %s End\n", equations[5].c_str());
+	out << "\t\t//X\n\t\tBegin\t" << mc.equations[0] << " End \n" <<
+		"\t\t//Y\n\t\tBegin \t" << mc.equations[1] << " End \n" <<
+		"\t\t//Z\n\t\tBegin \t" << mc.equations[2] << " End \n" <<
+		"\t\t//ROTX\n\t\tBegin" << mc.equations[3] << " End \n" <<
+		"\t\t//ROTY\n\t\tBegin" << mc.equations[4] << " End \n" <<
+		"\t\t//ROTZ\n\t\tBegin" << mc.equations[5] << " End \n";
 
+
+	return out;
+}
+std::ostream& operator<<(std::ostream& out, MathCode* mcPtr)
+{
+	out << "\t\t//X\n\t\tBegin\t" << mcPtr->equations[0] << " End \n" <<
+		"\t\t//Y\n\t\tBegin \t" << mcPtr->equations[1] << " End \n" <<
+		"\t\t//Z\n\t\tBegin \t" << mcPtr->equations[2] << " End \n" <<
+		"\t\t//ROTX\n\t\tBegin" << mcPtr->equations[3] << " End \n" <<
+		"\t\t//ROTY\n\t\tBegin" << mcPtr->equations[4] << " End \n" <<
+		"\t\t//ROTZ\n\t\tBegin" << mcPtr->equations[5] << " End \n";
+
+
+	return out;
 }
 

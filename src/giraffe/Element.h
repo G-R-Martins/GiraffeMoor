@@ -42,7 +42,7 @@ public:
 	virtual ~Element();
 
 	//Interface
-	virtual void WriteGiraffeModelFile(FILE *f) = 0;
+	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
 
 	///
 	/// Get functions

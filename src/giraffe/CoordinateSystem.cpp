@@ -13,9 +13,14 @@ CoordinateSystem::~CoordinateSystem()
 {}
 
 
-void CoordinateSystem::WriteGiraffeModelFile(FILE *f)
+void CoordinateSystem::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tCS\t%d\tE1\t%.11e\t%.11e\t%.11e\tE3\t%.11e\t%.11e\t%.11e\n", number, E1[0], E1[1], E1[2], E3[0], E3[1], E3[2]);
+	fout << "\tCS " << number <<
+		std::setprecision(11) << 
+		"\tE1 " << E1[0] << " " << E1[1] << " " << E1[2] <<
+		"\tE3 " << E3[0] << " " << E3[1] << " " << E3[2] <<
+		std::setprecision(6) << 
+		"\n";
 }
 
 
