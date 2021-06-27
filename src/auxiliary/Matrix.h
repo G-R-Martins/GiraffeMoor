@@ -13,8 +13,11 @@ public:
 	~Matrix(void);													//Destrutor Padrão
 
 	//Gets and Sets
+	long getLines() const;											//Retorna o número de linhas da matriz
 	long getLines();												//Retorna o número de linhas da matriz
+	long getColumns() const;										//Retorna o número de colunas da matriz 
 	long getColumns();												//Retorna o número de colunas da matriz 
+	double& GetItem(long line, long column) const;
 
 	void setLines(long value);										//Define o número de linhas da matriz 
 	void setColumns(long value);									//Define o número de colunas da matriz 

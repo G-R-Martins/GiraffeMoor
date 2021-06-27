@@ -73,5 +73,12 @@ public:
 	
 	//Check if stiffness matrix is defined
 	bool ExistAnalyticalStiffMat() const, ExistNumericalStiffMat() const;
+
+	///
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const StiffnessMatrix& mat);
+	friend std::ostream& operator<<(std::ostream& out, StiffnessMatrix* mat);
 };
 

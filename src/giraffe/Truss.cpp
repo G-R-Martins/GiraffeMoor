@@ -19,6 +19,6 @@ void Truss::WriteGiraffeModelFile(std::ostream& fout) const
 		fout << "\t//" << label << "\n";
 	fout << "\tTruss_1 " << number <<
 		"\tPipeSec " << section <<
-		"\tNodes " << nodes[0] << " "<< nodes[1] <<
+		"\tNodes " << nodes[0] << " " << nodes[1] <<
 		"\n";
 }

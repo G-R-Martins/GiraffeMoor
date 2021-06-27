@@ -5,9 +5,6 @@
 
 Post::Post()
 	: mag_factor(1.0), write{ false, false, false, false, false, false, false, false, false, false }
-	/*WriteMesh_flag(true), WriteRenderMesh_flag(false), WriteRigidContactSurfaces_flag(false), WriteFlexibleContactSurfaces_flag(false),
-	WriteConstraints_flag(false), WriteSpecialConstraints_flag(false), WriteForces_flag(false), WriteContactForces_flag(false),
-	WriteRenderRigidBodies_flag(false), WriteRenderParticles_flag(false)*/
 {}
 
 Post::~Post()
@@ -39,7 +36,6 @@ bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, c
 	}
 
 	//Comment
-	//vtk_file << "'''\n\tSeabed VTK DataFile\n\tCreated by GiraffeMoor v" << version << "\n'''\n" << std::endl;
 	vtk_file << "# vtk DataFile Version 3.0\n";
 
 	//Header
@@ -67,7 +63,6 @@ bool Post::CreateWaterVTK(std::string folder, const std::array<double, 2>& x, co
 	}
 
 	//Comment
-	//vtk_file << "'''\n\tWater surface VTK DataFile\n\tCreated by GiraffeMoor v" << version << "\n'''\n" << std::endl;
 	vtk_file << "# vtk DataFile Version 3.0\n";
 
 	//Header

@@ -87,7 +87,7 @@ std::ostream& operator<<(std::ostream& out, Table* tabPtr)
 	//Writes table
 	for (size_t i = 0; i < tabPtr->table.size(); ++i)
 	{
-		out << "\t" << tabPtr->table[i][0];
+		out << "\t\t" << tabPtr->table[i][0];
 		for ( int j = 1; j < 7; ++j )
 			out << "\t" << tabPtr->table[i][j];
 		out << "\n";

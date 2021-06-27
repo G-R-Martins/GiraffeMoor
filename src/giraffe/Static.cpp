@@ -19,7 +19,8 @@ void Static::WriteGiraffeModelFile(std::ostream& fout) const
 		"\tTimeStep " << i_time_step <<
 		"\tMaxTimeStep " << max_time_step <<
 		"\tMinTimeStep " << min_time_step <<
-		"\tMaxIt " << max_it << "\tMinIt " << min_it <<
+		"\tMaxIt " << max_it << 
+		"\tMinIt " << min_it <<
 		"\tConvIncrease " << conv_increase << 
 		"\tIncFactor " << inc_factor <<
 		"\tSample " << sample << "\n";

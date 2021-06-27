@@ -193,14 +193,15 @@ void Summary::Append2File_Impl()
 	//Stiffness matrix header
 		sum_file << ++cur_section << ") Analytical stiffness matrix\n";
 
-		//Close file
-		sum_file.close();
+		////Close file
+		//sum_file.close();
 
 		//Check residuos and print to file
 		mm.stiff_matrix->check_Ktan();
-		mm.stiff_matrix->FprintKtan(summ_name.c_str());
+		//mm.stiff_matrix->FprintKtan(summ_name.c_str());
+		sum_file << mm.stiff_matrix;
 	}
-	else
+	//else
 		//Close file
 		sum_file.close();
 }
