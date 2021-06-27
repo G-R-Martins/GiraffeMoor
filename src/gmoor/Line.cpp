@@ -240,7 +240,12 @@ const unsigned int Line::GetNumber() const
 	return this->number;
 }
 
-const unsigned int Line::GetNSegments() const
+const size_t Line::GetNSegments() const
 {
 	return this->segments.size();
+}
+
+const size_t Line::GetSegmentSet() const
+{
+	return this->segment_set;
 }

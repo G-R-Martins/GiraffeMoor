@@ -18,7 +18,9 @@ public:
 
 	//Get functions
 	const unsigned int GetNumber() const;
-	const unsigned int GetNSegments() const;
+	const size_t GetNSegments() const;
+
+	const size_t GetSegmentSet() const;
 	
 	//============================================================================
 

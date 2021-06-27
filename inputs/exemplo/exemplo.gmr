@@ -18,7 +18,8 @@ Keypoints
 
 SegmentSets
 	Set 1
-		Length 835.35 	Property 2 	Discretization	100
+		Length 435.35 	Property 2 	Discretization	100
+		Length 400 	Property 2 	Discretization	100
 		
 Lines
 	Line 1	Anchor	1	Fairlead 2 	VesselID 1 	SegmentSet 1
@@ -128,10 +129,10 @@ StiffnessMatrix
 	Analytical	true
 
 NodalForces
-	Node vessel 1 Step 1
+	Node vessel 10 Step 1
 		MathCode 
 		Z if (t >t0, 1.2+1.2*sin((t-t0)*2*pi/(2.14)), if (t >= t0-1, 1.2*t-(t0-1)*1.2, 0))
-	Node last LineID 1 Step 3
+	Node last LineID 100 Step 3
 		File "teste.csv"	HeaderLines	NTimes 11
 		// 0.05	-1.1453697	0	0.0162558	0	0.0167063	0
 		// .10	-1.1494725	0	0.0361393	0	0.0165411	0
@@ -142,7 +143,7 @@ NodalForces
 		0.05	-1.1453697	0	0.0162558	0	0.0167063	0
 		 .10	-1.1494725	0	0.0361393	0	0.0165411	0
 		 0.15	-1.1524285	0	0.0559821	0	0.0163579	0
-	Node first LineID 6 Step 1
+	Node first SegmentID 20 LineID 6 Step 1
 		TimeSeries
 		0.05	-1.1453697	0	0.0162558	0	0.0167063	0
 		 .10	-1.1494725	0	0.0361393	0	0.0165411	0
