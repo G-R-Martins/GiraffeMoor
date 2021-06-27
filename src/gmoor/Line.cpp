@@ -239,3 +239,8 @@ const unsigned int Line::GetNumber() const
 {
 	return this->number;
 }
+
+const unsigned int Line::GetNSegments() const
+{
+	return this->segments.size();
+}
