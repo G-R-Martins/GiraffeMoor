@@ -71,15 +71,40 @@ Matrix::~Matrix(void)
 }
 
 //Retorna o número de linhas da matriz
+long Matrix::getLines() const
+{
+	return this->m_lines;
+}
 long Matrix::getLines()
 {
 	return this->m_lines;
 }
 //Retorna o número de colunas da matriz 
+long Matrix::getColumns() const
+{
+	return this->m_columns;
+}
 long Matrix::getColumns()
 {
 	return this->m_columns;
 }
+
+double& Matrix::GetItem(long line, long column) const
+{
+	//Check if is a valid position
+	if (line > m_lines - 1 || column > m_columns - 1 || line < 0 || column < 0)
+	{
+		std::cout << "Not valid position accessed in matrix! (" << line << ", " << column << ")\n";
+		double* ret = new double[1];
+		ret[0] = 0;
+		return ret[0];
+	}
+	else
+		//Retorna o valor na posição desejada
+		return this->m_matrix[line + column * m_lines];
+}
+
+
 //Define o número de linhas da matriz
 void Matrix::setLines(long value)
 {

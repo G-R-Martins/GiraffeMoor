@@ -21,9 +21,6 @@ public:
 	//Reads GiraffeMoor file
 	bool Read(FILE *f);
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f);
-
 	//Setting start time ('t0') to apply math code
 	void SetStartTime(const double& start);
 	
@@ -33,5 +30,11 @@ public:
 	//Changing 't0' for the real time
 	void SetEquationInitialTime(const double& init);
 
+
+	///
+	///Overloaded operator to print line in the summary file 
+	///
+	friend std::ostream& operator<<(std::ostream& out, const MathCode& mc);
+	friend std::ostream& operator<<(std::ostream& out, MathCode* mcPtr);
 };
 

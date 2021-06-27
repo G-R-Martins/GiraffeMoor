@@ -2,17 +2,13 @@
 #include "Element.h"
 
 
-class RigidBody :
-	public Element
+class RigidBody : public Element
 {
 public:
 	RigidBody();
 	~RigidBody();
 
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f) override;
-
-	//Label (comment)
-	std::string label;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 };
 

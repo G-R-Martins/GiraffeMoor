@@ -16,12 +16,6 @@ StiffnessMatrix::StiffnessMatrix()
 StiffnessMatrix::~StiffnessMatrix()
 {
 	K_tan.flush();
-
-	/*if (time_series)
-	{
-		time_series->table.clear();
-		time_series = nullptr;
-	}*/
 }
 
 bool StiffnessMatrix::Read(FILE *f)
@@ -327,4 +321,64 @@ void StiffnessMatrix::check_Ktan()
 				K_tan(i, j) = 0.0;
 		}
 	}
+}
+
+void StiffnessMatrix::FprintKtan(const std::string& file)
+{
+	this->K_tan.fprint(file.c_str());
+}
+
+unsigned int StiffnessMatrix::GetStep() const
+{
+	return this->stiff_matrix_step;
+}
+
+bool StiffnessMatrix::ExistNumericalStiffMat() const
+{
+	return this->bool_num;
+}
+
+bool StiffnessMatrix::ExistAnalyticalStiffMat() const
+{
+	return this->bool_ana;
+}
+
+
+std::ostream& operator<<(std::ostream& out, const StiffnessMatrix& mat)
+{
+	out << "\n";
+	for (long i = 0; i < mat.K_tan.getLines(); ++i)
+	{
+		out << "| ";
+		for ( long j = 0; j < mat.K_tan.getColumns(); ++j )
+		{
+			if ( mat.K_tan.GetItem(i, j) > 1 || mat.K_tan.GetItem(i, j) < -1 )
+				out << " " << mat.K_tan.GetItem(i, j) << "\t";
+			else
+				out << "      0     \t";
+		}
+		out << "|\n";
+	}
+	out << "\n";
+
+	return out;
+}
+std::ostream& operator<<(std::ostream& out, StiffnessMatrix* mat)
+{
+	out << std::setprecision(5) << "\n";
+	for (long i = 0; i < mat->K_tan.getLines(); ++i)
+	{
+		out << "| ";
+		for ( long j = 0; j < mat->K_tan.getColumns(); ++j )
+		{
+			if ( mat->K_tan.GetItem(i, j) > 1 || mat->K_tan.GetItem(i, j) < -1 )
+				out << " " << mat->K_tan.GetItem(i, j) << "\t";
+			else
+				out << "      0     \t";
+		}
+		out << "|\n";
+	}
+	out << std::setprecision(6) << "\n";
+
+	return out;
 }

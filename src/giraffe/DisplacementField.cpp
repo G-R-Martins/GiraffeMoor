@@ -17,16 +17,19 @@ DisplacementField::DisplacementField(unsigned int n_nodes)
 DisplacementField::~DisplacementField()
 {}
 
-void  DisplacementField::WriteGiraffeModelFile(FILE *f)
+void  DisplacementField::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tDisplacementField\t%d\tNNodes\t%d\tCS\t%d\tSolutionStep\t%d\n", number, (int)disp_data.size(), cs, solution_step);
+	fout << "\tDisplacementField " << number <<
+		"\tNNodes " << disp_data.size() <<
+		"\tCS " << cs << "\tSolutionStep " << solution_step <<
+		"\n";
 	//Write displacement data
-	for (int i = 0; i < (int)disp_data.size(); i++)
+	for (size_t i = 0; i < disp_data.size(); ++i)
 	{
-		fprintf(f, "\t%d\t", disp_data[i].node);
-		for (int j = 0; j < 6; j++)
-			fprintf(f, "%.12e\t", disp_data[i].disp[j]);
-		fprintf(f, "\n");
+		fout << "\t" << disp_data[i].node << "\t";
+		for ( size_t j = 0; j < 6; ++j )
+			fout << disp_data[i].disp[j] << "\t";
+		fout << "\n";
 	}
 }
 

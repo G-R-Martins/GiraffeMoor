@@ -8,7 +8,7 @@ public:
 	~Node();
 	
 	//Writes giraffe file
-	void WriteGiraffeModelFile(FILE *f);
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	//============================================================================
 

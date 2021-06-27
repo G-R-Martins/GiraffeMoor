@@ -2,17 +2,12 @@
 
 class SolutionStep
 {
-public:
-	SolutionStep();
-	~SolutionStep();
-	
-	bool Read(FILE* f);
 	unsigned int number;
 	bool isStatic;
 
-	/*-------------
-	Time parameters
-	--------------*/
+	/// 
+	/// Time parameters
+	/// 
 
 	//Global step start time
 	double global_start;
@@ -32,10 +27,9 @@ public:
 	//Sample -> to save VTK
 	int sample;
 
-	/*----------------------
-	    Damping parameters
-	  (for dynamic analisys)
-	------------------------*/
+	/// 
+	/// Damping parameters 
+	/// 
 
 	// Newmark damping (numerical damping)
 	double beta_new, gamma_new;
@@ -44,6 +38,45 @@ public:
 
 	//============================================================================
 
+public:
+	SolutionStep();
+	~SolutionStep();
+	
+	bool Read(FILE* f);
+	
+	///
+	/// Set functions
+	/// 
+	void SetGlobalStart(double time);
+
+	/// 
+	/// Get functions
+	/// 
+
+	unsigned int GetNumber() const;
+
+	//Time parameters
+	double GetGlobalStart() const;
+	double GetEndTime() const;
+	double GetTimestep() const;
+	double GetMaxTimestep() const;
+	double GetMinTimestep() const;
+
+	//Sample -> to save VTK
+	int GetSample() const;
+
+	/// 
+	/// Damping parameters 
+	/// 
+
+	double GetBeta_new() const, GetGamma_new() const;
+	double GetAlpha_ray() const, GetBeta_ray() const;
+
+	bool CheckIfIsStatic() const;
+
+
+	//============================================================================
+	
 	/*-------------------
 	 Overloaded operators
 	--------------------*/

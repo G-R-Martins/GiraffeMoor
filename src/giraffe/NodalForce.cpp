@@ -33,27 +33,28 @@ NodalForce::~NodalForce()
 		table->table.clear();
 		table = nullptr;
 	}
-
 	if (mathCode) 
 		delete mathCode;
 }
 
 //Writes Giraffe input file
-void NodalForce::WriteGiraffeModelFile(FILE* f)
+void NodalForce::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tNodalLoad\t%d\tNodeSet\t%d\tCS\t%d\t", this->GetNumber(), nodeset, this->GetCoordinateSystem());
-	if (this->CheckIfIsMathCode())
+	fout << "\tNodalLoad " << number << 
+		"\tNodeSet " << nodeset << 
+		"\tCS " << CS << "\t";
+	if (isMathCode)
 	{
-		fprintf(f, "MathCode\n");
-		mathCode->WriteGiraffeModelFile(f);
+		fout << "MathCode\n" << mathCode;
 	}
-	else if (this->CheckIfIsExternalFile())
+	else if (extFile)
 	{
-		fprintf(f, "\n\t\tFile \"%s\"\tHeaderLines %d\tNTimes %d\n", file_name.c_str(), header_lines, n_times);
+		fout << "\n\t\tFile \"" << file_name << "\"" <<
+			"\tHeaderLines " << header_lines << 
+			"\tNTimes " << n_times << "\n";
 	}
 	else
 	{
-		fprintf(f, "NTimes\t%d\n", table->GetLines());
-		table->Write(f);
+		fout << "NTimes" << table->GetLines() << "\n" << table;
 	}
 }

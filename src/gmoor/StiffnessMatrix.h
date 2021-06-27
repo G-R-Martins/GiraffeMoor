@@ -3,31 +3,6 @@
 
 class StiffnessMatrix
 {
-public:
-	StiffnessMatrix();
-	~StiffnessMatrix();
-
-	//============================================================================
-
-					/*-------
-					Functions
-					--------*/
-	
-	//Reads input file
-	bool Read(FILE *f);
-	
-	//Calculates current line contribution to the analytical stiffness matrix
-	void calc_Kaux(Matrix &fairlead, const std::vector<double>& eul_ang, const double& hf, const double& vf, const double& alpha, Matrix& Fi, Matrix& Ki);
-	
-	//Setting numbers less than "MIN_NON_ZERO" to zero
-	void check_Ktan();
-	
-	//============================================================================
-
-					/*-------
-					Variables
-					--------*/
-
 	/*--------------------------------------------------------------------
 	Booleans to indicate which type of stiffness matrix will be calculated
 	---------------------------------------------------------------------*/
@@ -48,7 +23,7 @@ public:
 	double rot_init_x;
 	double rot_init_y;
 	double rot_init_z;
-	
+
 	/*Offsets to calculate numerical stiffness matrix*/
 	unsigned int stiff_matrix_step;	//Stiffness matrix solution -> step
 	double time_matrix;		//Stiffness matrix solution -> time step
@@ -64,8 +39,46 @@ public:
 	/*-------------------------
 	Analytical stiffness matrix
 	--------------------------*/
-	
+
 	Matrix K_tan;
 	static const int MIN_NON_ZERO = 1;
+	
+	//============================================================================
+
+public:
+	StiffnessMatrix();
+	~StiffnessMatrix();
+	
+					/*-------
+					Functions
+					--------*/
+	
+	//Reads input file
+	bool Read(FILE *f);
+	
+	//Calculates current line contribution to the analytical stiffness matrix
+	void calc_Kaux(Matrix &fairlead, const std::vector<double>& eul_ang, const double& hf, const double& vf, const double& alpha, Matrix& Fi, Matrix& Ki);
+	
+	//Setting numbers less than "MIN_NON_ZERO" to zero
+	void check_Ktan();	
+
+	//Print stiffness matrix
+	void FprintKtan(const std::string& file);
+
+	// 
+	// Get functions
+	// 
+	
+	unsigned int GetStep() const;
+	
+	//Check if stiffness matrix is defined
+	bool ExistAnalyticalStiffMat() const, ExistNumericalStiffMat() const;
+
+	///
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const StiffnessMatrix& mat);
+	friend std::ostream& operator<<(std::ostream& out, StiffnessMatrix* mat);
 };
 

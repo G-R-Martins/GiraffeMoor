@@ -2,10 +2,7 @@
 #include "VesselDisplacement.h"
 #include "Log.h"
 #include "AuxFunctions.h"
-
-
-//Global variable
-extern std::string folder_name;
+#include "IO.h" //to get the folder name
 
 
 VesselDisplacement::VesselDisplacement()
@@ -94,7 +91,7 @@ bool VesselDisplacement::Read(FILE* f)
 		}
 
 		//Tries to open the file before continue
-		std::string full_file_name = folder_name + "time series/" + std::string(file_name);
+		std::string full_file_name = IO::folder_name + "time series/" + std::string(file_name);
 		std::ifstream inp(full_file_name);
 
 		if (!inp.is_open())

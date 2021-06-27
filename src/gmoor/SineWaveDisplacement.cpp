@@ -76,15 +76,18 @@ bool SineWaveDisplacement::Read(FILE *f)
 	return true;
 }
 
-void SineWaveDisplacement::WriteGiraffeModelFile(FILE *f)
+void SineWaveDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tNodalDisplacement\t%d\tNodeSet\t%d\tCS\t%d\tMathCode\n", number, node_set, cs);
-	fprintf(f, "\t//X\n\t%s\n", equations[0].c_str());
-	fprintf(f, "\t//Y\n\t%s\n", equations[1].c_str());
-	fprintf(f, "\t//Z\n\t%s\n", equations[2].c_str());
-	fprintf(f, "\t//ROTX\n\t%s\n", equations[3].c_str());
-	fprintf(f, "\t//ROTY\n\t%s\n", equations[4].c_str());
-	fprintf(f, "\t//ROTZ\n\t%s\n", equations[5].c_str());
+	fout << "\tNodalDisplacement" << number <<
+		"\tNodeSet" << node_set <<
+		"\tCS" << cs <<
+		"\tMathCode" <<
+		"\n\t//X\n\t" << equations[0] <<
+		"\n\t//Y\n\t" << equations[1] <<
+		"\n\t//Z\n\t" << equations[2] <<
+		"\n\t//ROTX\n\t" << equations[3] <<
+		"\n\t//ROTY\n\t" << equations[4] <<
+		"\n\t//ROTZ\n\t" << equations[5];
 }
 
 void SineWaveDisplacement::GenerateMathCode()
@@ -96,7 +99,7 @@ void SineWaveDisplacement::GenerateMathCode()
 	if (start_time > 0.0)
 	{
 		// Mean drift
-		for (int i = 0; i < 6; i++)
+		for (size_t i = 0; i < 6; ++i)
 		{
 			double m = mean.table[0][i + 1] / mean.table[0][0];
 			double h = -1 * m * start_time;
@@ -112,7 +115,7 @@ void SineWaveDisplacement::GenerateMathCode()
 		}
 
 		// Oscillations
-		for (int i = 0; i < 6; i++)
+		for (size_t i = 0; i < 6; ++i)
 		{
 			//Checks if there is movement in the current direction
 			if (mean.table[0][i + 1] != 0.0 || amplitude[i] != 0.0)

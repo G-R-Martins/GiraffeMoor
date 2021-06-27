@@ -161,8 +161,19 @@ const unsigned int SegmentProperty::GetNumber() const
 }
 
 //Writes Giraffe file data
-void SegmentProperty::WriteGiraffeModelFile(FILE *f)
+void SegmentProperty::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSec\t%d\tEA\t%.6e\tEI\t%.6e\tGJ\t%.6e\tGA\t%.6e\tRho\t%.6e\tCDt\t%.6e\tCDn\t%.6e\tCAt\t%.6e\tCAn\t%.6e\tDe\t%.6e\tDi\t%.6e\n", 
-		number, EA, EI, GJ, GA, rho, CDt, CDn, CAt, CAn, diameter, 0.0);
+	fout << "\tSec " << number <<
+		"\tEA " << EA <<
+		"\tEI " << EI <<
+		"\tGJ " << GJ <<
+		"\tGA " << GA <<
+		"\tRho " << rho <<
+		"\tCDt " << CDt <<
+		"\tCDn " << CDn <<
+		"\tCAt " << CAt <<
+		"\tCAn " << CAn <<
+		"\tDe " << diameter <<
+		"\tDi " << 0.0 <<
+		"\n";
 }

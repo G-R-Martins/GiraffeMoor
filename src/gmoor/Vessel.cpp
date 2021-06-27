@@ -97,7 +97,7 @@ void Vessel::SetNodeset(unsigned int ns)
 { this->nodeset = ns; }
 
 void Vessel::SetRigidNodeset(unsigned int rigid_ns)
-{ this->rigid_nodeset = rigid_nodeset; }
+{ this->rigid_nodeset = rigid_ns; }
 
 void Vessel::SetElement(unsigned int elem)
 { this->element = elem; }
@@ -126,7 +126,7 @@ unsigned int Vessel::GetNodeset() const
 { return this->nodeset; }
 
 unsigned int Vessel::GetRigidNodeset() const
-{ return this->nodeset; }
+{ return this->rigid_nodeset; }
 
 unsigned int Vessel::GetElement() const
 { return this->element; }

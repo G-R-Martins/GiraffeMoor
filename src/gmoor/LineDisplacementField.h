@@ -7,7 +7,6 @@ class LineDisplacementField
 	unsigned int number;
 	unsigned int step;
 	bool isHarmonic;
-	//bool extFile;
 	double amplitude;
 	unsigned int mode;
 
@@ -21,9 +20,9 @@ public:
 	LineDisplacementField(LineDisplacementField&&) = default;
 	~LineDisplacementField() = default;
 
-	/*-------
-	Functions
-	--------*/
+			/*--------
+			 Functions
+ 			 --------*/
 	
 	//Read input file
 	bool Read(FILE* f);
@@ -35,7 +34,6 @@ public:
 	unsigned int GetNumber() const;
 	unsigned int GetStep() const;
 	bool IsHarmonic() const;
-	//bool CheckIfIsExternalFile();
 	double GetAmplitude() const;
 	unsigned int GetMode() const;
 

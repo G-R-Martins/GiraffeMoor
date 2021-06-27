@@ -13,22 +13,25 @@ NodeSet::NodeSet(const unsigned int& num_nodes, const unsigned int& node0, const
 NodeSet::~NodeSet()
 {}
 
-void NodeSet::WriteGiraffeModelFile(FILE *f)
+void NodeSet::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\t//");
-	fprintf(f, comment);
-	fprintf(f, "\n");
+	fout << "\t//" << comment << "\n";
 	if (total_nodes > 0)
 	{
-		fprintf(f, "\tNodeSet\t%d\tNodes\t%d\tSequence Initial\t%d\tIncrement\t%d", number, total_nodes, init, increment);
+		fout << "\tNodeSet " << number <<
+			"\tNodes " << total_nodes <<
+			"\tSequence Initial " << init <<
+			"\tIncrement " << increment;
 	}
 	else
 	{
-		fprintf(f, "\tNodeSet\t%d\tNodes\t%d\tList\t", number, (int)nodes.size());
-		for (int i = 0; i < (int)nodes.size(); i++)
-			fprintf(f, "%d ", nodes[i]);
+		fout << "\tNodeSet " << number <<
+			"\tNodes " << nodes.size() <<
+			"\tList ";
+		for (size_t i = 0; i < nodes.size(); ++i)
+			fout <<  nodes[i] << " ";
 	}
-	fprintf(f, "\n");
+	fout << "\n";
 }
 
 bool operator<(const NodeSet& ns1, const NodeSet& ns2)

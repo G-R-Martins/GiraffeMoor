@@ -9,11 +9,12 @@ protected:
 	/*-------
 	Variables
 	--------*/
-	///TODO: unique_ptr
+
 	//Data type
 	Table* table;
 	MathCode* mathCode;
 	bool fromFile;
+	
 	std::string file_name;
 	unsigned int header_lines, n_times;
 
@@ -24,7 +25,7 @@ protected:
 	unsigned int segmentID;
 	size_t lineID;
 
-	//Name -> vessel (no ID), first, middle or last (node of segment)
+	//Name -> vessel (ID), first, middle or last (node of segment)
 	std::string description;
 
 	//Initial step (may encompass more than one)
@@ -35,8 +36,6 @@ public:
 	MoorLoad();
 	~MoorLoad();
 	
-	//============================================================================
-
 			/*-------
 			Functions
 			--------*/
@@ -44,7 +43,10 @@ public:
 	//Reads GiraffeMoor file
 	bool Read(FILE* f);
 
-	//Set functions
+	///
+	///Set functions
+	///
+	
 	void SetFileOption(bool opt);
 	void SetFileName(std::string_view name);
 	void SetHeaderLines(unsigned int lines);
@@ -55,7 +57,10 @@ public:
 	void SetDescription(std::string_view desc);
 	void SetStep(unsigned int initial_step);
 
-	//Get functions
+	///
+	///Get functions
+	///
+	
 	Table* GetTable();
 	MathCode* GetMathCode();
 

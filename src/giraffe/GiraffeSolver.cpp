@@ -77,18 +77,17 @@ bool GiraffeSolver::Read(FILE* f)
 }
 
 
-void GiraffeSolver::WriteGiraffeModelFile(FILE* f) const
+void GiraffeSolver::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	if (fprintf(f, "\tProcessors %d\tLinSys ", nCores))
-	{
-		if (isDirect)	fprintf(f, "Direct\n");
-		else			fprintf(f, "Iterative\n");
-
-	}
+	fout << "\tProcessors " << nCores <<
+		"\tLinSys ";
+	isDirect ? fout << "Direct\n" : 
+		       fout <<"Iterative\n";
 }
 
-
-// Set/Get functions
+///
+/// Set/Get functions
+///
 
 void GiraffeSolver::SetSolverOptions(unsigned int cores, bool bool_direct)
 { 

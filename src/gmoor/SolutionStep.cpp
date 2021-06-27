@@ -104,22 +104,20 @@ bool SolutionStep::Read(FILE* f)
 		return false;
 	}
 
-	// Numerical damping for dynamic analysis 
-
-	//Saves position
-	fgetpos(f, &pos);
-
-	//Check if user has defined numerical damping for static analysis
-	if (fscanf(f, "%s", str) && !strcmp(str, "NumericalDamping") && isStatic)
-	{
-
-		if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
+	///
+	/// Numerical damping for dynamic analysis 
+	///
+	
+	//Check if user has defined numerical damping for the analysis step
+	if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "NumericalDamping"))// && isStatic)
+	//{
+		/*if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
 		{
 			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
 			Log::AddWarning(w);
-		}
-	}
-	else if (!isStatic && !strcmp(str, "NumericalDamping"))
+		}*/
+	//}
+	//else if (/*!isStatic && */!strcmp(str, "NumericalDamping"))
 	{
 		//Damping cases:
 		if (fscanf(f, "%s", str) && !strcmp(str, "null"))
@@ -162,26 +160,101 @@ bool SolutionStep::Read(FILE* f)
 			Log::AddWarning(w);
 			return false;
 		}
+
+		//Warning for static analysis
+		if ( isStatic )
+		{
+			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
+			Log::AddWarning(w);
+		}
 	}
 	else if (!isStatic && strcmp(str, "NumericalDamping"))
 	{
-		std::string w = "\n   + Numerical damping was not defined for the step number " + std::to_string(number) + ". Newmark coeficients were set to zero.";
+		std::string w = "\n   + Numerical damping was not defined for the dynamic step number " + std::to_string(number) 
+			+ ". Newmark coeficients were set to zero.";
 		Log::AddWarning(w);
 		fsetpos(f, &pos);
 	}
-	if (fscanf(f, "%s", str) && !strcmp(str, "RayleighDamping") &&
-		fscanf(f, "%s %lf", str, &alpha_ray) && !strcmp(str, "Alpha") && fscanf(f, "%s %lf", str, &beta_ray) && !strcmp(str, "Beta"))
+	else
+		fsetpos(f, &pos);
+
+	//Check if user has defined Rayleigh damping for the analysis step
+	if ( !fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "RayleighDamping") &&
+		fscanf(f, "%s %lf", str, &alpha_ray) && !strcmp(str, "Alpha") && fscanf(f, "%s %lf", str, &beta_ray) && !strcmp(str, "Beta") )
 	{
-		if (isStatic)
+		if ( isStatic )
 		{
-			std::string w = "\n   + There is no need to define Rayleigh damping for the static analysis of the step number " + std::to_string(number);
+			std::string w = "\n   + There is no need to define Rayleigh damping for the static analysis of the step number "
+				+ std::to_string(number);
 			Log::AddWarning(w);
 		}
 	}
 	else
 		fsetpos(f, &pos);
 
-
 	//All ok while reading
 	return true;
+}
+
+void SolutionStep::SetGlobalStart(double time)
+{ this->global_start = time; }
+
+unsigned int SolutionStep::GetNumber() const
+{
+	return this->number;
+}
+
+double SolutionStep::GetGlobalStart() const
+{
+	return this->global_start;
+}
+
+double SolutionStep::GetEndTime() const
+{
+	return this->end_time;
+}
+
+double SolutionStep::GetTimestep() const
+{
+	return this->timestep;
+}
+
+double SolutionStep::GetMaxTimestep() const
+{
+	return this->max_timestep;
+}
+
+double SolutionStep::GetMinTimestep() const
+{
+	return this->min_timestep;
+}
+
+int SolutionStep::GetSample() const
+{
+	return this->sample;
+}
+
+double SolutionStep::GetBeta_new() const
+{
+	return this->beta_new;
+}
+
+double SolutionStep::GetGamma_new() const
+{
+	return this->gamma_new;
+}
+
+double SolutionStep::GetAlpha_ray() const
+{
+	return this->alpha_ray;
+}
+
+double SolutionStep::GetBeta_ray() const
+{
+	return this->beta_ray;
+}
+
+bool SolutionStep::CheckIfIsStatic() const
+{
+	return this->isStatic;
 }

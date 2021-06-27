@@ -13,7 +13,7 @@ public:
 	const unsigned int GetNumber() const;
 
 	//Writes Giraffe file data
-	void WriteGiraffeModelFile(FILE *f);
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	/*-------
 	Variables

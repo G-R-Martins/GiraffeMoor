@@ -13,9 +13,18 @@ NSSS::~NSSS()
 {
 	bool_table.Clear();
 }
-void NSSS::WriteGiraffeModelFile(FILE *f)
+void NSSS::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tNSSS\t%d\tNodeSet\t%d\tSurfaceSet\t%d\tMU\t%.6e\tEPN\t%.6e\tCN\t%.6e\tEPT\t%.6e\tCT\t%.6e\tPinball\t%.6e\tRadius\t%.6e\tMaxPointwiseInt\t%d\t",
-		number, node_set, surface_set, mu, epn, cn, ept, ct, pinball, radius, max_interactions);
-	bool_table.Write(f);
+	fout << "\tNSSS " << number <<
+		"\tNodeSet " << node_set <<
+		"\tSurfaceSet " << surface_set <<
+		"\tMU " << mu <<
+		"\tEPN " << epn <<
+		"\tCN " << cn <<
+		"\tEPT " << ept <<
+		"\tCT " << ct <<
+		"\tPinball " << pinball <<
+		"\tRadius " << radius <<
+		"\tMaxPointwiseInt " << max_interactions << 
+		" " << bool_table;
 }

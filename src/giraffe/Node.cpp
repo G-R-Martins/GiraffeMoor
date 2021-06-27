@@ -8,15 +8,12 @@ Node::Node()
 Node::~Node()
 {}
 
-void Node::WriteGiraffeModelFile(FILE *f)
+void Node::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	if (mark_comment)
-	{
-		fprintf(f, "\t//%s\n", comment);
-	}
+	if ( mark_comment )
+		fout << "\t//" << comment << "\n";
 
-	fprintf(f, "\tNode\t%d\t%.14e\t%.14e\t%.14e\n", number,
-		ref_coordinates[0],
-		ref_coordinates[1],
-		ref_coordinates[2]);
+	fout << "\tNode " << number << "\t\t" <<
+		ref_coordinates[0] << " \t" << ref_coordinates[1] << " \t" << ref_coordinates[2] <<
+		"\n";
 }

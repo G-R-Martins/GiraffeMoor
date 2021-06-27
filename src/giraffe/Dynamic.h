@@ -1,8 +1,7 @@
 #pragma once
 #include "Solution.h"
 
-class Dynamic :
-	public Solution
+class Dynamic :	public Solution
 {
 public:
 	Dynamic();
@@ -11,7 +10,7 @@ public:
 	//============================================================================
 
 	//Writes output file
-	void WriteGiraffeModelFile(FILE *f) override;	
+	void WriteGiraffeModelFile(std::ostream& fout) const override;	
 	
 	//============================================================================
 

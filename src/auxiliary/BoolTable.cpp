@@ -57,6 +57,16 @@ void BoolTable::Write(FILE *f) const
 		fprintf(f, "%d ",(int)data_table[i]);
 	fprintf(f, "\n");
 }
+std::ostream& operator<<(std::ostream& out, const BoolTable& btab)
+{
+	out << "BoolTable ";
+	for (int i = 0; i < btab.GetSize(); ++i)
+		out << btab.GetBoolOption(i) << " ";
+	out << "\n";
+
+
+	return out;
+}
 
 //Print output file
 void BoolTable::Print() const
@@ -131,4 +141,13 @@ void BoolTable::Pop_Back()
 int BoolTable::Size()
 {
 	return (int)data_table.size();
+}
+size_t BoolTable::GetSize() const
+{
+	return data_table.size();
+}
+
+bool BoolTable::GetBoolOption(size_t pos) const
+{
+	return this->data_table[pos];
 }

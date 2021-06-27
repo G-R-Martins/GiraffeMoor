@@ -9,9 +9,6 @@ public:
 	~Pipe();
 
 	//Writes GIRAFFE input file
-	void WriteGiraffeModelFile(FILE *f) override;
-
-	//Label (comment)
-	std::string label;
+	void WriteGiraffeModelFile(std::ostream& fout) const override;
 };
 

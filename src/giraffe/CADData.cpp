@@ -21,7 +21,6 @@ bool CADData::Read(FILE* f)
 		}
 		else
 			name = temp_name;
-
 	}
 	else
 	{
@@ -34,9 +33,9 @@ bool CADData::Read(FILE* f)
 	return true;
 }
 
-void CADData::WriteGiraffeModelFile(FILE* f)
+void CADData::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tSTLSurface %zd %s\n", number, name.c_str());
+	fout << "\tSTLSurface " << number << "\t" <<name << "\n";
 }
 
 

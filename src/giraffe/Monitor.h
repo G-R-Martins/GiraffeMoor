@@ -17,13 +17,13 @@ public:
 	bool Read(FILE *f);
 
 	//Writes Giraffe file data
-	void WriteGiraffeModelFile(FILE *f) const;
+	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	//============================================================================
 
-	/*-------------------------------------
-	  Structs with rules to create monitors
-	 -------------------------------------*/
+	/*------------------------------------------
+	  Structs with guidelines to create monitors
+	 ------------------------------------------*/
 	struct SequenceNodes { unsigned int nodes, begin, increment; };
 	struct SequenceElements { unsigned int elements, begin, increment; };
 

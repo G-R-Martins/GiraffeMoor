@@ -12,10 +12,11 @@ RigidNodeSet::~RigidNodeSet()
 	bool_table.Clear();
 }
 
-void RigidNodeSet::WriteGiraffeModelFile(FILE *f)
+void RigidNodeSet::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	if (!comment.empty())
-		fprintf(f, "\t//%s\n", comment.c_str());
-	fprintf(f, "\tRigidNodeSet\t%d\tPilotNode\t%d\tNodeSet\t%d\t", number, pilot_node, node_set);
-	bool_table.Write(f);
+	if ( !comment.empty() )
+		fout << "\t//" << comment << "\n";
+	fout << "\tRigidNodeSet " << number <<
+		"\tPilotNode " << pilot_node <<
+		"\tNodeSet " << node_set << " " << bool_table;
 }

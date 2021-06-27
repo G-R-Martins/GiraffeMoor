@@ -35,7 +35,9 @@ public:
 
 	bool Read(FILE* f);
 
-	//Set functions
+	///
+	///Set functions
+	///
 	void SetStartTime(const double& start);
 	void SetStartTableTime(const double& start_time, const size_t& start_line);
 	Table* const GetTimeSeries() const;
@@ -45,7 +47,9 @@ public:
 	const unsigned int& GetFileHeaders() const;
 	const unsigned int& GetFileNTimes() const;
 
-	//Get functions
+	///
+	///Set functions
+	///
 	unsigned int GetVesselID() const;
 	unsigned int GetStep() const;
 

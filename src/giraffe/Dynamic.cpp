@@ -11,8 +11,18 @@ Dynamic::~Dynamic()
 {}
 
 //Writes output file
-void Dynamic::WriteGiraffeModelFile(FILE *f)
+void Dynamic::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tDynamic\t%d\tEndTime\t%.6e\tTimeStep\t%.6e\tMaxTimeStep\t%.6e\tMinTimeStep\t%.6e\tMaxIt\t%d\tMinIt\t%d\tConvIncrease\t%d\tIncFactor\t%.6e\tSample\t%d\t\n\t\tRayleighDamping\tAlpha\t%.6e\tBeta\t%.6e\tUpdate\t%d\tNewmarkCoefficients\tBeta\t%.6e\tGamma\t%.6e\n",
-		solution_number, end_time, i_time_step, max_time_step, min_time_step, max_it, min_it, conv_increase, inc_factor, sample, alpha, beta, update, beta_new, gamma_new);
+	fout << "\tDynamic " << solution_number <<
+		std::setprecision(6) <<
+		"\tEndTime " << end_time <<
+		"\tTimeStep " << i_time_step <<
+		"\tMaxTimeStep " << max_time_step <<
+		"\tMinTimeStep " << min_time_step <<
+		"\tMaxIt " << max_it << "\tMinIt " << min_it <<
+		"\tConvIncrease " << conv_increase << 
+		"\tIncFactor " << inc_factor <<
+		"\tSample " << sample <<
+		"\n\t\tRayleighDamping \tAlpha " << alpha << "\tBeta " << beta << "\tUpdate " << update <<
+		"\tNewmarkCoefficients \tBeta " << beta_new << "\tGamma " << gamma_new << "n";
 }

@@ -27,21 +27,23 @@ NodalDisplacement::NodalDisplacement(const std::string& f_name, const unsigned i
 NodalDisplacement::~NodalDisplacement()
 {}
 
-void  NodalDisplacement::WriteGiraffeModelFile(FILE *f)
+void NodalDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fprintf(f, "\tNodalDisplacement\t%d\tNodeSet\t%d\tCS\t%d\t", number, node_set, cs);
+	fout << "\tNodalDisplacement " << number << 
+		"\tNodeSet " << node_set << 
+		"\tCS " << cs << "\t";
 	if (isMathCode)
 	{
-		fprintf(f, "MathCode\n");
-		mathCode->WriteGiraffeModelFile(f);
+		fout << "MathCode\n" << mathCode;
 	}
 	else if (extFile)
 	{
-		fprintf(f, "\n\t\tFile \"%s\"\tHeaderLines %d\tNTimes %d\n", file_name.c_str(), header_lines, n_times);
+		fout << "\n\t\tFile \"" << file_name << "\"" <<
+			"\tHeaderLines " << header_lines << 
+			"\tNTimes " << n_times << "\n";
 	}
 	else
 	{
-		fprintf(f, "NTimes\t%d\n", table->GetLines());
-		table->Write(f);
+		fout << "NTimes" << table->GetLines() << "\n" << table;
 	}
 }

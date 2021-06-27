@@ -60,8 +60,6 @@ public:
 	Cylinder();
 	~Cylinder();
 
-	//==========================================================================================================================
-
 					/*--------
 					|Functions|
 					---------*/
@@ -69,9 +67,9 @@ public:
 	//Reads input file
 	bool Read(FILE* f);
 
-	/*-------------------
-	Setting private data
-	--------------------*/
+	///
+	/// Set functions
+	///
 
 	//Set coordinate system
 	void SetCoordinateSystem(unsigned int CS);
@@ -104,9 +102,9 @@ public:
 	//Current cylinder element type
 	void SetCylinderType(char &temp);
 
-	/*-------------------
-	Accesing private data
-	--------------------*/
+	///
+	/// Get functions
+	///
 
 	//Number of elements
 	unsigned int GetDiscretization() const;

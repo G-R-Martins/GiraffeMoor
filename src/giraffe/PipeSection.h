@@ -12,7 +12,7 @@ public:
 	~PipeSection();
 	
 	//Writes Giraffe file
-	void WriteGiraffeModelFile(FILE *f);	
+	void WriteGiraffeModelFile(std::ostream& fout) const;	
 
 	//Variables
 	unsigned int number;

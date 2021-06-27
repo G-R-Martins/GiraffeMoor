@@ -8,7 +8,6 @@
 #include "Load.h"
 #include "Constraint.h"
 
-
 #include "Monitor.h"
 #include "ConvergenceCriteria.h"
 #include "CADData.h"
@@ -29,8 +28,6 @@
 
 #include "OscillatorySurf.h"
 #include "SurfaceSet.h"
-#include "Point.h"
-#include "TriangleSurf.h"
 
 #include "Displacement.h"
 #include "NodalDisplacement.h"
@@ -59,7 +56,6 @@ public:
 	~GiraffeModel();
 	
 	//==========================================================================================================================
-	//==========================================================================================================================
 
 							/*+-+-+-+-+-+-+-+-+-+-+-+
 							|						|
@@ -67,7 +63,7 @@ public:
 							|						|
 							+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-		
+	
 	/*--------------------
 	Giraffe Model Database
 	---------------------*/
@@ -86,8 +82,6 @@ public:
 
 	std::deque <Node> node_vector;
 	std::vector <CoordinateSystem> cs_vector;
-	std::vector <Point> point_vector;
-	std::vector <TriangleSurf> triangle_vector;
 	std::vector <OscillatorySurf> oscillatory_vector;
 	std::vector <NodeSet> node_set_vector;
 	std::vector <SurfaceSet> surface_set_vector;
@@ -123,7 +117,6 @@ public:
 	
 	void GenerateNode(const unsigned int& number, Matrix& pos, const char* comment);
 	void GenerateNode(const unsigned int& number, Matrix& pos);
-	void GeneratePoint(const unsigned int& number, Matrix& pos);
 	void GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z, const char* comment);
 	void GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z);
 	void GenerateNode(const unsigned int& number, const std::array<double, 3>& coord, const char* comment);
@@ -184,7 +177,6 @@ public:
 	Surfaces and contact
 	-------------------*/
 
-	void GenerateTriangle(const unsigned int& number, const unsigned int& point1, const unsigned int& point2, const unsigned int& point3, const unsigned int& pilot_node);
 	void GenerateOscillatorySurf(const unsigned int& number, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs, const unsigned int& pilot_node);
 	void GenerateSurfaceSet(const unsigned int& number, const std::vector<unsigned int>& list);
 	void GenerateNSSSContact(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set, const double& mu, const double& epn, const double& cn, const double& ept, const double& ct, const double& pinball, const double& radius, const unsigned int& max_interactions, BoolTable& bool_table);

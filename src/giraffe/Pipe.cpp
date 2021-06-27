@@ -3,7 +3,6 @@
 
 
 Pipe::Pipe()
-	: label("")
 {
 	nodes.resize(3);
 }
@@ -12,17 +11,15 @@ Pipe::Pipe()
 Pipe::~Pipe()
 {}
 
-void Pipe::WriteGiraffeModelFile(FILE *f)
+void Pipe::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	if (mark_segment_begin)
-		fprintf(f, "\t//Segment begin\n");
-	else if (!label.empty())
-		fprintf(f, "\t//%s\n", label.c_str());
-	fprintf(f, "\tPipe_1\t%d\tPipeSec\t%d\tCS\t%d\tNodes\t%d\t%d\t%d\n",
-		number,
-		section,
-		cs,
-		nodes[0],
-		nodes[1],
-		nodes[2]);
+	if ( mark_segment_begin )
+		fout << "\t//Segment begin\n";
+	else if ( !label.empty() )
+		fout << "\t//" << label << "\n";
+	fout << "\tPipe_1 " << number <<
+		"\tPipeSec " << section <<
+		"\tCS " << cs <<
+		"\tNodes " << nodes[0] << " " << nodes[1] << " " << nodes[2] <<
+		"\n";
 }

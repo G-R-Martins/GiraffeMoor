@@ -93,21 +93,6 @@ void GiraffeModel::GenerateNode(const unsigned int& number, const std::array<dou
 	node_vector.back().mark_comment = false;
 	node_vector.back().ref_coordinates = coord;
 }
-void GiraffeModel::GeneratePoint(const unsigned int& number, Matrix& pos)
-{
-	point_vector.emplace_back();
-	point_vector.back().number = number;
-	point_vector.back().coordinates = pos;
-}
-void GiraffeModel::GenerateTriangle(const unsigned int& number, const unsigned int& point1, const unsigned int& point2, const unsigned int& point3, const unsigned int& pilot_node)
-{
-	triangle_vector.emplace_back();
-	triangle_vector.back().number = number;
-	triangle_vector.back().points[0] = point1;
-	triangle_vector.back().points[1] = point2;
-	triangle_vector.back().points[2] = point3;
-	triangle_vector.back().pilot_node = pilot_node;
-}
 void GiraffeModel::GenerateOscillatorySurf(const unsigned int& number, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs, const unsigned int& pilot_node)
 {
 	oscillatory_vector.emplace_back();
@@ -127,64 +112,55 @@ void GiraffeModel::GenerateOscillatorySurf(const unsigned int& number, const dou
 void GiraffeModel::GenerateTrussElement(const unsigned int& number, const bool& segment_begin, const unsigned int& section, const unsigned int& node1, const unsigned int& node2)
 {
 	element_vector.emplace_back(new Truss());
-	element_vector.back()->number = number;
-	element_vector.back()->mark_segment_begin = segment_begin;
-	element_vector.back()->section = section;
-	element_vector.back()->nodes[0] = node1;
-	element_vector.back()->nodes[1] = node2;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetFirstElementBool(segment_begin);
+	element_vector.back()->SetSection(section);
+	element_vector.back()->SetNodes({node1,node2});
 }
 void GiraffeModel::GenerateTrussElement(const unsigned int& number, const bool& segment_begin, const unsigned int& section, const unsigned int& node1, const unsigned int& node2, const std::string& comment)
 {
 	element_vector.emplace_back(new Truss());
-	element_vector.back()->number = number;
-	element_vector.back()->mark_segment_begin = segment_begin;
-	element_vector.back()->section = section;
-	element_vector.back()->nodes[0] = node1;
-	element_vector.back()->nodes[1] = node2;
-	Truss* ptr = static_cast< Truss* >( element_vector.back() );
-	ptr->label = comment;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetFirstElementBool(segment_begin);
+	element_vector.back()->SetSection(section);
+	element_vector.back()->SetNodes({node1,node2});
+	element_vector.back()->SetLabel(comment);
 }
 void  GiraffeModel::GenerateRigidBodyElement(const unsigned int& number, const unsigned int& RB_data, const unsigned int& cs, const unsigned int& node)
 {
 	element_vector.emplace_back(new RigidBody());
-	element_vector.back()->number = number;
-	element_vector.back()->material = RB_data;
-	element_vector.back()->cs = cs;
-	element_vector.back()->nodes[0] = node;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetMaterial(RB_data);
+	element_vector.back()->SetCS(cs);
+	element_vector.back()->SetNodes({node});
 }
 void  GiraffeModel::GenerateRigidBodyElement(const unsigned int& number, const unsigned int& RB_data, const unsigned int& cs, const unsigned int& node, const std::string& comment)
 {
 	element_vector.emplace_back(new RigidBody());
-	element_vector.back()->number = number;
-	element_vector.back()->material = RB_data;
-	element_vector.back()->cs = cs;
-	element_vector.back()->nodes[0] = node;
-	RigidBody* ptr = static_cast< RigidBody* >( element_vector.back() );
-	ptr->label = comment;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetMaterial(RB_data);
+	element_vector.back()->SetCS(cs);
+	element_vector.back()->SetNodes({node});
+	element_vector.back()->SetLabel(comment);
 }
 void GiraffeModel::GeneratePipeElement(const unsigned int& number, const bool& segment_begin, const unsigned int& section, const unsigned int& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3)
 {
 	element_vector.emplace_back(new Pipe());
-	element_vector.back()->number = number;
-	element_vector.back()->mark_segment_begin = segment_begin;
-	element_vector.back()->section = section;
-	element_vector.back()->cs = cs;
-	element_vector.back()->nodes[0] = node1;
-	element_vector.back()->nodes[1] = node2;
-	element_vector.back()->nodes[2] = node3;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetFirstElementBool(segment_begin);
+	element_vector.back()->SetSection(section);
+	element_vector.back()->SetCS(cs);
+	element_vector.back()->SetNodes({node1,node2,node3});
 }
 void GiraffeModel::GeneratePipeElement(const unsigned int& number, const unsigned int& section, const unsigned int& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment)
 {
 	element_vector.emplace_back(new Pipe());
-	element_vector.back()->number = number;
-	element_vector.back()->mark_segment_begin = false;
-	element_vector.back()->section = section;
-	element_vector.back()->cs = cs;
-	element_vector.back()->nodes[0] = node1;
-	element_vector.back()->nodes[1] = node2;
-	element_vector.back()->nodes[2] = node3;
-	Pipe* ptr = static_cast< Pipe* >( element_vector.back() );
-	ptr->label = comment;
+	element_vector.back()->SetNumber(number);
+	element_vector.back()->SetFirstElementBool(false);
+	element_vector.back()->SetSection(section);
+	element_vector.back()->SetCS(cs);
+	element_vector.back()->SetNodes({node1,node2,node3});
+	element_vector.back()->SetLabel(comment);
 }
 void GiraffeModel::GenerateCoordinateSystem(unsigned int number, Matrix& E1, Matrix& E3)
 {
@@ -325,7 +301,6 @@ void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const u
 void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, MathCode* math_code)
 {
 	displacement_vector.emplace_back(new NodalDisplacement(math_code));
-	//displacement_vector.emplace_back(math_code);
 	//Pointer to the displacement
 	NodalDisplacement* ptr = static_cast< NodalDisplacement*>(displacement_vector.back());
 	ptr->number = number;
@@ -397,7 +372,6 @@ void GiraffeModel::GenerateNodeSet(const unsigned int& number, const unsigned in
 	node_set_vector.emplace_back();
 	node_set_vector.back().number = number;
 	node_set_vector.back().nodes.resize(1);
-	//node_set_vector.back().nodes.reserve(1);
 	node_set_vector.back().nodes[0] = node;
 	strcpy(node_set_vector.back().comment, comment);
 }
@@ -409,12 +383,7 @@ void GiraffeModel::GenerateNodeSet(const unsigned int& number, const unsigned in
 }
 void GiraffeModel::GenerateSurfaceSet(const unsigned int& number, const std::vector<unsigned int>& list)
 {
-	surface_set_vector.emplace_back(SurfaceSet());
-	surface_set_vector.back().number = number;
-	surface_set_vector.back().surfaces.resize(list.size());
-	//surface_set_vector.back().surfaces.reserve(list.size());
-	for (int i = 0; i < (int)list.size(); i++)
-		surface_set_vector.back().surfaces[i] = list[i];
+	surface_set_vector.emplace_back(SurfaceSet(number, list));
 }
 void GiraffeModel::GenerateStaticSolutionStep(const unsigned int& number, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample)
 {

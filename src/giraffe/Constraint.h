@@ -6,8 +6,8 @@ class Constraint
 public:
 	Constraint();
 	virtual ~Constraint();
-	virtual void WriteGiraffeModelFile(FILE *f) = 0;
+	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
 
-	unsigned int number;				//ID do elemento
+	unsigned int number;				//element ID
 };
 

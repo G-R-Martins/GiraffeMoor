@@ -40,11 +40,11 @@ public:
 	----------------------------*/
 
 	unsigned int cur_line;
-	unsigned int tot_elem;  //1 line
+	unsigned int tot_elem;			//per line
 
 	unsigned int cur_node_mesh;
 	unsigned int cur_elem;
-	unsigned int cur_cs;		//Start with '2', because the first one will be the global coordinate system
+	unsigned int cur_cs;			//Start with '2', because the first one will be the global coordinate system
 	unsigned int cur_node_set;
 	unsigned int cur_vessel;
 	unsigned int cur_special_constraint;
@@ -105,7 +105,7 @@ public:
 
 					/*-+-+-+-+-+-+-+-+
 					|                |
-					|    Database    |
+					|     Objects    |
 					|                |
 					+-+-+-+-+-+-+-+-+*/
 
