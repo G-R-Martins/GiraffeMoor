@@ -396,7 +396,36 @@ bool IO::CheckModel()
 			}
 		});//end for (displacement fields)
 	}
+	if (!mm.moorload_vector.empty())
+	{
+		std::for_each(mm.moorload_vector.cbegin(), mm.moorload_vector.cend(), [&](const MoorLoad& load) {
+			//Description
+			auto description = load.GetDescription();
+			// Warning message
+			std::stringstream ss; 
+			
+			//Check vessel number
+			if (description == "vessel")
+			{
+				if ( load.GetNodeID() > n_keywords["Vessels"] ) { 
+					ss << "\n   + Invalid vessel number to apply load: " << load.GetNodeID(); 
+					Log::AddWarning(ss); modelOk = false; }
+			}
+			//Check line number
+			else if (load.GetLineID() > n_keywords["Lines"]) { 
+				ss << "\n   + Invalid line number to apply load: " << load.GetNodeID(); 
+				Log::AddWarning(ss); modelOk = false; }
+			//Check segment number
+			else if (mm.line_vector[load.GetLineID()].GetNSegments() > n_keywords["SegmentProperties"])
+			{ 
+				ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID(); 
+				Log::AddWarning(ss); modelOk = false; }
+
+		});//end for (loads)
+	}
 	mm.moor_constraint.CheckModel(modelOk, n_keywords);
+
+
 
 	return modelOk;
 }

@@ -18,6 +18,7 @@ public:
 
 	//Get functions
 	const unsigned int GetNumber() const;
+	const unsigned int GetNSegments() const;
 	
 	//============================================================================
 

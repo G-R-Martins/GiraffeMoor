@@ -47,7 +47,6 @@ set(Header_Files_Giraffe
 	src/giraffe/OscillatorySurf.h
 	src/giraffe/Pipe.h
 	src/giraffe/PipeSection.h
-	src/giraffe/Point.h
 	src/giraffe/Post.h
 	src/giraffe/RigidBody.h
 	src/giraffe/RigidBodyData.h
@@ -56,11 +55,9 @@ set(Header_Files_Giraffe
 	src/giraffe/SameRotation.h
 	src/giraffe/SeaCurrent.h
 	src/giraffe/Solution.h
-	src/giraffe/SolverOptions.h
 	src/giraffe/SpecialConstraint.h
 	src/giraffe/Static.h
 	src/giraffe/SurfaceSet.h
-	src/giraffe/TriangleSurf.h
 	src/giraffe/Truss.h
 	src/giraffe/Monitor.h
 	)
@@ -135,7 +132,6 @@ set(Source_Files_Giraffe
 	src/giraffe/OscillatorySurf.cpp
 	src/giraffe/Pipe.cpp
 	src/giraffe/PipeSection.cpp
-	src/giraffe/Point.cpp
 	src/giraffe/Post.cpp
 	src/giraffe/RigidBody.cpp
 	src/giraffe/RigidBodyData.cpp
@@ -144,11 +140,9 @@ set(Source_Files_Giraffe
 	src/giraffe/SameRotation.cpp
 	src/giraffe/SeaCurrent.cpp
 	src/giraffe/Solution.cpp
-	src/giraffe/SolverOptions.cpp
 	src/giraffe/SpecialConstraint.cpp
 	src/giraffe/Static.cpp
 	src/giraffe/SurfaceSet.cpp
-	src/giraffe/TriangleSurf.cpp
 	src/giraffe/Truss.cpp
 	)
 set(Source_Files_GMoor
