@@ -407,19 +407,43 @@ bool IO::CheckModel()
 			//Check vessel number
 			if (description == "vessel")
 			{
-				if ( load.GetNodeID() > n_keywords["Vessels"] ) { 
-					ss << "\n   + Invalid vessel number to apply load: " << load.GetNodeID(); 
-					Log::AddWarning(ss); modelOk = false; }
+				if ( load.GetNodeID() > n_keywords["Vessels"] )
+					ss << "\n   + Invalid vessel number to apply load: " << load.GetNodeID(); modelOk = false;
 			}
-			//Check line number
-			else if (load.GetLineID() > n_keywords["Lines"]) { 
-				ss << "\n   + Invalid line number to apply load: " << load.GetNodeID(); 
-				Log::AddWarning(ss); modelOk = false; }
-			//Check segment number
-			else if (mm.line_vector[load.GetLineID()].GetNSegments() > n_keywords["SegmentProperties"])
+			else 
 			{ 
-				ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID(); 
-				Log::AddWarning(ss); modelOk = false; }
+				//Check line number
+				if ( load.GetLineID() > n_keywords["Lines"] )
+				{ ss << "\n   + Invalid line number to apply load: " << load.GetLineID(); modelOk = false; }
+				else
+				{
+					if ( size_t seg = load.GetSegmentID() )
+					{
+						//With segment defined (not using SegmentSet)
+						if ( mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"] )
+						{ ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID(); modelOk = false; }
+						//Seg == 0 -> use SegmentSet 
+						else
+						{
+							// No segment set: 
+							if ( mm.segment_set_vector.empty() )
+							{ ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined"; modelOk = false; }
+							else
+							{ // Check segment set
+								size_t segset_size = mm.segment_set_vector[mm.line_vector[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
+								if ( seg > segset_size )
+								{
+									ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ": segment number " <<
+										seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet(); modelOk = false;
+								}
+							}
+						}// end 'seg == 0'
+					} 
+				}
+			} // end 'else vessel'
+			/// Approach for check empty stringstream adapted from https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null/36327567
+			if (ss.peek() != decltype(ss)::traits_type::eof())
+				Log::AddWarning(ss); 
 
 		});//end for (loads)
 	}
