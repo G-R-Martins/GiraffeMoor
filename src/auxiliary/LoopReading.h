@@ -16,7 +16,7 @@ namespace LoopReading
 
 	/// <summary>
 	///	
-	/// There is some functions that might seems to be unecessary repeated.
+	/// There are some functions that might seems to be unecessary repeated.
 	/// This choice was made to clarify when use ordered or unordered containers
 	/// and to avoid some 'if' statements 
 	/// 

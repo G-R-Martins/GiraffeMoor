@@ -4,13 +4,13 @@
 |                                                       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-File created on: Jun 27, 2021 at 08h55min 
+File created on: Jun 28, 2021 at 16h21min 
 
 1) Lines
 	Line 1
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -22,7 +22,7 @@ File created on: Jun 27, 2021 at 08h55min
 	Line 2
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -34,7 +34,7 @@ File created on: Jun 27, 2021 at 08h55min
 	Line 3
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -46,7 +46,7 @@ File created on: Jun 27, 2021 at 08h55min
 	Line 4
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -58,7 +58,7 @@ File created on: Jun 27, 2021 at 08h55min
 	Line 5
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -70,7 +70,7 @@ File created on: Jun 27, 2021 at 08h55min
 	Line 6
 		Configuration: Suspended above the seabed
 		Total length: 835.35m
-		Number of segments: 1
+		Number of segments: 2
 
 	         -----------------------------------------------
 	        |   Element      Node   NodeSet     Tension[N]  |
@@ -103,9 +103,7 @@ File created on: Jun 27, 2021 at 08h55min
 	[3] 2.000e+00s - 3.000e+00s : Coupling fairleads statically
 	[4] 3.000e+00s - 4.000e+00s : Establishing sea current
 	[5] 4.000e+00s - 5.000e+00s : Static step
-		- Displacement of the vessel 2 with MathCode
 	[6] 5.000e+00s - 7.000e+00s : Static step
-		- Applying time series to vessel 1
 	[7] 7.000e+00s - 9.000e+00s : Static step
 
 5) Analytical stiffness matrix

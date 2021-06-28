@@ -62,37 +62,23 @@ bool MoorConstraint::Read(FILE * f)
 }
 
 
-//Check input data readed
-void MoorConstraint::CheckModel(bool& modelOk, std::map<std::string_view, std::size_t>& n_keywords)
-{
-	if (existAnchorConstraint)
-	{
-		std::for_each(anchors.cbegin(), anchors.cend(), [&](const AnchorConstraint& c) {
-			if (c.GetNumberID() > n_keywords["Lines"]) { 
-				std::stringstream ss; 
-				ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid line ID to change its anchor constraint" ; 
-				Log::AddWarning(ss); modelOk = false; }
-		});
-	}
-	if (existVesselConstraint)
-	{
-		std::for_each(vessels.cbegin(), vessels.cend(), [&](const VesselConstraint& c) {
-			if (c.GetNumberID() > n_keywords["Vessels"]) { 
-				std::stringstream ss; 
-				ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid vessel ID to change its constraints" ; 
-				Log::AddWarning(ss); modelOk = false; }
-		});
-	}
-	if (existLineConstraint)
-	{
-		std::for_each(lines.cbegin(), lines.cend(), [&](const LineConstraint& c) {
-			if (c.GetNumberID() > n_keywords["Lines"]) { 
-				std::stringstream ss; 
-				ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid line ID to change its constraints" ; 
-				Log::AddWarning(ss); modelOk = false; }
-		});
-	}
-}
+/// 
+/// Get functions
+/// 
+
+const std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints() const
+{ return this->anchors; }
+std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints()
+{ return this->anchors; }
+const std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints() const
+{ return this->vessels; }
+std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints()
+{ return this->vessels; }
+const std::vector<LineConstraint>& MoorConstraint::GetLineConstraints() const
+{ return this->lines; }
+std::vector<LineConstraint>& MoorConstraint::GetLineConstraints()
+{ return this->lines; }
+
 
 
 bool MoorConstraint::ExistAnchorConstraint()

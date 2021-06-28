@@ -8,8 +8,6 @@
 #include "Log.h"
 
 
-//It changes the folder to search for input file
-#define _DEV_
 
 //Global objects
 extern MooringModel mm;
@@ -312,8 +310,6 @@ bool IO::CheckModel()
 	/// 
 	/// <returns> booleano q indica se o modelo passou por todas as etapas </returns>
 
-	//Track checking status (returned by this function)
-	bool modelOk = true;
 
 	std::map<std::string_view, std::size_t> n_keywords{
 		//Mandatory blocks
@@ -322,133 +318,170 @@ bool IO::CheckModel()
 		/*nothing to check:*/{"Environment", 1}, {"Solution", 1},
 	};
 
+	//Stream with warning message(s)
+	std::stringstream ss;
 	
-	//Checks mandatory keywords
-	if (mm.keypoint_vector.front().GetNumber() != 1 || mm.keypoint_vector.back().GetNumber() != n_keywords["Keypoints"])				{ Log::AddWarning("\n   + Invalid keypoint numbering");	modelOk = false; }
-	if (mm.segment_property_vector.front().GetNumber() != 1 || mm.segment_property_vector.back().GetNumber() == n_keywords["SegProp"])	{ Log::AddWarning("\n   + Invalid segment property numbering");	modelOk = false; }
-	if (mm.line_vector.front().GetNumber() != 1 || mm.line_vector.back().GetNumber() != n_keywords["Lines"])							{ Log::AddWarning("\n   + Invalid line numbering"); modelOk = false; }
+	///
+	/// Checks mandatory keywords
+	///
+	
+	/*--- Keypoints ---*/
+	if (mm.keypoint_vector.front().GetNumber() != 1 || mm.keypoint_vector.back().GetNumber() != n_keywords["Keypoints"])
+		ss << "\n   + Invalid keypoint numbering";
+	/*--- Segment properties ---*/
+	if (mm.segment_property_vector.front().GetNumber() != 1 || mm.segment_property_vector.back().GetNumber() == n_keywords["SegProp"])
+		ss << "\n   + Invalid segment property numbering";
+	/*--- Lines ---*/
+	if (mm.line_vector.front().GetNumber() != 1 || mm.line_vector.back().GetNumber() != n_keywords["Lines"])
+		ss << "\n   + Invalid line numbering";
 	{
-		std::stringstream ss;
-		bool isOk = true;
-
 		std::for_each(mm.line_vector.cbegin(), mm.line_vector.cend(), [&](const Line& line) {
-			if (line.keypoint_A > n_keywords["Keypoints"] || line.keypoint_B > n_keywords["Keypoints"]) { 
-				ss << "\n   + Invalid keypoint referenced at line number " << line.number ; isOk = false; }
+			if (line.keypoint_A > n_keywords["Keypoints"] || line.keypoint_B > n_keywords["Keypoints"])
+				ss << "\n   + Invalid keypoint referenced at line number " << line.number;
 			if (!line.usingSegmentSet)
 				std::for_each(line.segments.cbegin(), line.segments.cend(), [&](const LineSegment& seg) {
-				if (seg.GetProperty() > n_keywords["SegmentProperties"]) { 
-					ss << "\n   + Invalid segment property referenced at line number " << line.number ; isOk = false; }; }
+				if (seg.GetProperty() > n_keywords["SegmentProperties"])
+					ss << "\n   + Invalid segment property referenced at line number " << line.number; }
 			);//end of nested for_each (segments)
 		});//end of first for_each (lines)
-		
-		if (!isOk)																											{ Log::AddWarning(ss);	modelOk = false; };
 	}
-	if (mm.vessel_vector.front().GetNumber() != 1 || mm.vessel_vector.back().GetNumber() != n_keywords["Vessels"])					{ Log::AddWarning("\n   + Invalid vessel numbering");	modelOk = false; }
+	/*--- Vessels ---*/
+	if (mm.vessel_vector.front().GetNumber() != 1 || mm.vessel_vector.back().GetNumber() != n_keywords["Vessels"])
+		ss << "\n   + Invalid vessel numbering";
 	{
-		std::stringstream ss;
-		bool isOk = true;
-
-		std::for_each(mm.vessel_vector.cbegin(), mm.vessel_vector.cend(), [&](const Vessel& vessel) { 
-			if (vessel.GetKeypoint() > n_keywords["Keypoints"]) { 
-				ss << "\n   + Invalid pilot node referenced at vessel number " << vessel.GetNumber() ; isOk = false; }; }
+		std::for_each(mm.vessel_vector.cbegin(), mm.vessel_vector.cend(), [&](const Vessel& vessel) {
+			if (vessel.GetKeypoint() > n_keywords["Keypoints"])
+				ss << "\n   + Invalid pilot node referenced at vessel number " << vessel.GetNumber(); }
 		);//end of for_each
-		if (!isOk)																											{ Log::AddWarning(ss);	modelOk = false; }
 	}
-	if (mm.moorsolution.GetStepsVec().front().GetNumber() != 1 || mm.moorsolution.GetStepsVec().back().GetNumber() != n_keywords["SolSteps"]) { Log::AddWarning("\n   + Invalid solution steps numbering");	modelOk = false; }
+	if (mm.moorsolution.GetStepsVec().front().GetNumber() != 1 || mm.moorsolution.GetStepsVec().back().GetNumber() != n_keywords["SolSteps"])
+		ss << "\n   + Invalid solution steps numbering";
 	
-	//Checks optional keywords
+	/// 
+	/// Checks optional keywords
+	/// 
+	
+	/*--- Segment sets ---*/
 	if (!mm.segment_set_vector.empty())
 	{
 		std::for_each(mm.segment_set_vector.cbegin(), mm.segment_set_vector.cend(), [&](const SegmentSet& set) {
 			std::for_each(set.GetAllSegment().cbegin(), set.GetAllSegment().cend(), [&](const LineSegment& seg) {
-				if (seg.GetProperty() > n_keywords["Keypoints"]){
-					std::stringstream ss; ss << "\n   + Invalid segment property referenced at segment set number " << set.GetSetID() ; Log::AddWarning(ss); modelOk = false;
-				}
+				if (seg.GetProperty() > n_keywords["Keypoints"])
+					ss << "\n   + Invalid segment property referenced at segment set number " << set.GetSetID();
 			});//end of nested for_each (line segments)
 		});//end of first for_each (segment set)
 	}
+	/*--- Vessel displacements ---*/
 	if (!mm.vessel_disp_vector.empty())
 	{
 		std::for_each(mm.vessel_disp_vector.cbegin(), mm.vessel_disp_vector.cend(), [&](const VesselDisplacement& disp) {
-			if (disp.GetVesselID() > n_keywords["Vessels"]) {
-				std::stringstream ss; ss << "\n   + \"" << disp.GetVesselID() << "\" is not a valid vessel ID to apply displacement" ; Log::AddWarning(ss); modelOk = false;
-			}
-			if (disp.GetStep() > n_keywords["SolSteps"] ){
-				std::stringstream ss; ss << "\n   + Invalid analysis step number to displace the vessel number " << disp.GetVesselID(); Log::AddWarning(ss); modelOk = false;
-			}
+			if (disp.GetVesselID() > n_keywords["Vessels"]) 
+				ss << "\n   + Invalid vessel ID to apply displacement: " << disp.GetVesselID() ;
+			if (disp.GetStep() > n_keywords["SolSteps"] )
+				ss << "\n   + Invalid analysis step number to displace the vessel number " << disp.GetVesselID() << ": " << disp.GetStep();
 		});//end for (vessel displacements)
 	}
+	/*--- Platforms ---*/
 	if (!mm.moorpost.platform_cads.empty())
 	{
 		std::for_each(mm.moorpost.platform_cads.cbegin(), mm.moorpost.platform_cads.cend(), [&](const CADData& c) {
-			if (c.GetNumber() > n_keywords["Vessels"]) { 
-				std::stringstream ss; ss << "\n   + \"" << c.GetNumber() << "\" is not a valid vessel ID to link a CAD file" ; Log::AddWarning(ss); modelOk = false; }
+			if (c.GetNumber() > n_keywords["Vessels"]) 
+				ss << "\n   + \"" << c.GetNumber() << "\" is not a valid vessel ID to link a CAD file";
 		});
 	}
+	/*--- Displacement fields ---*/
 	if (!mm.disp_field_vector.empty())
 	{
 		std::for_each(mm.disp_field_vector.cbegin(), mm.disp_field_vector.cend(), [&](const LineDisplacementField& disp) {
-			if (disp.GetNumber() > n_keywords["Lines"]) {
-				std::stringstream ss; ss << "\n   + \"" << disp.GetNumber() << "\" is not a valid line ID to apply displacement field" ; Log::AddWarning(ss); modelOk = false;
-			}
-			if (disp.GetStep() > n_keywords["SolSteps"]) {
-				std::stringstream ss; ss << "\n   + Invalid analysis step number to displace the vessel number " << disp.GetNumber(); Log::AddWarning(ss); modelOk = false;
-			}
+			if (disp.GetNumber() > n_keywords["Lines"]) 
+				ss << "\n   + Invalid line ID to apply displacement field: " << disp.GetNumber();
+			if (disp.GetStep() > n_keywords["SolSteps"])
+				ss << "\n   + Invalid analysis step number to displace the vessel number " << disp.GetNumber() << ": " << disp.GetStep();
 		});//end for (displacement fields)
 	}
+	/*--- Loads ---*/
 	if (!mm.moorload_vector.empty())
 	{
 		std::for_each(mm.moorload_vector.cbegin(), mm.moorload_vector.cend(), [&](const MoorLoad& load) {
 			//Description
 			auto description = load.GetDescription();
-			// Warning message
-			std::stringstream ss; 
 			
 			//Check vessel number
 			if (description == "vessel")
 			{
 				if ( load.GetNodeID() > n_keywords["Vessels"] )
-					ss << "\n   + Invalid vessel number to apply load: " << load.GetNodeID(); modelOk = false;
+					ss << "\n   + Invalid vessel number to apply load: " << load.GetNodeID(); 
 			}
 			else 
 			{ 
 				//Check line number
-				if ( load.GetLineID() > n_keywords["Lines"] )
-				{ ss << "\n   + Invalid line number to apply load: " << load.GetLineID(); modelOk = false; }
+				if (load.GetLineID() > n_keywords["Lines"])
+					ss << "\n   + Invalid line number to apply load: " << load.GetLineID();
 				else
 				{
 					if ( size_t seg = load.GetSegmentID() )
 					{
 						//With segment defined (not using SegmentSet)
-						if ( mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"] )
-						{ ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID(); modelOk = false; }
+						if (mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
+							ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID();
 						//Seg == 0 -> use SegmentSet 
 						else
 						{
 							// No segment set: 
-							if ( mm.segment_set_vector.empty() )
-							{ ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined"; modelOk = false; }
+							if (mm.segment_set_vector.empty())
+								ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined";
 							else
 							{ // Check segment set
 								size_t segset_size = mm.segment_set_vector[mm.line_vector[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
 								if ( seg > segset_size )
 								{
 									ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ": segment number " <<
-										seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet(); modelOk = false;
+										seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet();
 								}
 							}
 						}// end 'seg == 0'
 					} 
 				}
 			} // end 'else vessel'
-			/// Approach for check empty stringstream adapted from https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null/36327567
-			if (ss.peek() != decltype(ss)::traits_type::eof())
-				Log::AddWarning(ss); 
 
 		});//end for (loads)
 	}
-	mm.moor_constraint.CheckModel(modelOk, n_keywords);
+	/*--- Constraints ---*/
+	{
+		MoorConstraint* constrPtr = &mm.moor_constraint;
+		if (constrPtr->ExistAnchorConstraint())
+		{
+			std::for_each(constrPtr->GetAnchorConstraints().cbegin(), constrPtr->GetAnchorConstraints().cend(), [&](const AnchorConstraint& c) {
+				if (c.GetNumberID() > n_keywords["Lines"])
+					ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid line ID to change its anchor constraint";
+				});
+		}
+		if (constrPtr->ExistVesselConstraint())
+		{
+			std::for_each(constrPtr->GetVesselConstraints().cbegin(), constrPtr->GetVesselConstraints().cend(), [&](const VesselConstraint& c) {
+				if (c.GetNumberID() > n_keywords["Vessels"])
+					ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid vessel ID to change its constraints";
+				});
+		}
+		if (constrPtr->ExistLineConstraint())
+		{
+			std::for_each(constrPtr->GetLineConstraints().cbegin(), constrPtr->GetLineConstraints().cend(), [&](const LineConstraint& c) {
+				if (c.GetNumberID() > n_keywords["Lines"])
+					ss << "\n   + \"" << c.GetNumberID() << "\" is not a valid line ID to change its constraints";
+				});
+		}
+	}
 
+	// Checking status
+	bool modelOk = true;
+
+	/// Approach for check empty stringstream adapted from 
+	/// https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null/36327567
+	if (ss.peek() != decltype(ss)::traits_type::eof())
+	{
+		Log::AddWarning(ss);
+		modelOk = false;
+	}
 
 
 	return modelOk;
@@ -458,7 +491,7 @@ bool IO::CheckModel()
 void IO::WriteGiraffeModelFile()
 {
 	//Giraffe input file
-	std::ofstream fgir(folder_name + input_name + ".txt", std::ofstream::out);
+	std::ofstream fgir(folder_name + input_name + ".inp", std::ofstream::out);
 
 	fgir << "/////////////////////////////////////////////////////////////////////////////\n";
 	fgir << "//                                                                         //\n";

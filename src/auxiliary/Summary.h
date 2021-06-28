@@ -81,7 +81,7 @@ class Summary
 public:
 
 	//Create/return Singleton instance
-	static Summary& Summary::getInstance() { static Summary summary; return summary; }
+	static Summary& getInstance() { static Summary summary; return summary; }
 
 	//Deleting copy and assignment 
 	Summary(const Summary&) = delete;
