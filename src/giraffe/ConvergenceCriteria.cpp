@@ -60,7 +60,7 @@ bool ConvergenceCriteria::Read(FILE *f)
 void ConvergenceCriteria::WriteGiraffeModelFile(std::ostream& fout) const
 {
 
-	fout << std::setprecision(6) <<
+	fout << 
 		"\tForceTolerance " << force_tol <<
 		"\n\tMomentTolerance " << moment_tol <<
 		"\n\tForceMinimumReference " << force_min <<

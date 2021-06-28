@@ -18,7 +18,7 @@ PipeSection::~PipeSection()
 //Writes Giraffe file data
 void PipeSection::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fout << std::setprecision(6) <<
+	fout << 
 		"\tPS " << number <<
 		"\tEA " << EA <<
 		"\tEI " << EI <<

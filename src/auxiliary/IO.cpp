@@ -417,35 +417,35 @@ bool IO::CheckModel()
 				//Check line number
 				if (load.GetLineID() > n_keywords["Lines"])
 					ss << "\n   + Invalid line number to apply load: " << load.GetLineID();
-				else if ( size_t seg = load.GetSegmentID() )
+				if (size_t seg = load.GetSegmentID())
+				{
+					//With segment defined (not using SegmentSet)
+					if (mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
+						ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID();
+					//Seg == 0 -> use SegmentSet 
+					else
 					{
-						//With segment defined (not using SegmentSet)
-						if (mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
-							ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID();
-						//Seg == 0 -> use SegmentSet 
+						// No segment set: 
+						if (mm.segment_set_vector.empty())
+							ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined";
 						else
-						{
-							// No segment set: 
-							if (mm.segment_set_vector.empty())
-								ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined";
-							else
-							{ // Check segment set
-								size_t segset_size = mm.segment_set_vector[mm.line_vector[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
-								if ( seg > segset_size )
-								{
-									ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ": segment number " <<
-										seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet();
-								}
+						{ // Check segment set
+							size_t segset_size = mm.segment_set_vector[mm.line_vector[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
+							if (seg > segset_size)
+							{
+								ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ": segment number " <<
+									seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet();
 							}
-						}// end 'seg == 0'
-					} 
+						}
+					}// end 'seg == 0'
+				}
 			} // end 'else vessel'
 
 		});//end for (loads)
 	}
 	/*--- Constraints ---*/
 	{
-		MoorConstraint* constrPtr = &mm.moor_constraint;
+		MoorConstraint* constrPtr = &mm.moor_constraint; //pointer to MoorConstraint
 		if (constrPtr->ExistAnchorConstraint())
 		{
 			std::for_each(constrPtr->GetAnchorConstraints().cbegin(), constrPtr->GetAnchorConstraints().cend(), [&](const AnchorConstraint& c) {
@@ -498,8 +498,9 @@ void IO::WriteGiraffeModelFile()
 
 	fgir << "\n/*Units:\n\tTime: s\n\tMass: kg\n\tLinear: m\n\tForce: N\n\tRotation: rad\n\tAzimuth: degree\n*/\n";
 
-	//Use scientific notation to float points
-	fgir.setf(std::ofstream::scientific);
+	//General formatting
+	fgir.setf(std::ofstream::scientific);	//Use scientific notation to float points
+	fgir << std::setprecision(6);			//Default precision for float points
 
 	fgir << "\nSolutionSteps\t" << gm.solution_vector.size() << "\n";
 	for ( Solution* sol : gm.solution_vector )
