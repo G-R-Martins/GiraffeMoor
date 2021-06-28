@@ -417,9 +417,7 @@ bool IO::CheckModel()
 				//Check line number
 				if (load.GetLineID() > n_keywords["Lines"])
 					ss << "\n   + Invalid line number to apply load: " << load.GetLineID();
-				else
-				{
-					if ( size_t seg = load.GetSegmentID() )
+				else if ( size_t seg = load.GetSegmentID() )
 					{
 						//With segment defined (not using SegmentSet)
 						if (mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
@@ -441,7 +439,6 @@ bool IO::CheckModel()
 							}
 						}// end 'seg == 0'
 					} 
-				}
 			} // end 'else vessel'
 
 		});//end for (loads)
