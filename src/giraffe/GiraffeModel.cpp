@@ -40,7 +40,7 @@ GiraffeModel::~GiraffeModel()
 
 }
 
-void GiraffeModel::GenerateNode(const unsigned int& number, Matrix& pos, const char* comment)
+void GiraffeModel::GenerateNode(unsigned int number, Matrix& pos, const char* comment)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;
@@ -50,7 +50,7 @@ void GiraffeModel::GenerateNode(const unsigned int& number, Matrix& pos, const c
 	node_vector.back().ref_coordinates[1] = pos(1, 0);
 	node_vector.back().ref_coordinates[2] = pos(2, 0);
 }
-void GiraffeModel::GenerateNode(const unsigned int& number, Matrix &pos)
+void GiraffeModel::GenerateNode(unsigned int number, Matrix &pos)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;
@@ -59,7 +59,7 @@ void GiraffeModel::GenerateNode(const unsigned int& number, Matrix &pos)
 	node_vector.back().ref_coordinates[1] = pos(1, 0);
 	node_vector.back().ref_coordinates[2] = pos(2, 0);
 }
-void GiraffeModel::GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z, const char* comment)
+void GiraffeModel::GenerateNode(unsigned int number, double X, double Y, double Z, const char* comment)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;
@@ -69,7 +69,7 @@ void GiraffeModel::GenerateNode(const unsigned int& number, const double& X, con
 	node_vector.back().ref_coordinates[1] = Y;
 	node_vector.back().ref_coordinates[2] = Z;
 }
-void GiraffeModel::GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z)
+void GiraffeModel::GenerateNode(unsigned int number, double X, double Y, double Z)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;
@@ -78,7 +78,7 @@ void GiraffeModel::GenerateNode(const unsigned int& number, const double& X, con
 	node_vector.back().ref_coordinates[1] = Y;
 	node_vector.back().ref_coordinates[2] = Z;
 }
-void GiraffeModel::GenerateNode(const unsigned int& number, const std::array<double,3>& coord, const char* comment)
+void GiraffeModel::GenerateNode(unsigned int number, const std::array<double,3>& coord, const char* comment)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;
@@ -86,7 +86,7 @@ void GiraffeModel::GenerateNode(const unsigned int& number, const std::array<dou
 	strcpy(node_vector.back().comment, comment);
 	node_vector.back().ref_coordinates = coord;
 }
-void GiraffeModel::GenerateNode(const unsigned int& number, const std::array<double, 3>& coord)
+void GiraffeModel::GenerateNode(unsigned int number, const std::array<double, 3>& coord)
 {
 	node_vector.emplace_back();
 	node_vector.back().number = number;

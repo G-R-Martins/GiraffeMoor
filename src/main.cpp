@@ -8,6 +8,7 @@
 MooringModel mm;
 GiraffeModel gm;
 
+
 int main(int argc, char* argv[])
 {
 	//Launch GiraffeMoor

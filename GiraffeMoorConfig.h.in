@@ -1,0 +1,4 @@
+// Configured options and settings
+#define GiraffeMoor_VERSION_MAJOR @GiraffeMoor_VERSION_MAJOR@
+#define GiraffeMoor_VERSION_MINOR @GiraffeMoor_VERSION_MINOR@
+#define GiraffeMoor_VERSION_PATCH @GiraffeMoor_VERSION_PATCH@
