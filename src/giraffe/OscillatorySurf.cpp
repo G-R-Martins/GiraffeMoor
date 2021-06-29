@@ -19,7 +19,7 @@ void OscillatorySurf::WriteGiraffeModelFile(std::ostream& fout) const
 		"\tLambda2 " << lambda2 <<
 		"\tPhi1 " << phi1 <<
 		"\tPhi2 " << phi2 <<
-		"\tWaves1" << waves1 <<
+		"\tWaves1 " << waves1 <<
 		"\tWaves2 " << waves2 <<
 		"\tCS " << cs <<
 		"\tPilotNode " << pilot_node <<

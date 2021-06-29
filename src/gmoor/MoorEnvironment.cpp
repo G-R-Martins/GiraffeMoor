@@ -151,7 +151,7 @@ double MoorEnvironment::GetGravity()
 double MoorEnvironment::GetRhoFluid() const
 { return this->rhofluid; }
 double MoorEnvironment::GetWaterDepth() const
-{ return this->rhofluid; }
+{ return this->waterdepth; }
 
 Seabed& MoorEnvironment::GetSeabed()
 { return this->seabed; }

@@ -18,7 +18,7 @@ extern GiraffeModel gm;
 //Static variable
 FirstLevelKeyword IO::cur_level = FirstLevelKeyword::None;
 std::string IO::folder_name, IO::input_name, IO::name;
-std::string IO::version = std::to_string(GiraffeMoor_VERSION_MAJOR) 
+std::string IO::version = std::to_string(GiraffeMoor_VERSION_MAJOR)
 	/*-- The following option to check and introduce '0' if n < 10 is quite inefficient, but one of the shortest ways to do it --*/
 	+ "." + std::string(2 - std::to_string(GiraffeMoor_VERSION_MINOR).length(), '0') + std::to_string(GiraffeMoor_VERSION_MINOR) 
 	+ "." + std::string(2 - std::to_string(GiraffeMoor_VERSION_PATCH).length(), '0') + std::to_string(GiraffeMoor_VERSION_PATCH) 
@@ -539,9 +539,10 @@ void IO::WriteGiraffeModelFile()
 	for ( PipeSection& ps : gm.pipe_section_vector )
 		ps.WriteGiraffeModelFile(fgir);
 
-	fgir << "\nRigidBodyData\t" << gm.rbdata_vector.size() << "\n";
+	fgir << "\nRigidBodyData\t" << gm.rbdata_vector.size();
 	for ( RigidBodyData& rbdata : gm.rbdata_vector )
 		rbdata.WriteGiraffeModelFile(fgir);
+	fgir << "\n";
 
 	if ( !gm.post.cads_vector.empty() )
 	{
