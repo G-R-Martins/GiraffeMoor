@@ -13,7 +13,6 @@ Post::~Post()
 void Post::WriteGiraffeModelFile(std::ostream& fout) const
 {
 	fout << "\tMagFactor " << mag_factor <<
-		std::setprecision(6) <<
 		"\n\tWriteMesh " << write.mesh_flag <<
 		"\n\tWriteRenderMesh " << write.renderMesh_flag <<
 		"\n\tWriteRigidContactSurfaces " << write.rigidContactSurfaces_flag <<

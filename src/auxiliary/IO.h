@@ -1,5 +1,7 @@
 #pragma once
 
+//It changes the folder to search for input file
+#define _DEV_
 
 enum class FirstLevelKeyword
 {

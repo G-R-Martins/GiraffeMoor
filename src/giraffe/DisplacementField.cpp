@@ -26,7 +26,7 @@ void  DisplacementField::WriteGiraffeModelFile(std::ostream& fout) const
 	//Write displacement data
 	for (size_t i = 0; i < disp_data.size(); ++i)
 	{
-		fout << "\t" << disp_data[i].node << "\t";
+		fout << "\t\t" << disp_data[i].node << "\t";
 		for ( size_t j = 0; j < 6; ++j )
 			fout << disp_data[i].disp[j] << "\t";
 		fout << "\n";

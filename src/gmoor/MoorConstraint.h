@@ -29,14 +29,18 @@ public:
 	//Reads input file
 	bool Read(FILE* f);
 
-	//Check input data readed
-	void CheckModel(bool& modelOk, std::map<std::string_view , std::size_t>& n_keywords);
 
+	/// 
+	/// Get functions
+	/// 
+	const std::vector<AnchorConstraint>& GetAnchorConstraints() const;
+	std::vector<AnchorConstraint>& GetAnchorConstraints();
+	const std::vector<VesselConstraint>& GetVesselConstraints() const;
+	std::vector<VesselConstraint>& GetVesselConstraints();
+	const std::vector<LineConstraint>& GetLineConstraints() const;
+	std::vector<LineConstraint>& GetLineConstraints();
+	
 	//Check if exist at least one constraint of the type
 	bool ExistAnchorConstraint(), ExistVesselConstraint(), ExistLineConstraint();
-
-	std::vector<AnchorConstraint>& GetAnchorConstraints() { return  anchors; }
-	std::vector<VesselConstraint>& GetVesselConstraints() { return  vessels; }
-	std::vector<LineConstraint>& GetLineConstraints() { return  lines; }
 };
 

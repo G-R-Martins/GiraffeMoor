@@ -115,12 +115,12 @@ public:
 	Nodes and points
 	---------------*/
 	
-	void GenerateNode(const unsigned int& number, Matrix& pos, const char* comment);
-	void GenerateNode(const unsigned int& number, Matrix& pos);
-	void GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z, const char* comment);
-	void GenerateNode(const unsigned int& number, const double& X, const double& Y, const double& Z);
-	void GenerateNode(const unsigned int& number, const std::array<double, 3>& coord, const char* comment);
-	void GenerateNode(const unsigned int& number, const std::array<double, 3>& coord);
+	void GenerateNode(unsigned int number, Matrix& pos, const char* comment);
+	void GenerateNode(unsigned int number, Matrix& pos);
+	void GenerateNode(unsigned int number, double X, double Y, double Z, const char* comment);
+	void GenerateNode(unsigned int number, double X, double Y, double Z);
+	void GenerateNode(unsigned int number, const std::array<double, 3>& coord, const char* comment);
+	void GenerateNode(unsigned int number, const std::array<double, 3>& coord);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 

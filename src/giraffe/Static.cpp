@@ -14,7 +14,6 @@ Static::~Static()
 void Static::WriteGiraffeModelFile(std::ostream& fout) const
 {
 	fout << "\tStatic " << solution_number <<
-		std::setprecision(6) <<
 		"\tEndTime " << end_time <<
 		"\tTimeStep " << i_time_step <<
 		"\tMaxTimeStep " << max_time_step <<

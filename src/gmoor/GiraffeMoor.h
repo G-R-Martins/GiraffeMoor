@@ -51,7 +51,6 @@ namespace GiraffeMoor
 				IO::WriteGiraffeModelFile();
 
 #ifdef NDEBUG
-				IO::WriteGiraffeModelFile();
 				RunGiraffe();
 #endif
 			}

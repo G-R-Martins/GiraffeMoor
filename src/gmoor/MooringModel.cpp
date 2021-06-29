@@ -205,12 +205,19 @@ bool MooringModel::GenerateCatenary()
 		//Vertical forces at the end of each segment
 		std::vector <double> FV(( size_t )n_segs + 1);
 
+
+#ifdef _DEV_
 		{
 			std::cout << "\nSolving equations for the line " << line.number << "...\n";
 			AuxFunctions::Time::Timer timer;
+#endif // _DEV_
+
 			if ( !SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix) )
 				return false;
+#ifdef _DEV_
 		}
+#endif // _DEV_
+
 		SetLinesConfiguration(line, F, FV, n_segs);
 
 		if (line.percent > 0 && x_tdp > 0 && abs(line.anc_tdp) > 0 && abs(line.tdp_fair) > 0)

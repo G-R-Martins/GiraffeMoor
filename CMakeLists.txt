@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 ## Project name and version
-project(GiraffeMoor VERSION 0.02.00)
+project(GiraffeMoor VERSION 0.03.01)
 
 
 ## specify the C++ standard
@@ -177,9 +177,9 @@ set(Source_Files_GMoor
 set(Source_Files_All
 	src/main.cpp
 	src/PCH.cpp
-	${Source_Files_Auxiliary} #Auxiliary
-	${Source_Files_Giraffe} #Giraffe
-	${Source_Files_GMoor} #GiraffeMoor
+	${Source_Files_Auxiliary}	# Auxiliary
+	${Source_Files_Giraffe}		# Giraffe
+	${Source_Files_GMoor}		# GiraffeMoor
 	)
 
 
@@ -189,6 +189,9 @@ set(Source_Tree ${Source_Files_All} ${Header_Files_All})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Source_Tree})
 
 
+## Configure a header file to pass some of the CMake settings to the source code
+configure_file(${PROJECT_NAME}Config.h.in ${PROJECT_NAME}Config.h)
+
 ## Create exe and set GiraffeMoor as startup
 add_executable(${PROJECT_NAME} ${Source_Tree})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -197,6 +200,7 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 ## Folders with headers
 target_include_directories(${PROJECT_NAME} 
 	PUBLIC
+	${PROJECT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/src 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/auxiliary 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/giraffe 

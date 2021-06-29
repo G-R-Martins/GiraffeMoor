@@ -55,6 +55,6 @@ void NodalForce::WriteGiraffeModelFile(std::ostream& fout) const
 	}
 	else
 	{
-		fout << "NTimes" << table->GetLines() << "\n" << table;
+		fout << "NTimes " << table->GetLines() << "\n" << table;
 	}
 }

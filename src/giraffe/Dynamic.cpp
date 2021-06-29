@@ -14,7 +14,6 @@ Dynamic::~Dynamic()
 void Dynamic::WriteGiraffeModelFile(std::ostream& fout) const
 {
 	fout << "\tDynamic " << solution_number <<
-		std::setprecision(6) <<
 		"\tEndTime " << end_time <<
 		"\tTimeStep " << i_time_step <<
 		"\tMaxTimeStep " << max_time_step <<
