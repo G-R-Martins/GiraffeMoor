@@ -32,6 +32,7 @@ void NodalDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
 	fout << "\tNodalDisplacement " << number << 
 		"\tNodeSet " << node_set << 
 		"\tCS " << cs << "\t";
+
 	if (isMathCode)
 	{
 		fout << "MathCode\n" << mathCode;

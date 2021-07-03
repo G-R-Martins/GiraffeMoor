@@ -80,7 +80,7 @@ bool MooringModel::GenerateGiraffeModel()
 	//Set model and generate steps (with pescribed displacements and/or loads)
 	GeneralSetting();
 
-	//Seabed
+	//SeabedSetRhoFluid
 	GenerateSeabed();
 
 	//Nodal constraints 
@@ -142,7 +142,7 @@ void MooringModel::CopyData()
 	bool_g.Set(1, true);
 	gm.environment.SetGravityBooltable(bool_g);
 
-	gm.environment.SetRhoFluid(g);
+	gm.environment.SetRhoFluid (environment.GetRhoFluid());
 	gm.environment.SetSeaCurrentVec(environment.GetSeaCurrentVec());
 	gm.environment.SetWaterDepth(environment.GetWaterDepth());
 
@@ -511,6 +511,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 		double alpha = atan2(( A(1, 0) - B(1, 0) ), ( A(0, 0) - B(0, 0) ));
 		stiff_matrix->calc_Kaux(Fairleads_StiffnessMatrix, eul_ang, Hf, Vf, alpha, F, Ki);
 	}
+
 	return true;
 }
 

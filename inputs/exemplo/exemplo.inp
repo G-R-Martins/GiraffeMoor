@@ -136,107 +136,107 @@ Constraints	18
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
-		ROTX	BoolTable 1 1 1 
-		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTX	BoolTable 1 1 0 
+		ROTY	BoolTable 1 1 0 
+		ROTZ	BoolTable 1 0 0 
 	NodalConstraint 3	NodeSet 16
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
 		ROTX	BoolTable 1 1 1 
 		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTZ	BoolTable 1 0 1 
 	NodalConstraint 4	NodeSet 13
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
 		ROTX	BoolTable 1 1 1 
 		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTZ	BoolTable 1 0 1 
 	NodalConstraint 5	NodeSet 10
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
 		ROTX	BoolTable 1 1 1 
 		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTZ	BoolTable 1 0 1 
 	NodalConstraint 6	NodeSet 7
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
 		ROTX	BoolTable 1 1 1 
 		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTZ	BoolTable 1 0 1 
 	NodalConstraint 7	NodeSet 4
 		UX		BoolTable 1 1 1 
 		UY		BoolTable 1 1 1 
 		UZ		BoolTable 1 1 1 
 		ROTX	BoolTable 1 1 1 
 		ROTY	BoolTable 1 1 1 
-		ROTZ	BoolTable 1 1 1 
+		ROTZ	BoolTable 1 0 1 
 	NodalConstraint 8	NodeSet 17
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 9	NodeSet 14
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 10	NodeSet 11
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 11	NodeSet 8
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 12	NodeSet 5
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 13	NodeSet 2
 		UX		BoolTable 1 1 1 0 
 		UY		BoolTable 1 1 1 0 
 		UZ		BoolTable 1 1 1 0 
-		ROTX	BoolTable 1 1 1 0 
-		ROTY	BoolTable 1 1 1 0 
-		ROTZ	BoolTable 1 1 1 0 
+		ROTX	BoolTable 0 1 1 0 
+		ROTY	BoolTable 0 1 1 0 
+		ROTZ	BoolTable 0 1 1 0 
 	NodalConstraint 14	NodeSet 3
 		UX		BoolTable 1 1 0 0 1 0 0 
 		UY		BoolTable 1 1 0 0 0 1 0 
 		UZ		BoolTable 1 1 0 0 
-		ROTX	BoolTable 1 1 0 0 1 0 0 
-		ROTY	BoolTable 1 1 0 0 0 1 0 
-		ROTZ	BoolTable 1 1 0 0 
+		ROTX	BoolTable 1 1 0 0 
+		ROTY	BoolTable 1 1 0 0 0 0 1 
+		ROTZ	BoolTable 1 1 0 0 1 1 1 
 	NodalConstraint 15	NodeSet 9
 		UX		BoolTable 1 1 0 0 1 0 0 
 		UY		BoolTable 1 1 0 0 0 1 0 
 		UZ		BoolTable 1 1 0 0 1 0 1 
-		ROTX	BoolTable 1 1 0 0 1 0 0 
-		ROTY	BoolTable 1 1 0 0 0 1 0 
-		ROTZ	BoolTable 1 1 0 0 1 0 1 
+		ROTX	BoolTable 1 1 0 0 1 1 0 
+		ROTY	BoolTable 1 1 0 0 0 0 1 
+		ROTZ	BoolTable 1 1 0 0 
 	NodalConstraint 16	NodeSet 20
 		UX		BoolTable 1 1 1 1 1 0 0 
 		UY		BoolTable 1 1 1 1 1 0 0 
 		UZ		BoolTable 1 1 1 1 1 1 1 
-		ROTX	BoolTable 1 1 1 1 1 0 0 
-		ROTY	BoolTable 1 1 1 1 1 0 0 
-		ROTZ	BoolTable 1 1 1 1 1 1 1 
+		ROTX	BoolTable 1 1 1 1 
+		ROTY	BoolTable 1 1 1 1 
+		ROTZ	BoolTable 1 1 1 1 
 	NodalConstraint 17	NodeSet 22
 		UX		BoolTable 1 
 		UY		BoolTable 1 
@@ -254,7 +254,7 @@ Constraints	18
 
 Environment
 	GravityData	G 0.000000e+00 0.000000e+00 -9.810000e+00 BoolTable 1 
-	OceanData	RhoFluid 9.810000e+00	SurfacePosition 0.000000e+00 0.000000e+00 0.000000e+00
+	OceanData	RhoFluid 1.025000e+03	SurfacePosition 0.000000e+00 0.000000e+00 0.000000e+00
 	SeaCurrent	N 2 BoolTable 0 0 1 
 		Depth 0.000000e+00	Speed 1.000000e+00	Angle 0.000000e+00
 		Depth 2.000000e+02	Speed 1.000000e+00	Angle 0.000000e+00

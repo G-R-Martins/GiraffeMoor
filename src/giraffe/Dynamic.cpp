@@ -23,5 +23,5 @@ void Dynamic::WriteGiraffeModelFile(std::ostream& fout) const
 		"\tIncFactor " << inc_factor <<
 		"\tSample " << sample <<
 		"\n\t\tRayleighDamping \tAlpha " << alpha << "\tBeta " << beta << "\tUpdate " << update <<
-		"\tNewmarkCoefficients \tBeta " << beta_new << "\tGamma " << gamma_new << "n";
+		"\tNewmarkCoefficients \tBeta " << beta_new << "\tGamma " << gamma_new << "\n";
 }

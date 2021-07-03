@@ -81,8 +81,8 @@ void GiraffeSolver::WriteGiraffeModelFile(std::ostream& fout) const
 {
 	fout << "\tProcessors " << nCores <<
 		"\tLinSys ";
-	isDirect ? fout << "Direct\n" : 
-		       fout <<"Iterative\n";
+
+	fout << (isDirect ? "Direct\n" : "Iterative\n");
 }
 
 ///

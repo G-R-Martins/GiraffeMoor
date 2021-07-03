@@ -103,9 +103,9 @@ std::ostream& operator<<(std::ostream& out, MathCode* mcPtr)
 	out << "\t\t//X\n\t\tBegin\t" << mcPtr->equations[0] << " End \n" <<
 		"\t\t//Y\n\t\tBegin \t" << mcPtr->equations[1] << " End \n" <<
 		"\t\t//Z\n\t\tBegin \t" << mcPtr->equations[2] << " End \n" <<
-		"\t\t//ROTX\n\t\tBegin" << mcPtr->equations[3] << " End \n" <<
-		"\t\t//ROTY\n\t\tBegin" << mcPtr->equations[4] << " End \n" <<
-		"\t\t//ROTZ\n\t\tBegin" << mcPtr->equations[5] << " End \n";
+		"\t\t//ROTX\n\t\tBegin\t" << mcPtr->equations[3] << " End \n" <<
+		"\t\t//ROTY\n\t\tBegin\t" << mcPtr->equations[4] << " End \n" <<
+		"\t\t//ROTZ\n\t\tBegin\t" << mcPtr->equations[5] << " End \n";
 
 
 	return out;

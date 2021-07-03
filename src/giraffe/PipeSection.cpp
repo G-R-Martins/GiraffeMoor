@@ -27,8 +27,8 @@ void PipeSection::WriteGiraffeModelFile(std::ostream& fout) const
 		"\tRho " << rho <<
 		"\tCDt " << CDt <<
 		"\tCDn " << CDn <<
-		"\tCAt " << CAn <<
-		"\tCAn " << CAt <<
+		"\tCAt " << CAt <<
+		"\tCAn " << CAn <<
 		"\tDe " << diameter <<
 		"\tDi " << 0.0 <<
 		"\n";
