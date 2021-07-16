@@ -27,8 +27,6 @@ std::string IO::version = std::to_string(GiraffeMoor_VERSION_MAJOR)
 
 bool IO::ReadKeyword(FILE* f, fpos_t& pos, char* word)
 {
-	//Finish
-	///dasdasdasd
 	if (fscanf(f, "%s", word) == EOF)				cur_level = FirstLevelKeyword::EndOfFile;
 	//Mandatory
 	else if (!strcmp(word, "Environment"))			cur_level = FirstLevelKeyword::Environment;
