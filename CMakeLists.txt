@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 ## Project name and version
-project(GiraffeMoor VERSION 0.03.02)
-
+project(GiraffeMoor VERSION 0.03.03 LANGUAGES CXX)
 
 ## specify the C++ standard
 #-- it must be located above the add_executable function
@@ -10,56 +9,107 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
-## Organize source/header files 
-## in a "filter tree" in Visual Studio solution explorer
-FILE(GLOB_RECURSE files_aux 
-	${CMAKE_SOURCE_DIR}/src/*.h ${CMAKE_SOURCE_DIR}/src/*.hpp ${CMAKE_SOURCE_DIR}/src/*.cpp
-	${CMAKE_SOURCE_DIR}/src/auxiliary/*.h ${CMAKE_SOURCE_DIR}/src/auxiliary/*.hpp ${CMAKE_SOURCE_DIR}/src/auxiliary/*.cpp
-	${CMAKE_SOURCE_DIR}/src/giraffe/*.h ${CMAKE_SOURCE_DIR}/src/giraffe/*.hpp ${CMAKE_SOURCE_DIR}/src/giraffe/*.cpp
-	${CMAKE_SOURCE_DIR}/src/gmoor/*.h ${CMAKE_SOURCE_DIR}/src/gmoor/*.hpp ${CMAKE_SOURCE_DIR}/src/gmoor/*.cpp
-	)
-set(Source_Files_All ${files_aux})
+## If true, the computer must have oneMKL installed, 
+# Otherwise, it is assumed that MKL DLLs will be used in .exe directory
+# or its folder is already added to path 
+option(USE_oneMKL "installed from Intel oneAPI" ON)
 
 
-#-- Create the tree in the VS solution explorer
-set(Source_Tree ${Source_Files_All})
-#add_executable(${PROJECT_NAME} ${Source_Tree})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Source_Tree})
-
-
-## Configure a header file to pass some of the CMake settings to the source code
-configure_file(${PROJECT_NAME}Config.h.in ${PROJECT_NAME}Config.h)
-
-## Create exe and set GiraffeMoor as startup
-add_executable(${PROJECT_NAME} ${Source_Tree})
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-
-## Folders with headers
-target_include_directories(${PROJECT_NAME} 
-	PUBLIC
-	${PROJECT_BINARY_DIR}
+## Directories with header files
+set(INCLUDE_DIR	
 	${CMAKE_CURRENT_SOURCE_DIR}/src 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/auxiliary 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/giraffe 
 	${CMAKE_CURRENT_SOURCE_DIR}/src/gmoor
 	)
 
+## Organize files in solution explorer with a "filter tree"
+FILE(GLOB_RECURSE files
+	${CMAKE_SOURCE_DIR}/src/*.h
+	${CMAKE_SOURCE_DIR}/src/*.hpp
+	${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-# To use 'fscanf' instead of 'fscanf_s' or c++ ifstream without getting any errors
-# and other C-functions without proper security implementations
-target_compile_definitions(${PROJECT_NAME}  PRIVATE _CRT_SECURE_NO_WARNINGS)
+#-- Create the tree in the VS solution explorer
+set(TREE_FILES ${files})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TREE_FILES})
 
-#####################################################################################
-#							Precompiled header										#
-#																					#
-# Solution taken from the Mark's comment (at may 2016) in:							#
-# https://stackoverflow.com/questions/148570/using-pre-compiled-headers-with-cmake/ #
-#####################################################################################
-if (MSVC)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /YuPCH.h /FIPCH.h")
+
+## Configure a header file to pass some of the CMake settings to the source code
+configure_file(${PROJECT_NAME}Config.h.in ${PROJECT_NAME}Config.h)
+
+
+## Search for oneMKL
+if(USE_oneMKL)
+	find_package(MKL CONFIG REQUIRED)
 endif()
 
-set_source_files_properties(src/PCH.cpp
-    PROPERTIES	COMPILE_FLAGS "/YcPCH.h")
-## End precompiled
+## Create the executable and set GiraffeMoor as startup project
+add_executable(${PROJECT_NAME} ${TREE_FILES})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+	PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME}
+	)
+
+# To use 'scanf' instead of 'scanf_s' or c++ fstream without getting any errors
+target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+
+
+##
+## Define different options for oneMKL or DLLs
+##
+if(USE_oneMKL)
+	target_compile_options(${PROJECT_NAME} 
+		PUBLIC 
+		$<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>
+		PRIVATE
+		# Set the warning level. Solution taken from: 
+		# https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
+		$<$<CXX_COMPILER_ID:MSVC>:/W3> # '/WX' to treat warnings as erros in VS
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic> # '-Werror' to treat warnings as errors in other compilers
+		)
+	target_include_directories(${PROJECT_NAME} 
+		PUBLIC
+		$<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES> # oneMKL
+		${PROJECT_BINARY_DIR} # to use the 'configure_file'
+		PRIVATE
+		${INCLUDE_DIR}
+		)
+		
+	target_link_libraries(${PROJECT_NAME} PUBLIC $<LINK_ONLY:MKL::MKL>)
+# MKL DLLs
+else() 
+	target_compile_options(${PROJECT_NAME} 
+		PRIVATE
+		# Set the warning level. 
+		$<$<CXX_COMPILER_ID:MSVC>:/W3> # add '/WX' to treat warnings as erros in VS
+		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic> # add '-Werror' to treat warnings as errors in other compilers
+		)
+		
+	target_include_directories(${PROJECT_NAME} 
+		PRIVATE
+		${INCLUDE_DIR}
+		)
+	
+	target_link_libraries(${PROJECT_NAME} 
+		PUBLIC 
+		mkl_intel_lp64_dll.lib mkl_core_dll.lib mkl_intel_thread_dll.lib libiomp5md.lib 
+		)
+	
+	target_link_directories(${PROJECT_NAME} 
+		PUBLIC  
+		${CMAKE_SOURCE_DIR}/dependencies/mkl/lib
+		)
+endif() # oneMKL or MKL DLLs
+
+
+
+## Compiler flags
+if (MSVC)
+	# Precompiled header 
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /YuPCH.h /FIPCH.h")
+	set_source_files_properties(src/PCH.cpp	PROPERTIES COMPILE_FLAGS "/YcPCH.h")
+	
+	# Change the Visual Studio working directory
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+		VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/input")
+
+endif()
