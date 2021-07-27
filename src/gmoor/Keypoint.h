@@ -19,10 +19,7 @@ public:
 	bool Read(FILE *f);
 
 	//Set functions
-	void SetID(unsigned int ID);
-	void SetX(double coord);
-	void SetY(double coord);
-	void SetZ(double coord);
+	
 
 	//Get functions
 	const unsigned int GetNumber() const;

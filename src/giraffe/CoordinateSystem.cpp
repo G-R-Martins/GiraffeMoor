@@ -35,7 +35,7 @@ void CoordinateSystem::SetE3(const std::array<double, 3>& coordinates)
 { this->E3 = coordinates; }
 
 void CoordinateSystem::SetCoordinateSystem(const std::array<double, 3>& e1, const std::array<double, 3>& e3)
-{ this->E1 = e1; this->E3; }
+{ this->E1 = e1; this->E3 = e3; }
 
 
 //Get functions

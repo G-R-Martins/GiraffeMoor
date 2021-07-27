@@ -200,23 +200,13 @@ bool MooringModel::GenerateCatenary()
 		 *===========*/
 
 		//Setting general parameters 
-		Catenary_GeneralSetting(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, Fair_stiff_matrix);
+		Catenary_GeneralSetting(line, n_segs, coordinates_A, coordinates_B, Fair_stiff_matrix);
 
 		//Vertical forces at the end of each segment
 		std::vector <double> FV(( size_t )n_segs + 1);
 
-
-#ifdef _DEV_
-		{
-			std::cout << "\nSolving equations for the line " << line.number << "...\n";
-			AuxFunctions::Time::Timer timer;
-#endif // _DEV_
-
-			if ( !SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix) )
-				return false;
-#ifdef _DEV_
-		}
-#endif // _DEV_
+		if(!SolveCatenaryEquations(line, n_segs, coordinates_A, coordinates_B, Hf, Vf, F, FV, Fair_stiff_matrix))
+			return false;
 
 		SetLinesConfiguration(line, F, FV, n_segs);
 
@@ -260,8 +250,8 @@ bool MooringModel::GenerateCatenary()
 
 /*Catenary functions
 	  -> 'GenerateCatenary' calls other functions*/
-void MooringModel::Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, Matrix& A, Matrix& B,
-										   double& Hf, double& Vf, Matrix& Fairleads_StiffnessMatrix)
+void MooringModel::Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, 
+										   Matrix& A, Matrix& B, Matrix& Fairleads_StiffnessMatrix)
 {
 	//Calculating gamma_s for all segments (and the maximum), total length and equivalent parameters
 	line.total_length = 0.0;
@@ -466,7 +456,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			}
 
 			//Equivalent specific weight
-			if (existTDP)		gamma_eq = g * rholen / line.total_length;
+			if (existTDP)		gamma_eq = g * rholen;
 
 			//If exist other segments, calculate equivalent parameters (used to calculate dynamic relaxation, if exists)
 			if (lim_seg != n_segs - 1)
@@ -488,10 +478,10 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			/*Imposing penetrarion in the seabed*/
 
 			//Equivalent specific weight
-			if (!existTDP)	gamma_eq = g * rholen / line.total_length;
+			if (!existTDP)	gamma_eq = g * rholen;
 
 			//Vertical displacement
-			double dz = -gamma_eq * line.total_length / ( elements * environment.GetSeabed().stiffness );
+			double dz = -gamma_eq / ( elements * environment.GetSeabed().stiffness );
 			penetration[line.number - 1].SetLine(0, 0, 0, 0, 0, 0, 0);
 			penetration[line.number - 1].SetLine(1, 0, 0, dz, 0, 0, 0);
 
@@ -893,19 +883,20 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 	char comment[200];
 
 	//Temporary data to create summary of the current line
-	std::array <unsigned int, 2> summ_elem, summ_nodesets;
+	std::array<unsigned int, 2> summ_elem = { 0,0 }, summ_nodesets = { 0,0 };
 
 
 	//total nodes of the current line (it may start negative to disregards nodes between segments)
-	unsigned int nodes_line = 1 - static_cast<unsigned int>(line.segments.size());
+	unsigned int nodes_line = 1 - static_cast<unsigned int>(line.segments.size()); //here migth happens overflow. It works, but should avoid overflow
 	unsigned int init_line; //first node of the current line
 	
 	static Matrix E3(3);
 	static Matrix E1(3);
 
 	//Creating points to represent the anchor (A) and the fairlead (F)
-	F(2, 0) = line.hasAnchor == true ? keypoint_vector[line.keypoint_A - 1].GetCoordinate('z') 
-		: keypoint_vector[line.keypoint_B - 1].GetCoordinate('z');
+	F(2, 0) = line.hasAnchor == true ? 
+		keypoint_vector[static_cast<std::vector<Keypoint, std::allocator<Keypoint>>::size_type>(line.keypoint_A) - 1].GetCoordinate('z') 
+		: keypoint_vector[static_cast<std::vector<Keypoint, std::allocator<Keypoint>>::size_type>(line.keypoint_B) - 1].GetCoordinate('z');
 
 	//Generating local coordinate system - for each line a single CS is established
 	E1.clear();	E3.clear();
@@ -1010,7 +1001,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					summ_elem[0] = cur_elem;
 					summ_nodesets[0] = cur_node_set-1;
 
-					init_line = ++cur_node_mesh;
+					init_line = cur_node_mesh++;
 					++node_x0;
 				}
 				else //equal the last node of the last segment
@@ -1121,8 +1112,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					 line.number, line.configuration, existTDP, x_tdp_ext, line.total_length, ( unsigned int )line.segments.size());
 
 	//Mooring line NodeSet
-	sprintf(comment, "Nodes of line %d - except the extreme points", line.number);
-	gm.GenerateNodeSet(cur_node_set, nodes_line - 2, init_line, 1, comment);
+	sprintf(comment, "Nodes of line %d", line.number);
+	gm.GenerateNodeSet(cur_node_set, nodes_line, init_line, 1, comment);
 	++cur_node_set;
 	++cur_cs;
 }
@@ -1548,7 +1539,7 @@ void MooringModel::GeneralSetting()
 	
 	//Generate vessel displacements
 	if (!vessel_disp_vector.empty()) 
-		GenerateVesselDisplacements(step);
+		GenerateVesselDisplacements();
 
 	//Generate forces
 	if (!moorload_vector.empty())	
@@ -1791,7 +1782,7 @@ void MooringModel::GenerateAnalysisSteps(unsigned int& step, double& start)
 	}
 }
 
-void MooringModel::GenerateVesselDisplacements(unsigned int& step)
+void MooringModel::GenerateVesselDisplacements()
 {
 	for (VesselDisplacement& disp : vessel_disp_vector)
 	{

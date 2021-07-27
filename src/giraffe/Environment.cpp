@@ -32,7 +32,7 @@ void Environment::SetRhoFluid(double rho)
 { this->rhofluid = rho; }
 
 void Environment::SetWaterDepth(double wd)
-{ this->waterdepth; }
+{ this->waterdepth = wd; }
 
 void Environment::SetGravityBooltable(const BoolTable & bool_grav)
 { this->bool_g = bool_grav; }

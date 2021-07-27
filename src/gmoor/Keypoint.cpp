@@ -45,18 +45,6 @@ bool Keypoint::Read(FILE *f)
 	return true;
 }
 
-void Keypoint::SetID(unsigned int ID)
-{}
-
-void Keypoint::SetX(double coord)
-{}
-
-void Keypoint::SetY(double coord)
-{}
-
-void Keypoint::SetZ(double coord)
-{}
-
 
 /*------
  Getters
