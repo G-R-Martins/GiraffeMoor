@@ -25,8 +25,6 @@ which is part of the [Intel oneAPI](https://software.intel.com/content/www/us/en
 
 Just make sure to get **`version 2021.3.0`**  or later.  There is no need to install the plugin for Visual Studio, the linking will be done by the CMake file. 
 
-It is also available another defined language to visualize the summary file.
-
 
 # Building and compiling
 
