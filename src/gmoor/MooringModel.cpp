@@ -455,8 +455,18 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 				elements += line.segments[seg].GetDiscretization();
 			}
 
-			//Equivalent specific weight
+			/*Imposing penetrarion in the seabed*/
+			
+			//'Equivalent' specific weight
 			if (existTDP)		gamma_eq = g * rholen;
+
+			//Vertical displacement
+			double dz = -gamma_eq / (elements * environment.GetSeabed().stiffness);
+			penetration[line.number - 1].SetLine( 0, 0, 0, 0, 0, 0, 0 );
+			penetration[line.number - 1].SetLine( 1, 0, 0, dz, 0, 0, 0 );
+
+			//Generates penetration displacement
+			gm.GenerateNodalDisplacement( ++cur_disp, line.number * 3, 1, &penetration[line.number - 1] );
 
 			//If exist other segments, calculate equivalent parameters (used to calculate dynamic relaxation, if exists)
 			if (lim_seg != n_segs - 1)
@@ -474,19 +484,6 @@ bool MooringModel::SolveCatenaryEquations(Line& line, const unsigned int& n_segs
 			//Equivalents paramenters to set penetration
 			rho_eq.push_back(rholen / line.total_length);
 			area_eq.push_back(arealen / line.total_length);
-
-			/*Imposing penetrarion in the seabed*/
-
-			//Equivalent specific weight
-			if (!existTDP)	gamma_eq = g * rholen;
-
-			//Vertical displacement
-			double dz = -gamma_eq / ( elements * environment.GetSeabed().stiffness );
-			penetration[line.number - 1].SetLine(0, 0, 0, 0, 0, 0, 0);
-			penetration[line.number - 1].SetLine(1, 0, 0, dz, 0, 0, 0);
-
-			//Generates penetration displacement
-			gm.GenerateNodalDisplacement(++cur_disp, line.number * 3, 1, &penetration[line.number - 1]);
 
 			//Fairlead force used to calculate analytical stiffness matrix
 			B(2, 0) = keypoint_vector[line.keypoint_B - 1].GetCoordinate('z') - dz;
@@ -2047,11 +2044,12 @@ void MooringModel::GenerateSeabed()
 	if (xmax == 0.0)	xmax = depth / 2.0;
 	
 	//Surface size (lambdas)
-	double l1 = ceil(2.0 * 1.5 * max(fabs(xmax), fabs(xmin)));
-	double l2 = ceil(2.0 * 1.5 * max(fabs(ymax), fabs(ymin)));
+	/// 5* maximum (absolute) to ensure contact
+	double l1 = ceil(5.0 * max(fabs(xmax), fabs(xmin)));
+	double l2 = ceil(5.0 * max(fabs(ymax), fabs(ymin)));
 	
-	//Pinball
-	environment.GetSeabed().pinball = (xmax - xmin);
+	//Pinball (hypotenuse, considering extreme points of the surface)
+	environment.GetSeabed().pinball = sqrt(pow(xmax - xmin, 2) + pow(ymax - ymin, 2));
 	//Radius to search contact
 	environment.GetSeabed().radius = 0.0;
 
