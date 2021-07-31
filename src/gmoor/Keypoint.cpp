@@ -63,6 +63,9 @@ const double Keypoint::GetCoordinate(char coordinate) const
 		return this->y;
 	case 'z':
 		return this->z;
+	default:
+		std::cerr << "Invalid direction to define anchor rotation constraint. It must 'x', 'y' or 'z'";
+		std::exit( EXIT_FAILURE );
 	}
 }
 
