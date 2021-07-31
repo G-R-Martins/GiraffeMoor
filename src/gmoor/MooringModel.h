@@ -193,8 +193,8 @@ public:
 	  -> 'GenerateCatenary' calls other functions*/
 	bool GenerateCatenary();
 
-	void Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, Matrix& A, Matrix& B,
-								 double& Hf, double& Vf, Matrix& Fairleads_StiffnessMatrix);
+	void Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, 
+								 Matrix& A, Matrix& B, Matrix& Fairleads_StiffnessMatrix);
 
 	bool SolveCatenaryEquations(Line& line, const unsigned int& n_segs, Matrix& A, Matrix& B,
 								double& Hf, double& Vf, Matrix& F, std::vector <double>& FV,
@@ -241,7 +241,7 @@ public:
 	void GenerateAnalysisSteps(unsigned int& step, double& start);
 
 	//Vessel(s) nodal displacement(s)
-	void GenerateVesselDisplacements(unsigned int& step);
+	void GenerateVesselDisplacements();
 	
 	//Creates applied forces
 	void GenerateForces();

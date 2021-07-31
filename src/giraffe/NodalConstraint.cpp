@@ -15,7 +15,7 @@ void NodalConstraint::WriteGiraffeModelFile(std::ostream& fout) const
 		"\t\tUX\t\t" << UX_table <<
 		"\t\tUY\t\t" << UY_table <<
 		"\t\tUZ\t\t" << UZ_table <<
-		"\t\tROTX\t" << UX_table <<
-		"\t\tROTY\t" << UY_table <<
-		"\t\tROTZ\t" << UZ_table;
+		"\t\tROTX\t" << ROTX_table <<
+		"\t\tROTY\t" << ROTY_table <<
+		"\t\tROTZ\t" << ROTZ_table;
 }

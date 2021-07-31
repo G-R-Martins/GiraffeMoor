@@ -67,8 +67,9 @@ int AnchorConstraint::GetRot(char rot) const
 		return this->roty;
 	case 'z':
 		return this->rotz;
-	/*default:
-		std::cerr << "Invalid direction to define anchor rotation constraint. It must 'x', 'y' or 'z'"*/
+	default:
+		std::cerr << "Invalid direction to define anchor rotation constraint. It must 'x', 'y' or 'z'" ;
+		std::exit( EXIT_FAILURE );
 	}
 }
 

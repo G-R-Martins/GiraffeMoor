@@ -6,7 +6,7 @@
 
 
 MoorLoad::MoorLoad()
-	: nodeID(0), segmentID(1), lineID(0), step(-1),
+	: nodeID(0), segmentID(1), lineID(0), step(0),
 	table(nullptr), mathCode(nullptr),
 	fromFile(false), file_name("\0"), header_lines(0), n_times(0)
 {}

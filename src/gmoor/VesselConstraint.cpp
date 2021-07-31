@@ -31,7 +31,7 @@ bool VesselConstraint::Read(FILE *f)
 
 	while (true)
 	{
-		int dof;
+		int dof = -1;
 
 		it_dof = to_constraint.find(std::string_view(str));
 

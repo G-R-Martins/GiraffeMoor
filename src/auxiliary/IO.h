@@ -1,7 +1,5 @@
 #pragma once
 
-//It changes the folder to search for input file
-#define _DEV_
 
 enum class FirstLevelKeyword
 {
@@ -63,6 +61,6 @@ public:
 	static void WriteGiraffeModelFile();
 
 	//Reads first level keyword (blue bold words)
-	static bool ReadKeyword(FILE* f, fpos_t& pos, char* word);
+	static bool ReadKeyword(FILE* f, char* word);
 
 };

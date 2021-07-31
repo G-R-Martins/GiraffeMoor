@@ -194,9 +194,6 @@ void StiffnessMatrix::calc_Kaux(Matrix& fairlead, const std::vector<double>& eul
 
 	//String stiffness of the mooring line
 	double khh_ = fh / hf;
-	double khv_ = fh / vf;
-	double kvh_ = fv / hf;
-	double kvv_ = fv / vf;
 
 	//Forces vector
 	Matrix fo(3, 1);

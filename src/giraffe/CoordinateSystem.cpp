@@ -19,7 +19,7 @@ void CoordinateSystem::WriteGiraffeModelFile(std::ostream& fout) const
 		std::setprecision(11) << 
 		"\tE1 " << E1[0] << " " << E1[1] << " " << E1[2] <<
 		"\tE3 " << E3[0] << " " << E3[1] << " " << E3[2] <<
-		std::setprecision(6) << 
+		std::setprecision(8) << 
 		"\n";
 }
 
@@ -35,7 +35,7 @@ void CoordinateSystem::SetE3(const std::array<double, 3>& coordinates)
 { this->E3 = coordinates; }
 
 void CoordinateSystem::SetCoordinateSystem(const std::array<double, 3>& e1, const std::array<double, 3>& e3)
-{ this->E1 = e1; this->E3; }
+{ this->E1 = e1; this->E3 = e3; }
 
 
 //Get functions
