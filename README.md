@@ -40,14 +40,14 @@ Then, follow these steps:
 git clone https://github.com/G-R-Martins/GiraffeMoor.git
 ```
 
-  2. Run the batch file according to your desire. You have 4 options: 
-     1. `gen_and_build.bat`: generate and build the solution without open Visual Studio
-     2. `build.bat`: build, by default, Debug solution
-     3. `openVS.bat`: open Visual Studio solution (I guess the lazy one, like me, doesn't like to get the .sln in ./build folder)
-     4. `all_actions.bat`: generate and build (debug) the solution, then open Visual Studio
+  2. Run the batch file according to your desire. You have 2 options: 
+     1. `gen_and_build.bat`: generate and build (debug mode by default) the solution without open Visual Studio.
+	    - if the solution is already generated, the script only will build 
+     2. `openVS.bat`: open Visual Studio solution (I guess the lazy one, like me, doesn't like to get the .sln in ./build folder)
 
 And that's it! :grin: :tada:
 
+:warning: Developer: the VS debugger is changed by `<root folder>/inputs`. See the [main CMake file](./CMakeLists.txt). Thus, create a folder called "inputs" in the root directory and put your files there. This is done just to avoid unnecessary uploads to Git, but you are free to change the `.gitignore` file in your personal repository, just keep in mind that when you run the Giraffe simulation, the size may be really large.
 
 # Executing 
 
@@ -90,7 +90,7 @@ Despite the fact the input file is designed to be short and comprehensive, it is
     
     Of course, I'm still studying the language/tools and I plan to "update the code" to modern C++ 
     ~~depending on my free time~~, not because *"I must write in a C++ style"* as some StackOverflow users say, but to learn and
-    practice different things. 
+    practice different things :smile: 
     
     Check the [projects](https://github.com/G-R-Martins/GiraffeMoor/projects) and **don't hesitate to make suggestions and corrections, please!**
   

@@ -1,22 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 
 
-## Set target configuration and platform
+## Set target configurations
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
-set(CMAKE_GENERATOR_PLATFORM x64)
+
+## Change default oneMKL interface
 set(MKL_INTERFACE lp64)
-
-
-## Project name and version
-project(GiraffeMoor VERSION 0.03.04 LANGUAGES CXX)
-
 
 ## specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
-## Set "GiraffeMoor" as startup project, not the default ALL_BUILD
+## Project name and version
+project(GiraffeMoor VERSION 0.03.04 LANGUAGES CXX)
+
+## Change startup project to GiraffeMoor
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GiraffeMoor)
 
 
@@ -28,7 +27,6 @@ option(USE_oneMKL "installed from Intel oneAPI" ON)
 if(USE_oneMKL)
 	find_package(MKL CONFIG REQUIRED)
 endif()
-
 
 ## Organize files in solution explorer with a "filter tree"
 FILE(GLOB_RECURSE files
@@ -56,7 +54,9 @@ configure_file(${PROJECT_NAME}Config.h.in ${PROJECT_NAME}Config.h)
 
 
 ## Other files to include in Visual Studio solution explorer
-set(FILES_TO_ADD README.md)
+set(FILES_TO_ADD 
+	README.md gen_and_build.bat
+	)
 
 ## Create the executable
 add_executable(${PROJECT_NAME} ${TREE_FILES} ${FILES_TO_ADD})
@@ -74,7 +74,6 @@ if(USE_oneMKL)
 	  PUBLIC 
 		$<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>
 	  PRIVATE
-		# Set the warning level. Solution taken from: https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
 		$<$<CXX_COMPILER_ID:MSVC>:/W3> # '/WX' to treat warnings as erros in VS
 		$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic> # '-Werror' to treat warnings as errors in other compilers
 		)
