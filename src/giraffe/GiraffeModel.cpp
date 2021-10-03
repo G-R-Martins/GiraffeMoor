@@ -93,6 +93,21 @@ void GiraffeModel::GenerateNode(unsigned int number, const std::array<double, 3>
 	node_vector.back().mark_comment = false;
 	node_vector.back().ref_coordinates = coord;
 }
+void GiraffeModel::GenerateNode(unsigned int number, const std::vector<double>& coord, const char* comment)
+{
+	node_vector.emplace_back();
+	node_vector.back().number = number;
+	node_vector.back().mark_comment = true;
+	strcpy(node_vector.back().comment, comment);
+	node_vector.back().ref_coordinates = std::array<double, 3>{ coord[0], coord[1], coord[2] };
+}
+void GiraffeModel::GenerateNode(unsigned int number, const std::vector<double>& coord)
+{
+	node_vector.emplace_back();
+	node_vector.back().number = number;
+	node_vector.back().mark_comment = false;
+	node_vector.back().ref_coordinates = std::array<double, 3>{ coord[0], coord[1], coord[2] };
+}
 void GiraffeModel::GenerateOscillatorySurf(const unsigned int& number, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs, const unsigned int& pilot_node)
 {
 	oscillatory_vector.emplace_back();
@@ -246,6 +261,25 @@ void GiraffeModel::GenerateNSSSContact(const unsigned int& number, const unsigne
 	ptr->max_interactions = max_interactions;
 	ptr->bool_table = bool_table;
 }
+void GiraffeModel::GenerateNSSSContact(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set, const double& mu, const double& epn, const double& cn, const double& ept, const double& ct, const double& pinball, const double& radius, const unsigned int& max_interactions, BoolTable& bool_table, const std::string& comment)
+{
+	contact_vector.emplace_back(new NSSS());
+	//Pointer to the NSSS Contact
+	NSSS* ptr = static_cast<NSSS*>(contact_vector.back());
+	ptr->number = number;
+	ptr->node_set = node_set;
+	ptr->surface_set = surface_set;
+	ptr->mu = mu;
+	ptr->epn = epn;
+	ptr->cn = cn;
+	ptr->ept = ept;
+	ptr->ct = ct;
+	ptr->pinball = pinball;
+	ptr->radius = radius;
+	ptr->max_interactions = max_interactions;
+	ptr->bool_table = bool_table;
+	ptr->comment = comment;
+}
 void GiraffeModel::GenerateRigidNodeSet(const unsigned int& number, const unsigned int& pilot_node, const unsigned int& node_set, BoolTable& bool_table)
 {
 	special_constraint_vector.emplace_back(new RigidNodeSet());
@@ -297,6 +331,17 @@ void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const u
 	ptr->node_set = node_set;
 	ptr->cs = cs;
 	ptr->table = values;
+}
+void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, Table values)
+{
+	displacement_vector.emplace_back(new NodalDisplacement());
+	//displacement_vector.emplace_back(values);
+	//Pointer to the NodalDisplacement
+	NodalDisplacement* ptr = static_cast<NodalDisplacement*>(displacement_vector.back());
+	ptr->number = number;
+	ptr->node_set = node_set;
+	ptr->cs = cs;
+	ptr->table = &values;
 }
 void GiraffeModel::GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, MathCode* math_code)
 {

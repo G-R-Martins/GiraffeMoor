@@ -51,7 +51,7 @@ public:
 	friend bool operator!=(const NodeSet& ns1, const NodeSet& ns2);
 	friend bool operator==(const NodeSet& ns1, const NodeSet& ns2);
 	NodeSet& operator=(NodeSet&& other) noexcept = default;
-	NodeSet& operator=(const NodeSet& other) = default;
+	NodeSet& operator=(const NodeSet&) = default;
 
 
 	NodeSet(NodeSet&& other) noexcept = default;

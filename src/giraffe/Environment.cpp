@@ -16,11 +16,11 @@ void Environment::WriteGiraffeModelFile(std::ostream& fout) const
 	fout << "\tGravityData\tG " << 0.0 << " " << 0.0 << " " << -gravity << " " << bool_g <<
 		"\tOceanData\tRhoFluid " << rhofluid << "\tSurfacePosition " << 0.0 << " " << 0.0 << " " << 0.0 <<
 		"\n\tSeaCurrent\tN " << seacurrent_vector.size() << " " << bool_current;
-	for (size_t i = 0; i < seacurrent_vector.size(); ++i)
+	for (const SeaCurrent& sc : GetSeaCurrentVec())
 	{
-		fout << "\t\tDepth " << seacurrent_vector[i].depth <<
-			"\tSpeed " << seacurrent_vector[i].speed << 
-			"\tAngle " << seacurrent_vector[i].azimuth << 
+		fout << "\t\tDepth " << sc.GetDepth() <<
+			"\tSpeed " << sc.GetSpeed() << 
+			"\tAngle " << sc.GetAzimuth() << 
 			"\n";
 	}
 }

@@ -71,7 +71,6 @@ public:
 	Post post;
 	Monitor monitor;
 	Environment environment;
-	ConvergenceCriteria conv_criteria;
 	GiraffeSolver gir_solver;
 
 	//--------------------------------------------------------------------------------------------------------------------------
@@ -121,6 +120,8 @@ public:
 	void GenerateNode(unsigned int number, double X, double Y, double Z);
 	void GenerateNode(unsigned int number, const std::array<double, 3>& coord, const char* comment);
 	void GenerateNode(unsigned int number, const std::array<double, 3>& coord);
+	void GenerateNode(unsigned int number, const std::vector<double>& coord, const char* comment);
+	void GenerateNode(unsigned int number, const std::vector<double>& coord);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -152,6 +153,7 @@ public:
 	------------*/
 	
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, Table* values);
+	void GenerateNodalDisplacement(const unsigned int & number, const unsigned int & node_set, const unsigned int & cs, Table values);
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, MathCode* math_code);
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, SineWaveDisplacement* wavedisp_ob);
 	void GenerateNodalDisplacement(const unsigned int& number, const unsigned int& node_set, const unsigned int& cs, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
@@ -180,6 +182,7 @@ public:
 	void GenerateOscillatorySurf(const unsigned int& number, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs, const unsigned int& pilot_node);
 	void GenerateSurfaceSet(const unsigned int& number, const std::vector<unsigned int>& list);
 	void GenerateNSSSContact(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set, const double& mu, const double& epn, const double& cn, const double& ept, const double& ct, const double& pinball, const double& radius, const unsigned int& max_interactions, BoolTable& bool_table);
+	void GenerateNSSSContact(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set, const double& mu, const double& epn, const double& cn, const double& ept, const double& ct, const double& pinball, const double& radius, const unsigned int& max_interactions, BoolTable& bool_table, const std::string& comment);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 

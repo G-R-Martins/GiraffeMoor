@@ -108,6 +108,7 @@ public:
 						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs ) { 
 		return getInstance().AddLine_Impl(nodes, elements, nodesets, tensions, number, configuration, TDP, x_tdp, total_length, segs); }
 	
+	//[initial time, end time, description]
 	static auto& GetSteps() { 
 		return getInstance().GetSteps_Impl(); }
 

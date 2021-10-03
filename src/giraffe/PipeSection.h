@@ -5,7 +5,7 @@ class PipeSection
 {
 public:
 	PipeSection();
-	PipeSection(const unsigned int& num, const char& tp, const double& d, const double& r,
+	PipeSection(const size_t& num, bool isbeam, const double& d, const double& r,
 				const double& ea, const double& ei, const double& gj, const double& ga,
 				const double& cdt, const double& cdn, const double& cat, const double& can,
 				const double& young, const double& poisson);
@@ -15,8 +15,8 @@ public:
 	void WriteGiraffeModelFile(std::ostream& fout) const;	
 
 	//Variables
-	unsigned int number;
-	char type;
+	size_t number;
+	bool isBeam;
 	double diameter;
 	double rho;
 	double EA;

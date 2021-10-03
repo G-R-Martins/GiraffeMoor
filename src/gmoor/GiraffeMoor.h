@@ -63,7 +63,7 @@ namespace GiraffeMoor
 	//Run Giraffe if is in release mode
 	static void RunGiraffe()
 	{
-		if (gm.gir_solver.GetRunOption())
+		if (gm.gir_solver.RunGiraffe())
 		{
 			system("CLS");
 			std::string GiraffeFile = "Giraffe.exe " + IO::input_name;

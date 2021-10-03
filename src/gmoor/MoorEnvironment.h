@@ -5,57 +5,66 @@
 
 class MoorEnvironment
 {
-	//General environment variables
-	static double gravity;
-	double rhofluid;
-	double waterdepth;
+private:
+	// General environment variables
+	static double s_gravity;
+	double m_rho_fluid;
+	double m_water_depth;
 	
-	//Seabed object
-	Seabed seabed;
+	Seabed m_seabed;
 
-	//Sea current
-	std::vector<SeaCurrent> seacurrent_vector;
-	
-	//Boolean to indicate if there is a sea current
-	bool seacurrent_exist;
-
-	//Boolean to indicate if sea current have constant amplitude and azimuth
-	bool const_seacurrent;
+	// Sea current
+	std::vector<SeaCurrent> m_sea_current_vector;
+	bool m_sea_current_exist; 
+	bool m_sea_current_is_constant;
 	
 	//============================================================================
 
 public:
-	
+
 	MoorEnvironment();
 	~MoorEnvironment();
 
-	//Reads input file
-	bool Read(FILE *f);
 
-	//Set functions
+	///
+	/// SETTERS
+	///
+	
 	static void SetGravity(double g);
-	void SetRhoFluid(double rho);
-	void SetWaterDepth(double wd);
-	void SetBoolConstantSeaCurrent(bool b);
+	void SetRhoFluid(double rho_fluid);
+	void SetWaterDepth(double water_depth);
+	void SetBoolConstantSeaCurrent(bool is_constant);
 
-	//Get functions
-	static double GetGravity();
-	double GetRhoFluid() const;
-	double GetWaterDepth() const;
+	
+	///
+	/// GETTERS
+	///
+	
+	inline static double GetGravity()		{ return MoorEnvironment::s_gravity; }
+	inline double GetRhoFluid() const		{ return this->m_rho_fluid; }
+	inline double GetWaterDepth() const		{ return this->m_water_depth; }
 
-	Seabed& GetSeabed();
-	Seabed const& GetSeabed() const;
+	inline Seabed& GetSeabed()				{ return this->m_seabed; }
+	inline Seabed const& GetSeabed() const	{ return this->m_seabed; }
 
-	SeaCurrent const& GetSeaCurrent(size_t sea_cur) const;
-	SeaCurrent& GetSeaCurrent(size_t sea_cur);
+	inline SeaCurrent const& GetSeaCurrent(size_t sc) const { 
+		return this->m_sea_current_vector[sc];	}
+	inline SeaCurrent& GetSeaCurrent(size_t sc) { 
+		return this->m_sea_current_vector[sc];	}
 
-	std::vector<SeaCurrent> const& GetSeaCurrentVec() const;
-	std::vector<SeaCurrent>& GetSeaCurrentVec();
+	inline std::vector<SeaCurrent> const& GetSeaCurrentVec() const { 
+		return this->m_sea_current_vector; }
+	inline std::vector<SeaCurrent>& GetSeaCurrentVec() { 
+		return this->m_sea_current_vector; }
 
-	bool CheckIfExistSeaCurrent() const;
-	bool CheckIfExistSeaCurrent();
-	bool CheckIfSeaCurrentIsConstant() const;
-	bool CheckIfSeaCurrentIsConstant();
+
+	// Getter-ish to do some checking
+	
+	bool ExistSeaCurrent() const			{ return this->m_sea_current_exist; }
+	bool ExistSeaCurrent()					{ return this->m_sea_current_exist; }
+	
+	bool SeaCurrentIsConstant() const		{ return this->m_sea_current_is_constant; }
+	bool SeaCurrentIsConstant()				{ return this->m_sea_current_is_constant; }
 
 };
 

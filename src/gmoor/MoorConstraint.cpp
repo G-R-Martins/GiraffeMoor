@@ -30,19 +30,19 @@ bool MoorConstraint::Read(FILE * f)
 	{
 		if (!strcmp(str, "VesselConstraints"))
 		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(vessels, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
+			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(vessels, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
 				return false;
 			existVesselConstraint = true;
 		}
 		else if (!strcmp(str, "AnchorConstraints"))
 		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(anchors, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
+			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(anchors, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
 				return false;
 			existAnchorConstraint = true;
 		}
 		else if (!strcmp(str, "LineConstraints"))
 		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(lines, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
+			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(lines, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
 				return false;
 			existLineConstraint = true;
 		}

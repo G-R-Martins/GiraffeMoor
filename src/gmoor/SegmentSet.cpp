@@ -48,7 +48,7 @@ bool SegmentSet::Read(FILE * f)
 
 
 	//Read segment(s)
-	if (!LoopReading::TryNestedKeyword_UnorderedMultiple(segments,
+	if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(segments,
 														 std::unordered_set<std::string_view>({ "Length" }),
 														 std::unordered_set<std::string_view>({ "Set" }),
 														 f, pos, str))
@@ -65,18 +65,26 @@ bool SegmentSet::Read(FILE * f)
 	return true;
 }
 
+/// 
+/// SETTERS
+/// 
+void SegmentSet::SetIDNumber(size_t id)
+{
+	this->ID = id;
+}
+
 //Returns the number of 'LineSegment's in the set
 const size_t& SegmentSet::GetSegmentSetSize() const
 {
 	return this->n_segments;
 }
 
-const size_t& SegmentSet::GetSetID() const
-{
-	return this->ID;
-}
 
 const std::vector<LineSegment>& SegmentSet::GetAllSegment() const
+{
+	return this->segments;
+}
+std::vector<LineSegment>& SegmentSet::GetAllSegment()
 {
 	return this->segments;
 }

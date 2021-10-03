@@ -4,7 +4,7 @@
 
 
 Post::Post()
-	: mag_factor(1.0), write{ false, false, false, false, false, false, false, false, false, false }
+	: m_mag_factor(1.0), m_writing_flags{ true, false, false, false, false, false, false, false, false, false }
 {}
 
 Post::~Post()
@@ -12,20 +12,10 @@ Post::~Post()
 
 void Post::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fout << "\tMagFactor " << mag_factor <<
-		"\n\tWriteMesh " << write.mesh_flag <<
-		"\n\tWriteRenderMesh " << write.renderMesh_flag <<
-		"\n\tWriteRigidContactSurfaces " << write.rigidContactSurfaces_flag <<
-		"\n\tWriteFlexibleContactSurfaces " << write.flexibleContactSurfaces_flag <<
-		"\n\tWriteForces " << write.forces_flag <<
-		"\n\tWriteConstraints " << write.constraints_flag <<
-		"\n\tWriteSpecialConstraints " << write.specialConstraints_flag <<
-		"\n\tWriteContactForces " << write.contactForces_flag <<
-		"\n\tWriteRenderRigidBodies " << write.renderRigidBodies_flag <<
-		"\n\tWriteRenderParticles " << write.renderParticles_flag << "\n";
+	fout << "\tMagFactor " << m_mag_factor << m_writing_flags << '\n';
 }
 
-bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)
+bool Post::CreateSeabedVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)
 {
 	std::ofstream vtk_file(folder + "seabed.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
@@ -52,7 +42,7 @@ bool Post::CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, c
 	return true;
 }	
 
-bool Post::CreateWaterVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y)
+bool Post::CreateWaterVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y)
 {
 	std::ofstream vtk_file(folder + "water.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
@@ -77,5 +67,20 @@ bool Post::CreateWaterVTK(std::string folder, const std::array<double, 2>& x, co
 	vtk_file << "POLYGONS 1 5 \n4 0 1 2 3\n";
 
 	return true;
+}
+
+void Post::SetMagFactor(double mag_factor)
+{
+	m_mag_factor = mag_factor;
+}
+
+void Post::SetAllCADs(const std::vector<CADData>& cad_vector)
+{
+	m_cad_vector = cad_vector;
+}
+
+void Post::SetAllCADs(std::vector<CADData>&& cad_vector)
+{
+	m_cad_vector = std::move(cad_vector);
 }
 

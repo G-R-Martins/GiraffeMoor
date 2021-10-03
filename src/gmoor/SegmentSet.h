@@ -25,13 +25,28 @@ public:
 	//Read input file
 	bool Read(FILE* f);
 
-	//Returns the number of 'LineSegment's in the set
-	const size_t& GetSegmentSetSize() const;
 
-	const size_t& GetSetID() const;
+	/// 
+	/// SETTERS
+	/// 
+	
+	void SetIDNumber(size_t id);
+	
+
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline size_t GetIDNumber() const { return this->ID; };
+	inline LineSegment& GetLastSegment() { return this->segments.back(); };
+	inline const LineSegment& GetLastSegment() const { return this->segments.back(); };
+
+	//Returns the number of 'LineSegment' in the set
+	const size_t& GetSegmentSetSize() const;
 
 	//Get the container with segments of the set
 	const std::vector<LineSegment>& GetAllSegment() const;
+	std::vector<LineSegment>& GetAllSegment();
 		
 	//Get a specific segment from the set
 	LineSegment& GetSegment(const size_t& seg);

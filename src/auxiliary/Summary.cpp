@@ -128,7 +128,7 @@ void Summary::Append2File_Impl()
 	sum_file << "\tSea current: ";
 
 	//Case with no sea current
-	if (!mm.environment.CheckIfExistSeaCurrent())
+	if (!mm.environment.ExistSeaCurrent())
 		sum_file << "no sea current\n";
 	//Case with sea current
 	else
@@ -139,22 +139,22 @@ void Summary::Append2File_Impl()
 
 		//Assuming sea current is constant
 		mm.environment.SetBoolConstantSeaCurrent(true);
-		value_const_seacur = mm.environment.GetSeaCurrent(0).speed;
+		value_const_seacur = mm.environment.GetSeaCurrent(0).GetSpeed();
 
 		//Checks sea current actually is constant
 		for (const SeaCurrent& sc : mm.environment.GetSeaCurrentVec())
 		{
-			if (mm.environment.CheckIfSeaCurrentIsConstant() && sc.speed != value_const_seacur)
+			if (mm.environment.SeaCurrentIsConstant() && sc.GetSpeed() != value_const_seacur)
 				mm.environment.SetBoolConstantSeaCurrent(false);
 
 			//Maximum and minimum speeds
-			if (sc.speed > max_speed) max_speed = sc.speed;
-			if (sc.speed < min_speed) min_speed = sc.speed;
+			if (sc.GetSpeed() > max_speed) max_speed = sc.GetSpeed();
+			if (sc.GetSpeed() < min_speed) min_speed = sc.GetSpeed();
 		}
 
 		//Print sea current summary 
-		if (mm.environment.CheckIfSeaCurrentIsConstant())
-			sum_file << "constant, " << mm.environment.GetSeaCurrent(0).speed << "m/s and " << mm.environment.GetSeaCurrent(0).azimuth << "deg\n";
+		if (mm.environment.SeaCurrentIsConstant())
+			sum_file << "constant, " << mm.environment.GetSeaCurrent(0).GetSpeed() << "m/s and " << mm.environment.GetSeaCurrent(0).GetAzimuth() << "deg\n";
 		else
 			sum_file << "between " << min_speed << "m/s and " << max_speed << "m/s\n";
 	}
@@ -163,8 +163,8 @@ void Summary::Append2File_Impl()
 	sum_file << "\tSeabed:\n";
 	sum_file << "\t  NodeSet: " << mm.pil_node_set << '\n';
 	sum_file << "\t  Friction: ";
-	if (mm.environment.GetSeabed().mu)
-		sum_file << "coefficient = " << mm.environment.GetSeabed().mu << "\n\n";
+	if (mm.environment.GetSeabed().GetFrictionCoefficient())
+		sum_file << "coefficient = " << mm.environment.GetSeabed().GetFrictionCoefficient() << "\n\n";
 	else
 		sum_file << "no friction\n\n";
 

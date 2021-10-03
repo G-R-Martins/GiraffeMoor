@@ -1,21 +1,6 @@
 #pragma once
 
 
-enum class FirstLevelKeyword
-{
-	None = 0,				//Initial value
-	EndOfFile = -1,			//End
-	Error = -100,			//Invalid keyword
-	CommentAfterBlock = 1,	//Comment after a block with only first level keyword (this can, and will, be improved changing the logic of the reading process)
-
-	//Mandatory keywords
-	Environment = 10, Keypoints, Lines, Vessels, SegmentProperties, Solution,
-
-	//Optional keywords
-	VesselDisplacements = 101, DisplacementFields, Platforms, GiraffeConvergenceCriteria, Monitors,
-	PostProcessing, StiffnessMatrix, GiraffeSolver, Constraints, NodalForces, SegmentSets
-};
-
 class IO
 {
 
@@ -25,16 +10,19 @@ class IO
 ///		although each object has its own reading and/or writing functions.
 /// 
 /// </summary>		
-	
+private:
+	static std::ifstream s_inp;
+	static std::unordered_map<std::string_view, std::function<bool(std::string& readed)>> s_func_reading;
+
 public:
+
+
 					/*+-+-+-+-+-+-+-+
 					|               |
 					|   Variables   |
 					|               |
 					+-+-+-+-+-+-+-+-*/
 
-	//Manages the reading first level (blue bold words in the Notepad++ language)
-	static FirstLevelKeyword cur_level;
 
 	//String (views) to input path
 	static std::string folder_name, input_name;
@@ -51,6 +39,39 @@ public:
 					|               |
 					+-+-+-+-+-+-+-+-*/
 
+	static bool ReadKeypoint(std::string& readed);
+	static bool ReadSegmentSet(std::string& readed);
+	static bool ReadSegment(std::string& readed);
+	static bool ReadLine(std::string& readed);
+	static bool ReadVessel(std::string& readed);
+
+	static bool ReadDynamicRelaxation(std::string& readed);
+	static bool ReadDynRelaxLines(std::string& readed);
+	static bool ReadDynRelaxVessels(std::string& readed);
+	static bool ReadSeaCurrentStep(std::string& readed);
+	static bool ReadAnalysis(std::string& readed);
+	static bool ReadSolutionStep(std::string& readed);
+
+	static bool ReadEnvGeneral(std::string& readed);
+	static bool ReadSeabed(std::string& readed);
+	static bool ReadSeaCurrent(std::string& readed);
+	static bool ReadSeaCurrentAt(std::string& readed);
+
+	static bool ReadSegmentProperty(std::string& readed);
+	static bool ReadPostFiles(std::string& readed);
+	static bool ReadCADs(std::string& readed);
+	static bool ReadAnalyticalStiffnessMatrix(std::string& readed);
+	static bool ReadNumericalStiffnessMatrix(std::string& readed);
+	static void ReadDisplacementFields(std::string& readed);
+	static void ReadConstraints(std::string& readed);
+	static bool ReadRunOption(std::string& readed);
+	static bool ReadProcessors(std::string& readed);
+	static bool ReadConvergenceCriteria(std::string& readed);
+	static bool ReadVesselDisplacement(std::string& readed);
+	static void ReadStiffnessMatrix(std::string& readed);
+	static void ReadNodalLoads(std::string& readed);
+
+
 	//Reads input file
 	static bool ReadFile();
 
@@ -59,8 +80,5 @@ public:
 
 	//Writes Giraffe input file
 	static void WriteGiraffeModelFile();
-
-	//Reads first level keyword (blue bold words)
-	static bool ReadKeyword(FILE* f, char* word);
 
 };

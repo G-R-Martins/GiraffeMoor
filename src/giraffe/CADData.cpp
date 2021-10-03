@@ -3,48 +3,34 @@
 #include "CADData.h"
 
 
-bool CADData::Read(FILE* f)
-{
-	//Reading auxiliary variables
-	char str[200], c, temp_name[200];
+CADData::CADData()
+	: m_number(0), m_name("\0")
+{}
+
+CADData::~CADData()
+{}
 
 
-	if (fscanf(f, "%zd %s", &number, str) && !strcmp(str, "Name"))
-	{
-		if (fscanf(f, "%[^\"]*", str) == EOF || fscanf(f, "%c%[^\"]s", &c, temp_name) == EOF || c != '\"'
-			|| fscanf(f, "%s", str) == EOF) //read the last quote
-		{
-
-			std::stringstream ss{ "\n   + Error reading CAD name of the platform number " }; ss << number;
-			Log::AddWarning(ss);
-			return false;
-		}
-		else
-			name = temp_name;
-	}
-	else
-	{
-		Log::AddWarning("\n   + Error reading CAD data");
-		return false;
-	}
-
-
-	//All ok while reading
-	return true;
-}
 
 void CADData::WriteGiraffeModelFile(std::ostream& fout) const
 {
-	fout << "\tSTLSurface " << number << "\t" <<name << "\n";
+	fout << "\tSTLSurface " << m_number << 
+		"\t" << m_name << "\n";
 }
 
 
+/// 
+/// SETTERS
+/// 
 
-size_t CADData::GetNumber() const
+void CADData::SetIDNumber(size_t number)
 {
-	return this->number;
+	this->m_number = number;
 }
-const std::string& CADData::GetName() const
+
+void CADData::SetName(const std::string& name)
 {
-	return this->name;
+	this->m_name = name;
 }
+
+

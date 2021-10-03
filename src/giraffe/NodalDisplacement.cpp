@@ -45,6 +45,6 @@ void NodalDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
 	}
 	else
 	{
-		fout << "NTimes " << table->GetLines() << "\n" << table;
+		fout << "NTimes " << table->GetNLines() << "\n" << table;
 	}
 }

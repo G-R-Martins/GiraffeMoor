@@ -39,7 +39,7 @@ public:
 	Parameters used to track data
 	----------------------------*/
 
-	unsigned int cur_line;
+	size_t cur_line;
 	unsigned int tot_elem;			//per line
 
 	unsigned int cur_node_mesh;
@@ -57,6 +57,7 @@ public:
 	unsigned int pil_node_set;		//seabed nodeset
 	bool TDZ;
 	bool existSharedLine;
+	
 
 	/*------------
 	TDP parameters
@@ -74,18 +75,15 @@ public:
 	//Number of elements in the TDZ
 	unsigned int elem_tdp;
 
-	//Segment number that contains the TDZ (if exists).
-	 //The TDZ is restricted to a single segment
-	unsigned int seg_tdp;
-
 	//============================================================================
 
 	/*-----------------------------------
 	Auxiliar tables, matrices and vectors
 	------------------------------------*/
 
-	//Table with values of lines penetration in the seabed 
-	Table* penetration;
+
+	//Tables with values of lines penetration in the seabed 
+	std::forward_list<Table> penetration;
 	
 	//Auxiliar matrix to mount line mesh
 	std::vector<std::vector<double>> x0_n;
@@ -95,6 +93,9 @@ public:
 
 	//Number of nodesets
 	std::forward_list<unsigned int> anchor_nodesets, fairlead_nodesets;
+
+	//Epsilons used to establish contact with line(s) and seabed
+	std::vector<double> line_seabed_epsilon;
 
 	// Dynamic relaxation data
 	std::vector<double> rho_eq;	///equivalent specific mass for each  line
@@ -117,7 +118,7 @@ public:
 	MoorSolution moorsolution;
 	MoorPost moorpost;
 	MoorConstraint moor_constraint;
-		
+	
 
 	/*-------------
 	Object pointers
@@ -193,23 +194,24 @@ public:
 	  -> 'GenerateCatenary' calls other functions*/
 	bool GenerateCatenary();
 
-	void Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, 
+	void Catenary_GeneralSetting(Line& line,
 								 Matrix& A, Matrix& B, Matrix& Fairleads_StiffnessMatrix);
 
-	bool SolveCatenaryEquations(Line& line, const unsigned int& n_segs, Matrix& A, Matrix& B,
+	bool SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 								double& Hf, double& Vf, Matrix& F, std::vector <double>& FV,
 								Matrix& Fairleads_StiffnessMatrix);
 
-	void SetLinesConfiguration(Line& line, Matrix& F, std::vector <double>& FV, const unsigned int& n_segs);
+	void SetLinesConfiguration(Line& line, Matrix& F, std::vector<double>& FV);
 
-	void GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& seg_init);
+	void GenerateCatenaryTDZ(Line& line, unsigned int& seg_init);
 
-	void CheckSegmentsSize(Line& line, const unsigned int& n_segs, const unsigned int& seg_init);
+	void CheckSegmentsSize(Line& line, const unsigned int& seg_init);
 
-	void SetMeshProperties(Line& line, const unsigned int& n_segs);
+	void SetMeshProperties(Line& line);
 
-	//Gera a malha das linhas
 	void GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, double& Vf);
+
+	void ImposePenetration(Line& line);
 
 	void GenerateCatenaryDisplacement(Line& line, const unsigned int& n_segs, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
 									  std::vector<std::vector<double>>& xcat_n, std::vector<std::vector<double>>& zcat_n, std::vector<std::vector<double>>& roty_n);
@@ -218,15 +220,15 @@ public:
 	//Checks for dummy elements
 	void CheckDummyElements();
 
-	//Generates contact
-	void GenerateContact();
+	//Generates contact between line(s) and seabed
+	void GenerateContacts();
 
 	void GenerateDynamicRelaxation();
 
 	inline bool Look4SharedLine();
 
 	//Generates vessel (node, element, nodeset and fairleads coupling)
-	void GenerateVessel();
+	void GenerateVessels();
 
 	void GenerateRigidNodeSets();
 	void IncludeSharedLinesFaileads(BoolTable& bool_t);

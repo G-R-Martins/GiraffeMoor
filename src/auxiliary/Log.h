@@ -1,5 +1,11 @@
 #pragma once
 
+//Typedefs
+typedef std::string_view	SV;
+typedef std::stringstream	SSTREAM;
+typedef std::string			STR;
+typedef std::vector<SV>		VEC_SV;
+typedef std::vector<STR>	VEC_STR;
 
 class Log
 {
@@ -28,7 +34,9 @@ class Log
 	//Singleton private constructor
 	Log(); 
 
+
 public:
+	
 	
 	//Create/return Singleton instance
 	static Log& getInstance()
@@ -45,11 +53,18 @@ public:
 
 
 	//Enumeration class for errors
+	enum class Warning
+	{
+		Invalid_ID = -1,
+		Removed_Obj,
+		InputModel
+	};
+	//Enumeration class for errors
 	enum class Error
 	{
 		Reading = -1,
-		FEM_Generation = -2,
-		InputModel = -3
+		FEM_Generation,
+		InputModel
 	};
 
 
@@ -58,19 +73,20 @@ public:
 	///
 	
 	//Add error to the string
-	static void AddError(const std::string_view& toAdd) { return getInstance().AddError_Impl(toAdd); }
-	static void AddError(const std::stringstream& toAdd) { return getInstance().AddError_Impl(toAdd); }
-	static void AddError(const std::string& toAdd) { return getInstance().AddError_Impl(toAdd); }
+	static void AddError(const SV& toAdd) { return getInstance().AddError_Impl(toAdd); }
+	static void AddError(const SSTREAM& toAdd) { return getInstance().AddError_Impl(toAdd); }
+	static void AddError(const STR& toAdd) { return getInstance().AddError_Impl(toAdd); }
 	static void AddError(const char* toAdd) { return getInstance().AddError_Impl(toAdd); }
 	//Add warning to the string 
-	static void AddWarning(const std::string_view& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	static void AddWarning(const std::stringstream& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	static void AddWarning(const std::string& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
+	static void AddWarning(const SV& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
+	static void AddWarning(const SSTREAM& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
+	static void AddWarning(const STR& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
 	static void AddWarning(const char* toAdd) { return getInstance().AddWarning_Impl(toAdd); }
+	static void AddWarning(Log::Warning type, VEC_STR toAdd) { return getInstance().AddWarning_Impl(type, toAdd); }
 	//Add message to the string 
-	static void AddFinalMessage(const std::string_view& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
-	static void AddFinalMessage(const std::stringstream& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
-	static void AddFinalMessage(const std::string& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
+	static void AddFinalMessage(const SV& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
+	static void AddFinalMessage(const SSTREAM& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
+	static void AddFinalMessage(const STR& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
 	static void AddFinalMessage(const char* toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
 	
 	//Functions to check if exist error/warning 
@@ -86,16 +102,17 @@ public:
 
 	//Last keyword readed
 	///Any word
-	static void SetLastKeyword(const std::string_view& key) { return getInstance().SetLastKeyword_Impl(key); }
+	static void SetLastKeyword(const SV& key) { return getInstance().SetLastKeyword_Impl(key); }
 	static void SetLastKeyword(const char* key) { return getInstance().SetLastKeyword_Impl(key); }
-	static std::string_view& GetLastKeyword() { return getInstance().GetLastKeyword_Impl(); }
+	static SV& GetLastKeyword() { return getInstance().GetLastKeyword_Impl(); }
 	///Valid keyword
-	static void SetLastValidKeyword(const std::string_view& key) { return getInstance().SetLastValidKeyword_Impl(key); }
+	static void SetLastValidKeyword(const SV& key) { return getInstance().SetLastValidKeyword_Impl(key); }
 	static void SetLastValidKeyword(const char* key) { return getInstance().SetLastValidKeyword_Impl(key); }
-	static std::string_view& GetLastValidKeyword() { return getInstance().GetLastValidKeyword_Impl(); }
+	static SV& GetLastValidKeyword() { return getInstance().GetLastValidKeyword_Impl(); }
 	
 	//Set error messages for each specific case
 	static void SetError(Log::Error error) { getInstance().SetError_Impl(error); }
+	static void SetError(Log::Error error, const STR& msg) { getInstance().SetError_Impl(error, msg); }
 
 	//===========================================================================================================
 
@@ -110,8 +127,8 @@ private:
 	bool existError, existWarning;
 	unsigned int contErrors,  contWarnings;
 
-	std::string error, warning, final_message;
-	std::string_view last_keyword, last_valid_keyword;
+	STR error, warning, final_message;
+	SV last_keyword, last_valid_keyword;
 
 
 					/*+-+-+-+-+-+-+-+
@@ -125,19 +142,20 @@ private:
 	/// 			  
 
 	//Add error to the string
-	void AddError_Impl(const std::string_view& toAdd);
-	void AddError_Impl(const std::stringstream& toAdd);
-	void AddError_Impl(const std::string& toAdd);
+	void AddError_Impl(const SV& toAdd);
+	void AddError_Impl(const SSTREAM& toAdd);
+	void AddError_Impl(const STR& toAdd);
 	void AddError_Impl(const char* toAdd);
 	//Add warning to the string 
-	void AddWarning_Impl(const std::string_view& toAdd);
-	void AddWarning_Impl(const std::stringstream& toAdd);
-	void AddWarning_Impl(const std::string& toAdd);
+	void AddWarning_Impl(const SV& toAdd);
+	void AddWarning_Impl(const SSTREAM& toAdd);
+	void AddWarning_Impl(const STR& toAdd);
 	void AddWarning_Impl(const char* toAdd);
+	void AddWarning_Impl(Log::Warning type, VEC_STR toAdd);
 	//Add message to the string 
-	void AddFinalMessage_Impl(const std::string_view& toAdd);
-	void AddFinalMessage_Impl(const std::stringstream& toAdd);
-	void AddFinalMessage_Impl(const std::string& toAdd);
+	void AddFinalMessage_Impl(const SV& toAdd);
+	void AddFinalMessage_Impl(const SSTREAM& toAdd);
+	void AddFinalMessage_Impl(const STR& toAdd);
 	void AddFinalMessage_Impl(const char* toAdd);
 
 	//Functions to check if exist error/warning 
@@ -152,16 +170,17 @@ private:
 
 	//Last keyword readed
 	///Any word
-	void SetLastKeyword_Impl(const std::string_view& key);
+	void SetLastKeyword_Impl(const SV& key);
 	void SetLastKeyword_Impl(const char* key);
-	std::string_view& GetLastKeyword_Impl();
+	SV& GetLastKeyword_Impl();
 	///Valid keyword
-	void SetLastValidKeyword_Impl(const std::string_view& key);
+	void SetLastValidKeyword_Impl(const SV& key);
 	void SetLastValidKeyword_Impl(const char* key);
-	std::string_view& GetLastValidKeyword_Impl();
+	SV& GetLastValidKeyword_Impl();
 
 	//Set error messages for each specific case
 	void SetError_Impl(Log::Error error);
+	void SetError_Impl(Log::Error error, const STR& msg);
 
 
 	/// 
@@ -169,9 +188,9 @@ private:
 	/// 
 
 	//Get functions
-	std::string& GetError();
-	std::string& GetWarning();
-	std::string& GetFinalMessage();
+	STR& GetError();
+	STR& GetWarning();
+	STR& GetFinalMessage();
 
 	//Update counters
 	void UpdateErrorCounter();

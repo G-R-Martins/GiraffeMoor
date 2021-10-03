@@ -4,7 +4,7 @@
 
 NSSS::NSSS()
 	: number(0), node_set(0), surface_set(0), mu(0), epn(0), cn(0), ept(0), ct(0), 
-	pinball(0), radius(0), max_interactions(0)
+	pinball(0), radius(0), max_interactions(0), comment("\0")
 {
 	bool_table.Clear();
 }
@@ -15,6 +15,9 @@ NSSS::~NSSS()
 }
 void NSSS::WriteGiraffeModelFile(std::ostream& fout) const
 {
+	if ( !comment.empty() )
+		fout << "//" << comment << "\n";
+	
 	fout << "\tNSSS " << number <<
 		"\tNodeSet " << node_set <<
 		"\tSurfaceSet " << surface_set <<

@@ -1,14 +1,19 @@
 #pragma once
 #include "CADData.h"
-
+#include "WritingFlags.h"
 
 class Post
 {
 public:
+	double m_mag_factor;  //Magnification factor of displacements
+	WritingFlags m_writing_flags;
+
+	std::vector<CADData> m_cad_vector;
+
+public:
 	Post();
 	~Post();
 
-	//============================================================================
 
 					/*-------
 					Functions
@@ -18,36 +23,35 @@ public:
 	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	// Creates seabed VTK file
-
-	bool CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
+	bool CreateSeabedVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
 	
 	//Creates water surface VTK file
-	bool CreateWaterVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
+	bool CreateWaterVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
 
 
-	//============================================================================
+
+	/// 
+	/// SETTERS
+	/// 
 	
-					/*-------
-					Variables
-					--------*/
-	//Magnification factor of displacements
-	double mag_factor;
+	void SetMagFactor(double mag_factor);
+	void SetAllCADs(const std::vector<CADData>& cad_vector);
+	void SetAllCADs(std::vector<CADData>&& cad_vector);
 
-	struct WritingOpt
-	{
-		bool mesh_flag;
-		bool renderMesh_flag;
-		bool rigidContactSurfaces_flag;
-		bool flexibleContactSurfaces_flag;
-		bool constraints_flag;
-		bool forces_flag;
-		bool specialConstraints_flag;
-		bool contactForces_flag;
-		bool renderParticles_flag;
-		bool renderRigidBodies_flag;
-	} write;
 
-	//Vector with CADs for post proessing
-	std::vector<CADData> cads_vector;
+	/// 
+	/// GETTERS
+	/// 
+
+	inline bool GetMagFactor() const { return m_mag_factor; }
+	
+	inline const WritingFlags& GetWritingFlags() const { return m_writing_flags; }
+	inline WritingFlags& GetWritingFlags() { return m_writing_flags; }	
+
+	inline const CADData& GetCAD(size_t platform) const { return m_cad_vector[platform]; }
+	inline CADData& GetCAD(size_t platform) { return m_cad_vector[platform]; }
+	inline const std::vector<CADData>& GetAllCADs() const { return m_cad_vector; }
+	inline std::vector<CADData>& GetAllCADs() { return m_cad_vector; }
+
 };
 

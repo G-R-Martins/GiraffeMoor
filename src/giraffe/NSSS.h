@@ -43,5 +43,8 @@ public:
 
 	//Current NSSS booltable
 	BoolTable bool_table;
+
+	//Comment 
+	std::string comment;
 };
 

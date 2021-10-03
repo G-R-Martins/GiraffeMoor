@@ -4,90 +4,73 @@
 
 
 LineSegment::LineSegment()
-	: length(0.0), property(0), discretization(0), n_nodes(0), n_elements(0)
-{}
-
-LineSegment::~LineSegment()
+	: m_length(0.0), m_property(0), m_discretization(0), 
+	m_tot_nodes(0), m_tot_elements(0), m_nodeset(0), 
+	m_epsilon(0.0), m_gamma(0.0)
 {}
 
 LineSegment& LineSegment::operator=(LineSegment&& other) noexcept
 {
-	length = std::move(other.length);
-	property = std::move(other.property);
-	discretization = std::move(other.discretization);
-	n_nodes = std::move(other.n_nodes);
-	n_elements = std::move(other.n_elements);
+	m_length = std::move(other.m_length);
+	m_property = std::move(other.m_property);
+	m_discretization = std::move(other.m_discretization);
+	m_tot_nodes = std::move(other.m_tot_nodes);
+	m_tot_elements = std::move(other.m_tot_elements);
+	m_nodeset = std::move(other.m_nodeset);
+	m_epsilon = std::move(other.m_epsilon);
+	m_gamma = std::move(other.m_gamma);
 
 	return *this;
 }
 
 LineSegment::LineSegment(LineSegment&& other) noexcept
-	: length(std::move(other.length)), property(std::move(other.property)), 
-	discretization(std::move(other.discretization)), n_nodes(std::move(other.n_nodes)), 
-	n_elements(std::move(other.n_elements))
+	: m_length(std::move(other.m_length)), m_property(std::move(other.m_property)),
+	m_discretization(std::move(other.m_discretization)), m_tot_nodes(std::move(other.m_tot_nodes)),
+	m_tot_elements(std::move(other.m_tot_elements)), m_nodeset(std::move(other.m_nodeset)),
+	m_epsilon(std::move(other.m_epsilon)), m_gamma(std::move(other.m_gamma))
 {}
 
 
-//Reads input file
-bool LineSegment::Read(FILE *f)
-{
-	char str[100];			//salva palavras-chave lidas e valores lidos
-	
+LineSegment::~LineSegment()
+{}
 
 
-	if (fscanf(f, "%s", str) && isdigit(str[0]))
-		length = atof(str);
-	else
-	{
-		Log::AddWarning("\n   + Error reading length of a segment");
-		return false;
-	}
 
+///
+/// SETTERS
+///
 
-	if (fscanf(f, "%s %d", str, &property) == EOF || strcmp(str, "Property"))
-	{
-		Log::AddWarning("\n   + Error reading 'Property' keyword\n");
-		return false;
-	}
-
-	if (fscanf(f, "%s %d", str, &discretization) == EOF || strcmp(str, "Discretization"))
-	{
-		Log::AddWarning("\n   + Error reading 'Discretization' keyword");
-		return false;
-	}
-
-
-	//All OK while reading
-	return true;
-}
-
-
-//Set functions
 void LineSegment::SetLength(double len)
-{ this->length = len; }
-void LineSegment::SetProperty(unsigned int prop)
-{ this->property = prop; }
-void LineSegment::SetDiscretization(unsigned int disc)
-{ this->discretization = disc; }
+{
+	this->m_length = len;
+}
+void LineSegment::SetProperty(size_t property)
+{
+	this->m_property = property;
+}
+void LineSegment::SetDiscretization(unsigned int discretization)
+{
+	this->m_discretization = discretization;
+}
 void LineSegment::SetNNodes(unsigned int nodes)
-{ this->n_nodes = nodes; }
+{
+	this->m_tot_nodes = nodes;
+}
 void LineSegment::SetNElements(unsigned int elements)
-{ this->n_elements = elements; }
-
-//Get functions
-double LineSegment::GetLength() const
-{ return this->length; }
-
-unsigned int LineSegment::GetProperty() const
-{ return this->property; }
-
-unsigned int LineSegment::GetDiscretization() const
-{ return this->discretization; }
-
-unsigned int LineSegment::GetNNodes() const
-{ return this->n_nodes; }
-
-unsigned int LineSegment::GetNElements() const
-{ return this->n_elements; }
+{
+	this->m_tot_elements = elements;
+}
+void LineSegment::SetNodeSet(unsigned int nodeset)
+{
+	this->m_nodeset = nodeset;
+}
+void LineSegment::SetEpsilon(double epsilon)
+{
+	this->m_epsilon = epsilon;
+}
+void LineSegment::SetGamma(double gamma)
+{
+	this->m_gamma = gamma;
+}
 
 

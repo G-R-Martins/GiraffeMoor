@@ -61,7 +61,7 @@ bool Platform::Read(FILE *f)
 		return false;
 	}
 	//Read cylinders
-	else if (!LoopReading::TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
+	else if (!AuxFunctions::Reading::TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
 		return false;
 
 
@@ -78,13 +78,13 @@ bool Platform::Read(FILE *f)
 			if (*it == "Connectivity")
 			{
 				sub_keyword.erase("Connectivity");
-				if (!LoopReading::TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
+				if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
 					return false;
 			}
 			else if (*it == "ConcentratedMass")
 			{
 				sub_keyword.erase("ConcentratedMass");
-				if (!LoopReading::TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
+				if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
 					return false;
 			}
 			else if (*it == "Platform")
@@ -306,7 +306,7 @@ bool Platform::FairleadsConnections(unsigned int& special_constraint, const std:
 			//Generates rigid node set special constraint
 			gm.GenerateSameDisplacement(special_constraint++, 
 										GetSpecificNode(plat_connect.GetPilotID(), cur_pilot_specification), 
-										line_vector[plat_connect.GetNodeID(0) - 1].node_B, BT);
+										line_vector[plat_connect.GetNodeID(0) - 1].GetNodeB(), BT);
 
 			//Checks if all fairleads has been generated
 			if (++cont_fairleads == line_vector.size()) break;
@@ -373,11 +373,11 @@ bool Platform::GenerateCSNodesElements(unsigned int& node, unsigned int& element
 	{
 		//Element property
 		unsigned int prop_ID = cyl->GetID();
-		char elem_type = segment_property_vector[( size_t )prop_ID - 1].type;
-		cyl->SetCylinderType(elem_type);
+		bool isBeam = segment_property_vector[( size_t )prop_ID - 1].IsBeam();
+		//cyl->SetCylinderType(elem_type);
 
 		//Updates the number of nodes
-		int n = elem_type == 'b' ? 2 : 1;
+		int n = isBeam ? 2 : 1;
 		tot_nodes += n * cyl->GetDiscretization() + 1;
 		
 		/*------------------------------
@@ -385,7 +385,7 @@ bool Platform::GenerateCSNodesElements(unsigned int& node, unsigned int& element
 		------------------------------*/
 		
 		//Beam elements
-		if (elem_type == 'b')
+		if ( isBeam )
 		{
 			for (unsigned int cyl_element = 1; cyl_element <= cyl->GetDiscretization(); cyl_element++)
 			{

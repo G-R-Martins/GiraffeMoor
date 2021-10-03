@@ -4,151 +4,134 @@
 
 
 SolutionStep::SolutionStep()
-	: number(0), isStatic(true), global_start(0.0), end_time(0.0), timestep(0.0), 
-	max_timestep(0.0), min_timestep(0.0), sample(0), beta_new(0.0), gamma_new(0.0), alpha_ray(0.0), beta_ray(0.0)
+	: m_number(0), m_is_static(true), m_is_dynamic(false),	m_global_start_time(0.0), 
+	m_end_time(0.0), m_timestep(0.0), m_max_timestep(0.0), m_min_timestep(0.0), 
+	m_sample(0.0), m_beta_new(0.0), m_gamma_new(0.0), m_alpha_ray(0.0), m_beta_ray(0.0)
+{}
+
+SolutionStep::SolutionStep(size_t number, bool is_static, bool is_dynamic,
+	double global_start_time, double end_time, double timestep,
+	double max_timestep, double min_timestep, int sample,
+	double beta_new, double gamma_new, double alpha_ray, double beta_ray)
+	: m_number(number), m_is_static(is_static), m_is_dynamic(is_dynamic),
+	m_global_start_time(global_start_time), m_end_time(end_time),
+	m_timestep(timestep), m_max_timestep(max_timestep), m_min_timestep(min_timestep),
+	m_sample(sample), m_beta_new(beta_new), m_gamma_new(gamma_new),
+	m_alpha_ray(alpha_ray), m_beta_ray(beta_ray)
 {}
 
 SolutionStep::~SolutionStep()
 {}
 
 
-//Overloaded operators
-bool operator<(const SolutionStep& obj1, const SolutionStep& obj2)
-{
-	return obj1.number < obj2.number;
-}
-bool operator>(const SolutionStep& obj1, const SolutionStep& obj2)
-{
-	return !(obj1 < obj2);
-}
+/// 
+/// SETTERS
+/// 
 
-bool operator==(const SolutionStep& obj1, const SolutionStep& obj2)
+void SolutionStep::SetIDNumber(size_t number)
 {
-	return obj1.number == obj2.number;
-}
-bool operator!=(const SolutionStep& obj1, const SolutionStep& obj2)
-{
-	return !(obj1 == obj2);
+	this->m_number = number;
 }
 
-
-//Reads input file
-bool SolutionStep::Read(FILE* f)
+void SolutionStep::SetStaticOpt(bool is_static)
 {
-	using namespace std::string_literals;
+	this->m_is_static = is_static;
+}
 
-	char str[200];
-	fpos_t pos;				//variável que salva ponto do stream de leitura
+void SolutionStep::SetDynamicOpt(bool is_dynamic)
+{
+	this->m_is_dynamic = is_dynamic;
+}
 
-	//Line number
-	if (fscanf(f, "%s", str) && isdigit(str[0]))
-		number = atoi(str);
-	else
+void SolutionStep::SetGlobalStartTime(double global_start_time)
+{
+	this->m_global_start_time = global_start_time;
+}
+
+void SolutionStep::SetEndTime(double end_time)
+{
+	this->m_end_time = end_time;
+}
+
+void SolutionStep::SetTimestep(double timestep)
+{
+	this->m_timestep = timestep;
+}
+
+void SolutionStep::SetMaxTimestep(double max_timestep)
+{
+	this->m_max_timestep = max_timestep;
+}
+
+void SolutionStep::SetMinTimeStep(double min_timestep)
+{
+	this->m_min_timestep = min_timestep;
+}
+
+void SolutionStep::SetSample(int sample)
+{
+	this->m_sample = sample;
+}
+
+bool SolutionStep::SetNewmarkDamping(std::string_view damping)
+{
+	if (damping == "null")
 	{
-		Log::AddWarning("\n   + Error reading analysis step number.");
-		return false;
+		m_beta_new = 0.3;
+		m_gamma_new = 0.5;
+		return true;
+	}
+	if (damping == "mild")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.505;
+		return true;
+	}
+	if (damping == "moderate")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.52;
+		return true;
+	}
+	if (damping == "high")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.55;
+		return true;
+	}
+	if (damping == "extreme")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.6;
+		return true;
 	}
 
-	//Solution type
-	if (fscanf(f, "%s", str) && !strcmp(str, "static"))	isStatic = true;
-	else if (!strcmp(str, "dynamic"))					isStatic = false;
-	else //ERROR
-	{
-		Log::AddWarning("\n   + Analysis should be \"static\" or \"dynamic\".");
-		return false;
-	}
+	// Or, defined each coefficient explicitly
+///	{
+///		std::unordered_set<std::string_view> coeffs = { "Beta", "Gamma" };
+///		for (int i = 0; i < 2; ++i)
+///		{
+///			auto nh = coeffs.extract(damping);
+///			if (nh.empty())
+///			{
+///				bool all_parameters_readed = coeffs.empty();
+///				if (!all_parameters_readed)
+///					Log::AddWarning("  + Error reading numerical damping");
+///
+///				return all_parameters_readed;
+///			}
+///
+///			if (name == "Beta")			ptr->SetBetaNewmark(std::stod(readed));
+///			else if (name == "Gamma")	ptr->SetGammaNewmark(std::stod(readed));
+///		}
+///
+///	}
 
-	//End time
-	if (fscanf(f, "%s %lf", str, &end_time) && !strcmp(str, "Time"));
-	else //ERROR (End time)
-	{
-		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
+	// ERROR: invalid numerical damping
+	Log::AddWarning(R"(
+   + Please define one of these keywords for setting numerical damping parameters:
 
-	//Time step
-	if (fscanf(f, "%s %lf", str, &timestep) && !strcmp(str, "TimeStep"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	// OPTIONAL
-	//	Maximum time step
-	fgetpos(f, &pos);
-	if (fscanf(f, "%s %lf", str, &max_timestep) && !strcmp(str, "MaxTimeStep"));
-	else //No maximum time step definition
-	{
-		max_timestep = timestep;
-		fsetpos(f, &pos);
-	}
-
-	//Minimum time step
-	if (fscanf(f, "%s %lf", str, &min_timestep) && !strcmp(str, "MinTimeStep"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	//Sample
-	if (fscanf(f, "%s %d", str, &sample) && !strcmp(str, "Sample"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	///
-	/// Numerical damping for dynamic analysis 
-	///
-	
-	//Check if user has defined numerical damping for the analysis step
-	if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "NumericalDamping"))// && isStatic)
-	//{
-		/*if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
-		{
-			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
-			Log::AddWarning(w);
-		}*/
-	//}
-	//else if (/*!isStatic && */!strcmp(str, "NumericalDamping"))
-	{
-		//Damping cases:
-		if (fscanf(f, "%s", str) && !strcmp(str, "null"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.5;
-		}
-		else if (!strcmp(str, "mild"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.505;
-		}
-		else if (!strcmp(str, "moderate"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.52;
-		}
-		else if (!strcmp(str, "high"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.55;
-		}
-		else if (!strcmp(str, "extreme"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.6;
-		}
-		else //ERROR
-		{
-			std::string w = "\n   + Please define one of these keywords for setting numerical damping parameters:\n\n";
-			w = R"(	 ------------------------------
+	 ------------------------------
 	|  Keyword   |  Beta |  Gamma  |
 	|------------|-------|---------|
 	|  null      |  0.3  |  0.500  |
@@ -156,105 +139,50 @@ bool SolutionStep::Read(FILE* f)
 	|  moderate  |  0.3  |  0.520  |
 	|  high      |  0.3  |  0.550  |
 	|  extreme   |  0.3  |  0.600  |
-	 ------------------------------)";
-			Log::AddWarning(w);
-			return false;
-		}
+	 ------------------------------)");
 
-		//Warning for static analysis
-		if ( isStatic )
-		{
-			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
-			Log::AddWarning(w);
-		}
-	}
-	else if (!isStatic && strcmp(str, "NumericalDamping"))
-	{
-		std::string w = "\n   + Numerical damping was not defined for the dynamic step number " + std::to_string(number) 
-			+ ". Newmark coeficients were set to zero.";
-		Log::AddWarning(w);
-		fsetpos(f, &pos);
-	}
-	else
-		fsetpos(f, &pos);
-
-	//Check if user has defined Rayleigh damping for the analysis step
-	if ( !fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "RayleighDamping") &&
-		fscanf(f, "%s %lf", str, &alpha_ray) && !strcmp(str, "Alpha") && fscanf(f, "%s %lf", str, &beta_ray) && !strcmp(str, "Beta") )
-	{
-		if ( isStatic )
-		{
-			std::string w = "\n   + There is no need to define Rayleigh damping for the static analysis of the step number "
-				+ std::to_string(number);
-			Log::AddWarning(w);
-		}
-	}
-	else
-		fsetpos(f, &pos);
-
-	//All ok while reading
-	return true;
+	return false;
 }
 
-void SolutionStep::SetGlobalStart(double time)
-{ this->global_start = time; }
-
-unsigned int SolutionStep::GetNumber() const
+void SolutionStep::SetBetaNewmark(double beta_new)
 {
-	return this->number;
+	this->m_beta_new = beta_new;
 }
 
-double SolutionStep::GetGlobalStart() const
+void SolutionStep::SetGammaNewmark(double gamma_new)
 {
-	return this->global_start;
+	this->m_gamma_new = gamma_new;
 }
 
-double SolutionStep::GetEndTime() const
+void SolutionStep::SetAlphaRayleigh(double alpha_ray)
 {
-	return this->end_time;
+	this->m_alpha_ray = alpha_ray;
 }
 
-double SolutionStep::GetTimestep() const
+void SolutionStep::SetBetaRayleigh(double beta_ray)
 {
-	return this->timestep;
+	this->m_beta_ray = beta_ray;
 }
 
-double SolutionStep::GetMaxTimestep() const
-{
-	return this->max_timestep;
-}
 
-double SolutionStep::GetMinTimestep() const
-{
-	return this->min_timestep;
-}
 
-int SolutionStep::GetSample() const
-{
-	return this->sample;
-}
+/// 
+/// Overloaded operators
+///
 
-double SolutionStep::GetBeta_new() const
+bool operator<(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return this->beta_new;
+	return obj1.m_number < obj2.m_number;
 }
-
-double SolutionStep::GetGamma_new() const
+bool operator>(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return this->gamma_new;
+	return !(obj1 < obj2);
 }
-
-double SolutionStep::GetAlpha_ray() const
+bool operator==(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return this->alpha_ray;
+	return obj1.m_number == obj2.m_number;
 }
-
-double SolutionStep::GetBeta_ray() const
+bool operator!=(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return this->beta_ray;
-}
-
-bool SolutionStep::CheckIfIsStatic() const
-{
-	return this->isStatic;
+	return !(obj1 == obj2);
 }

@@ -23,7 +23,13 @@ public:
 	bool Read(FILE *f);
 
 	/// 
-	/// Get functions
+	/// SETTERS
+	/// 
+	
+
+
+	/// 
+	/// GETTERS
 	/// 
 
 	unsigned int GetNumberID() const;
