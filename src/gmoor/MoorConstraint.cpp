@@ -1,89 +1,127 @@
 #include "PCH.h"
 #include "MoorConstraint.h"
-//Auxiliary function to read input file
-#include "LoopReading.h"
+#include "AuxFunctions.h"
 
 
 MoorConstraint::MoorConstraint()
-	: existAnchorConstraint(false), existVesselConstraint(false), existLineConstraint(false)
+	: m_number(0), m_nodeset(0), m_constraints(6)
+{}
+
+MoorConstraint::~MoorConstraint()
+{}
+
+
+/// 
+/// SETTERS
+/// 
+
+void MoorConstraint::SetIDNumber(size_t number)
 {
-	anchors.reserve(32);
-	vessels.reserve(16);
-	lines.reserve(32);
+	m_number = number;
+}
+void MoorConstraint::SetNodeset(size_t nodeset)
+{
+	m_nodeset = nodeset;
+}
+
+void MoorConstraint::SetDof(size_t dof, const std::list<bool>& constraints)
+{
+	m_constraints[dof] = constraints;
+}
+void MoorConstraint::PushToDof(size_t dof, bool constraint)
+{
+	m_constraints[dof].push_back(constraint);
+}
+void MoorConstraint::PushX(bool constraint)
+{
+	m_constraints[0].push_back(constraint);
+}
+void MoorConstraint::PushY(bool constraint)
+{
+	m_constraints[1].push_back(constraint);
+}
+void MoorConstraint::PushZ(bool constraint)
+{
+	m_constraints[2].push_back(constraint);
+}
+void MoorConstraint::PushRotX(bool constraint)
+{
+	m_constraints[3].push_back(constraint);
+}
+void MoorConstraint::PushRotY(bool constraint)
+{
+	m_constraints[4].push_back(constraint);
+}
+void MoorConstraint::PushRotZ(bool constraint)
+{
+	m_constraints[5].push_back(constraint);
 }
 
 
-//Read input file
-bool MoorConstraint::Read(FILE * f)
+/// 
+/// Overloaded Operators
+/// 
+
+bool operator<(const MoorConstraint& obj1, const MoorConstraint& obj2)
 {
-	//Saves keywords and values readed
-	char str[500];
+	return obj1.m_number < obj2.m_number;
+}
+bool operator>(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return !(obj1 < obj2);
+}
+bool operator==(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return obj1.m_number == obj2.m_number;
+}
+bool operator!=(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return !(obj1 == obj2);
+}
 
-	//Saves current position
-	fpos_t pos;
+std::ifstream& operator>>(std::ifstream& input, MoorConstraint* constraint)
+{
+	std::unordered_set<std::string_view> DoFs{ "X", "Y", "Z", "ROTX", "ROTY", "ROTZ" };
 
-	//Keywords
-	std::unordered_set<std::string_view> keywords({"AnchorConstraints", "VesselConstraints" , "LineConstraints" });
+	std::string readed;
+	size_t dof = 0;
 
-	//Loop to read solution parameters
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
+
+	// Object ID
+	input >> readed;
+	size_t num_ID = AuxFunctions::Reading::Try2GetObjectID<size_t>(input, readed);
+	constraint->m_number = num_ID;
+
+	input >> readed;
+	do
 	{
-		if (!strcmp(str, "VesselConstraints"))
+		// Check DoF
+		if (DoFs.count(readed) == 0)
 		{
-			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(vessels, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
-				return false;
-			existVesselConstraint = true;
-		}
-		else if (!strcmp(str, "AnchorConstraints"))
-		{
-			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(anchors, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
-				return false;
-			existAnchorConstraint = true;
-		}
-		else if (!strcmp(str, "LineConstraints"))
-		{
-			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(lines, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
-				return false;
-			existLineConstraint = true;
-		}
-		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
-			continue;
-		//Other word -> end loop and backs to IO class
-		else
-		{
-			fsetpos(f, &pos);
+			AuxFunctions::Reading::BackLastWord(input, readed);
+			// TODO: avisar GLs sem definição
 			break;
 		}
-	}
+		else
+			DoFs.erase(readed);
 
+		if (readed == "X")			dof = 0;
+		else if (readed == "Y")		dof = 1;
+		else if (readed == "Z")		dof = 2;
+		else if (readed == "ROTX")	dof = 3;
+		else if (readed == "ROTY")	dof = 4;
+		else if (readed == "ROTZ")	dof = 5;
 
-	//All ok while reading
-	return true;
+		// read options (MUST be '1' or '0')
+		while (input >> readed && std::isdigit(readed[0]))
+		{
+			constraint->m_constraints[dof].push_back(
+				(readed[0] == '1' ? true : false)
+			);
+		}
+		
+	} while (true);
+
+	return input;
 }
 
-
-/// 
-/// Get functions
-/// 
-
-const std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints() const
-{ return this->anchors; }
-std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints()
-{ return this->anchors; }
-const std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints() const
-{ return this->vessels; }
-std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints()
-{ return this->vessels; }
-const std::vector<LineConstraint>& MoorConstraint::GetLineConstraints() const
-{ return this->lines; }
-std::vector<LineConstraint>& MoorConstraint::GetLineConstraints()
-{ return this->lines; }
-
-
-
-bool MoorConstraint::ExistAnchorConstraint()
-{ return this->existAnchorConstraint; }
-bool MoorConstraint::ExistLineConstraint()
-{ return this->existLineConstraint; }
-bool MoorConstraint::ExistVesselConstraint()
-{ return this->existVesselConstraint; }

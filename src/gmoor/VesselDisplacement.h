@@ -27,6 +27,8 @@ private:
 
 public:
 	VesselDisplacement();
+	VesselDisplacement(const VesselDisplacement&) = default;
+	VesselDisplacement(VesselDisplacement&&) = default;
 	~VesselDisplacement();
 
 
@@ -62,10 +64,24 @@ public:
 	inline Table* GetTimeSeries()						{ return m_ptr_time_series; }
 	inline SineWaveDisplacement* GetSineWave() const	{ return m_ptr_sine_wave; }
 	inline MathCode* GetMathCode() const				{ return m_ptr_math_code; }
+	inline MathCode* GetMathCode()						{ return m_ptr_math_code; }
 
 	inline bool IsTable() const							{ return m_is_table; }
 	inline bool IsMathCode() const						{ return m_is_math_code; }
 	inline bool IsSineWave() const						{ return m_is_sine_wave; }
 	inline bool IsExternalFile() const					{ return m_is_external_file; }
 
+
+	/// 
+	/// Overloaded operators
+	/// 
+	
+
+	friend bool operator<(const VesselDisplacement& obj1, const VesselDisplacement& obj2);
+	friend bool operator>(const VesselDisplacement& obj1, const VesselDisplacement& obj2);
+	friend bool operator==(const VesselDisplacement& obj1, const VesselDisplacement& obj2);
+	friend bool operator!=(const VesselDisplacement& obj1, const VesselDisplacement& obj2);
+
+	VesselDisplacement& operator=(const VesselDisplacement&) = default;
+	VesselDisplacement& operator=(VesselDisplacement&&) = default;
 };

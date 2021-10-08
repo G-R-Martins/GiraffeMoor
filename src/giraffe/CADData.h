@@ -12,8 +12,6 @@ public:
 	CADData();
 	~CADData();
 
-	//IO
-	bool Read(FILE* f);
 	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 	
@@ -28,9 +26,19 @@ public:
 	/// 
 	/// GETTERS
 	/// 
-
+	
 	inline size_t GetNumber() const { return m_number; }
 	inline const std::string& GetName() const { return m_name; }
 	
+	
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend bool operator<(const CADData& obj1, const CADData& obj2);
+	friend bool operator>(const CADData& obj1, const CADData& obj2);
+	friend bool operator==(const CADData& obj1, const CADData& obj2);
+	friend bool operator!=(const CADData& obj1, const CADData& obj2);
+
 };
 

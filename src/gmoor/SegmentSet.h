@@ -22,9 +22,6 @@ public:
 	~SegmentSet() = default;
 	
 
-	//Read input file
-	bool Read(FILE* f);
-
 
 	/// 
 	/// SETTERS
@@ -52,11 +49,10 @@ public:
 	LineSegment& GetSegment(const size_t& seg);
 
 
-	//============================================================================
-
-	/*------------------
-	Overloaded operators
-	-------------------*/
+	
+	/// 
+	/// Overloaded operators
+	/// 
 
 	friend bool operator<(const SegmentSet& segset1, const SegmentSet& segset2);
 	friend bool operator>(const SegmentSet& segset1, const SegmentSet& segset2);

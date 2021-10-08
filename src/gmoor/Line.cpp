@@ -58,7 +58,6 @@ Line& Line::operator=(Line&& other) noexcept
 	m_segments = std::move(other.m_segments);
 	m_transition_nodes = std::move(other.m_transition_nodes);
 	m_configuration[0] = '\0';
-	m_vesselID = std::move(other.m_vesselID);
 	//tdz = std::move(other.tdz);
 	percent = std::move(other.percent);
 	anc_tdp = std::move(other.anc_tdp);

@@ -34,3 +34,27 @@ void CADData::SetName(const std::string& name)
 }
 
 
+
+/// 
+/// Overloaded operators
+/// 
+
+bool operator<(const CADData& obj1, const CADData& obj2)
+{
+	return obj1.m_number < obj2.m_number;
+}
+
+bool operator>(const CADData& obj1, const CADData& obj2)
+{
+	return !(obj1 < obj2);
+}
+
+bool operator==(const CADData& obj1, const CADData& obj2)
+{
+	return obj1.m_number == obj2.m_number;
+}
+
+bool operator!=(const CADData& obj1, const CADData& obj2)
+{
+	return !(obj1 == obj2);
+}

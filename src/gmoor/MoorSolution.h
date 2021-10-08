@@ -32,6 +32,11 @@ public:
 		m_beta_ray = beta_ray;
 	}
 
+	DynRelaxLinesConfig(const DynRelaxLinesConfig&) = default;
+	DynRelaxLinesConfig& operator=(const DynRelaxLinesConfig&) = default;
+	DynRelaxLinesConfig(DynRelaxLinesConfig&&) noexcept = default;
+	DynRelaxLinesConfig& operator=(DynRelaxLinesConfig&&) = default;
+
 	~DynRelaxLinesConfig() = default;
 
 	// SETTERS
@@ -53,7 +58,7 @@ private:
 	unsigned int m_steps_to_set_model;
 	
 	// Optional step to establish the sea current
-	std::unique_ptr<SolutionStep> m_sea_current_step_ptr;
+	std::shared_ptr<SolutionStep> m_sea_current_step_ptr;
 	bool m_seacurrent_step_exist;
 
 	// Optional dynamic relaxation step(s)
@@ -61,21 +66,22 @@ private:
 	bool m_dyn_relax_exist;
 	
 	// Optional step to search for lines static configuration
-	std::unique_ptr<DynRelaxLinesConfig> m_lines_configuration;
+	std::shared_ptr<DynRelaxLinesConfig> m_lines_configuration;
 	bool m_lines_config_exist;
 	
 	// Optional step to release forces at vessels
-	std::unique_ptr<SolutionStep> m_vessel_forces;
+	std::shared_ptr<SolutionStep> m_vessel_forces;
 	bool m_vessel_forces_exist;
 	
 	// Analysis steps
 	std::vector<SolutionStep> m_solution_steps;
 
-	//======================================================================================================
 
 public:
 
 	MoorSolution();
+	MoorSolution(const MoorSolution&) = default;
+	MoorSolution(MoorSolution&&) noexcept = default;
 	~MoorSolution();
 	
 	
@@ -92,7 +98,7 @@ public:
 		double max_timestep, double min_timestep, int sample,
 		double beta_new, double gamma_new, double alpha_ray, double beta_ray) 
 	{
-		this->m_sea_current_step_ptr = std::make_unique<SolutionStep>(number, is_static, is_dynamic,
+		this->m_sea_current_step_ptr = std::make_shared<SolutionStep>(number, is_static, is_dynamic,
 			global_start_time, end_time, timestep, max_timestep, min_timestep, sample,
 			beta_new, gamma_new, alpha_ray, beta_ray);
 	}
@@ -105,13 +111,13 @@ public:
 	inline unsigned int GetStepsBeforeAnalysis() const					{ return this->m_steps_to_set_model; }
 
 	// Get dynamic relaxation step to find lines static configuration
-	inline std::unique_ptr<DynRelaxLinesConfig>& GetStepDynRelaxLines()	{ return this->m_lines_configuration; }
+	inline std::shared_ptr<DynRelaxLinesConfig>& GetStepDynRelaxLines()	{ return this->m_lines_configuration; }
 	
 	// Get dynamic relaxation step to release vessel forces
-	inline std::unique_ptr<SolutionStep>& GetStepDynRelaxVessels()		{ return this->m_vessel_forces; }
+	inline std::shared_ptr<SolutionStep>& GetStepDynRelaxVessels()		{ return this->m_vessel_forces; }
 
 	// Get step to establish sea current
-	inline std::unique_ptr<SolutionStep>& GetStepSeaCurrent()			{ return this->m_sea_current_step_ptr; }
+	inline std::shared_ptr<SolutionStep>& GetStepSeaCurrent()			{ return this->m_sea_current_step_ptr; }
 
 	// Get the vector with all solution (anlysis) steps
 	inline const std::vector<SolutionStep>& GetStepsVec() const			{ return this->m_solution_steps; }
@@ -127,4 +133,12 @@ public:
 	bool ExistDynRelax_Vessel() const	{ return this->m_vessel_forces_exist; }
 	bool ExistSeaCurrentStep() const	{ return this->m_seacurrent_step_exist; }
 
+
+
+	///
+	/// Overloaded operators
+	///
+
+	MoorSolution& operator=(const MoorSolution&) = default;
+	MoorSolution& operator=(MoorSolution&&) = default;
 };

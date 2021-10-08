@@ -43,71 +43,71 @@ bool operator!= (Platform& plat1, Platform& plat2)
 bool Platform::Read(FILE *f)
 {
 
-	typedef std::unordered_set<std::string_view> uset;
+	//typedef std::unordered_set<std::string_view> uset;
 
-	//Saves keywords and values readed
-	char str[500];
-	
-	//Saves current position
-	fpos_t pos;
+	////Saves keywords and values readed
+	//char str[500];
+	//
+	////Saves current position
+	//fpos_t pos;
 
-	//Container with lower level keywords (ConcentratedMass is not mandatory)
-	uset sub_keyword({ "Connectivity", "ConcentratedMass" , "Platform"});
+	////Container with lower level keywords (ConcentratedMass is not mandatory)
+	//uset sub_keyword({ "Connectivity", "ConcentratedMass" , "Platform"});
 
-	//Platform and vessel numbers
-	if (fscanf(f, "%d %s %d", &number, str, &vessel_ID) == EOF || strcmp(str, "VesselID"))
-	{
-		std::cout << "[WARNING] Error reading platform data.\n";
-		return false;
-	}
-	//Read cylinders
-	else if (!AuxFunctions::Reading::TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
-		return false;
+	////Platform and vessel numbers
+	//if (fscanf(f, "%d %s %d", &number, str, &vessel_ID) == EOF || strcmp(str, "VesselID"))
+	//{
+	//	std::cout << "[WARNING] Error reading platform data.\n";
+	//	return false;
+	//}
+	////Read cylinders
+	//else if (!AuxFunctions::Reading::TryNestedKeyword(cylinders_container, uset({ "ID" }), sub_keyword, f, pos, str))
+	//	return false;
 
 
-	//Searches for comment block before "Connectivity" and "ConcentratedMass"
-	AuxFunctions::Read::TryComment(f);
+	////Searches for comment block before "Connectivity" and "ConcentratedMass"
+	//AuxFunctions::Read::TryComment(f);
 
-	uset::iterator it;
-	//Loop to read solution parameters
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-	{
-		it = sub_keyword.find(std::string(str));
-		if (it != sub_keyword.end())
-		{
-			if (*it == "Connectivity")
-			{
-				sub_keyword.erase("Connectivity");
-				if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
-					return false;
-			}
-			else if (*it == "ConcentratedMass")
-			{
-				sub_keyword.erase("ConcentratedMass");
-				if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
-					return false;
-			}
-			else if (*it == "Platform")
-			{
-				fsetpos(f, &pos);
-				return true;
-			}
-		}
-		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str));
-		//Other word -> end loop and backs to IO class
-		else
-		{
-			fsetpos(f, &pos);
-			break;
-		}
-	}
+	//uset::iterator it;
+	////Loop to read solution parameters
+	//while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
+	//{
+	//	it = sub_keyword.find(std::string(str));
+	//	if (it != sub_keyword.end())
+	//	{
+	//		if (*it == "Connectivity")
+	//		{
+	//			sub_keyword.erase("Connectivity");
+	//			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(connectivity_container, uset({ "PilotID", "Label" }), sub_keyword, f, pos, str))
+	//				return false;
+	//		}
+	//		else if (*it == "ConcentratedMass")
+	//		{
+	//			sub_keyword.erase("ConcentratedMass");
+	//			if (!AuxFunctions::Reading::TryNestedKeyword_UnorderedMultiple(concentrated_mass_container, uset({ "Body", "Label" }), sub_keyword, f, pos, str))
+	//				return false;
+	//		}
+	//		else if (*it == "Platform")
+	//		{
+	//			fsetpos(f, &pos);
+	//			return true;
+	//		}
+	//	}
+	//	else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str));
+	//	//Other word -> end loop and backs to IO class
+	//	else
+	//	{
+	//		fsetpos(f, &pos);
+	//		break;
+	//	}
+	//}
 
-	//Checks if the connectivity rules were defined
-	if (sub_keyword.find("Connectivity") != sub_keyword.end())
-	{
-		std::cout << "[WARNING] The connectivity for the platform number " << number << "was not defined.\n";
-		return false;
-	}
+	////Checks if the connectivity rules were defined
+	//if (sub_keyword.find("Connectivity") != sub_keyword.end())
+	//{
+	//	std::cout << "[WARNING] The connectivity for the platform number " << number << "was not defined.\n";
+	//	return false;
+	//}
 
 
 	//All ok while reading

@@ -34,6 +34,8 @@ public:
 		double global_start_time, double end_time, double timestep,
 		double max_timestep, double min_timestep, int sample,
 		double beta_new, double gamma_new, double alpha_ray, double beta_ray);
+	SolutionStep(const SolutionStep&) = default;
+	SolutionStep(SolutionStep&&) noexcept = default;
 	~SolutionStep();
 	
 	///
@@ -95,5 +97,8 @@ public:
 	friend bool operator> (const SolutionStep& obj1, const SolutionStep& obj2);
 	friend bool operator== (const SolutionStep& obj1, const SolutionStep& obj2);
 	friend bool operator!= (const SolutionStep& obj1, const SolutionStep& obj2);
+
+	SolutionStep& operator=(const SolutionStep&) = default;
+	SolutionStep& operator=(SolutionStep&&) = default;
 };
 

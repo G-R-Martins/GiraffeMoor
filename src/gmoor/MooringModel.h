@@ -117,7 +117,6 @@ public:
 	MoorEnvironment environment;
 	MoorSolution moorsolution;
 	MoorPost moorpost;
-	MoorConstraint moor_constraint;
 	
 
 	/*-------------
@@ -126,6 +125,7 @@ public:
 
 	//Stiffness matrix object (analytical or numerical)
 	std::unique_ptr<StiffnessMatrix> stiff_matrix;
+	
 	//============================================================================
 
 	/*-----------------------------------------------------
@@ -159,6 +159,9 @@ public:
 	//Vector with displacement fields
 	std::vector<LineDisplacementField> disp_field_vector;
 
+	std::vector<MoorConstraint> anchor_constraints;
+	std::vector<MoorConstraint> vessel_constraints;
+	std::vector<MoorConstraint> line_constraints;
 
 	//============================================================================
 

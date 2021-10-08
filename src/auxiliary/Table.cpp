@@ -76,17 +76,12 @@ std::ostream& operator<<(std::ostream& out, Table* tabPtr)
 // Read table
 std::ifstream& operator>>(std::ifstream& input, Table* table)
 {
-	// First line must be null
-	table->SetLine(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-	
 	std::string time;
-	size_t cur_line = 1;
+	size_t cur_line = 0;
 	do 
 	{
-		input >> time;
-
 		// Check the first number (TIME)
-		if (input >> time || !std::isdigit(time[0]))
+		if (!(input >> time) || !std::isdigit(time[0]))
 		{
 			AuxFunctions::Reading::BackLastWord(input, std::string_view(time));
 			break;
@@ -97,6 +92,8 @@ std::ifstream& operator>>(std::ifstream& input, Table* table)
 		// ... and read values for all DoFs
 		input >> table->table[cur_line][1] >> table->table[cur_line][2] >> table->table[cur_line][3] 
 			  >> table->table[cur_line][4] >> table->table[cur_line][5] >> table->table[cur_line][6];
+		
+		++cur_line;
 
 	} while (true);
 

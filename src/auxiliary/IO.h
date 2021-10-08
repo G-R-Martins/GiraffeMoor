@@ -12,7 +12,7 @@ class IO
 /// </summary>		
 private:
 	static std::ifstream s_inp;
-	static std::unordered_map<std::string_view, std::function<bool(std::string& readed)>> s_func_reading;
+	//static std::unordered_map<std::string_view, std::function<bool(std::string& readed)>> s_func_reading;
 
 public:
 
@@ -60,10 +60,11 @@ public:
 	static bool ReadSegmentProperty(std::string& readed);
 	static bool ReadPostFiles(std::string& readed);
 	static bool ReadCADs(std::string& readed);
+	static bool ReadPlatformCAD(std::string& readed);
 	static bool ReadAnalyticalStiffnessMatrix(std::string& readed);
 	static bool ReadNumericalStiffnessMatrix(std::string& readed);
-	static void ReadDisplacementFields(std::string& readed);
-	static void ReadConstraints(std::string& readed);
+	static bool ReadLineDisplacementFields(std::string& readed);
+	static bool ReadConstraints(std::string& readed);
 	static bool ReadRunOption(std::string& readed);
 	static bool ReadProcessors(std::string& readed);
 	static bool ReadConvergenceCriteria(std::string& readed);

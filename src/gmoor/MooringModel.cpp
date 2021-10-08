@@ -992,22 +992,21 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 						//Just anchor
 						else
 							sprintf(comment, "Anchor of line %zd", line.GetNumber());
-						
+
 						//Booelan to indicate if the anchor nodeset was found 
 						bool nodeset_found = false;
 
 						//Checks if there is different constraint for this anchor
-						if (moor_constraint.ExistAnchorConstraint())
+						for (MoorConstraint& constraint : anchor_constraints)
 						{
-							for (AnchorConstraint& anchor : moor_constraint.GetAnchorConstraints())
-								if (line.GetNumber() == anchor.GetNumberID())
-								{
-									anchor.SetNodeSet(line.GetNodesetA());
-									nodeset_found = true;
-									break;
-								}
+							if (line.GetNumber() == constraint.GetNumber())
+							{
+								constraint.SetNodeset(line.GetNodesetA());
+								nodeset_found = true;
+								break;
+							}
 						}
-
+						
 						if (!nodeset_found)
 							anchor_nodesets.push_front(line.GetNodesetA());
 						
@@ -1384,8 +1383,6 @@ inline bool MooringModel::Look4SharedLine()
 	{
 		if (line.IsShared())
 			return true;
-		else
-			return false;
 	}
 	return false;
 }
@@ -2191,21 +2188,18 @@ void MooringModel::GenerateConstraints()
 	ROTZ.Set(2, true, false);
 
 	//With different constraint definitions
-	if (moor_constraint.ExistAnchorConstraint())
+	for (const MoorConstraint& anchor : anchor_constraints)
 	{
-		//First, anchors with different constraints
-		for (const AnchorConstraint& anchor : moor_constraint.GetAnchorConstraints())
-		{
-			//Copies of the booltables for the first steps
-			BoolTable ROTX2(ROT), ROTY2(ROT), ROTZ2(ROTZ);
+		//Copies of the booltables for the first steps
+		BoolTable ROTX2(ROT), ROTY2(ROT), ROTZ2(ROTZ);
 
-			ROTX2.Push_Back(anchor.GetRot('x'));
-			ROTY2.Push_Back(anchor.GetRot('y'));
-			ROTZ2.Push_Back(anchor.GetRot('z'));
+		ROTX2.Multiple_Push_Back(anchor.GetRotX());
+		ROTY2.Multiple_Push_Back(anchor.GetRotY());
+		ROTZ2.Multiple_Push_Back(anchor.GetRotZ());
 
-			gm.GenerateNodalConstraint(++cur_constraint, anchor.GetNodeSet(), U, U, U, ROTX2, ROTY2, ROTZ2);
-		}
+		gm.GenerateNodalConstraint(++cur_constraint, anchor.GetNodeset(), U, U, U, ROTX2, ROTY2, ROTZ2);
 	}
+
 	//Anchors with default constraints
 	ROT.Push_Back(true);
 	ROTZ.Push_Back(true);
@@ -2221,7 +2215,7 @@ void MooringModel::GenerateConstraints()
 		gm.GenerateNodalConstraint(++cur_constraint, nodeset, U, U, U, ROT, ROT, ROT);
 
 	//Lines
-	if ( moor_constraint.ExistLineConstraint() )
+	if (!line_constraints.empty())
 	{
 		//Default conditions (steps to set the FE model)
 		std::list bool_list = {true, true, false};
@@ -2232,7 +2226,7 @@ void MooringModel::GenerateConstraints()
 				bool_list.push_back(false);
 		}
 
-		for ( LineConstraint& constr : moor_constraint.GetLineConstraints() )
+		for (MoorConstraint& constr : line_constraints)
 		{
 			//Booltables
 			std::vector<BoolTable> bt_vec(6);
@@ -2240,9 +2234,9 @@ void MooringModel::GenerateConstraints()
 
 			//Booltables
 			for ( size_t i = 0; i < 6; i++ )
-				bt_vec[i].Multiple_Push_Back(constr.GetDoFConstraints(i));
+				bt_vec[i].Multiple_Push_Back(constr.GetConstraint(i));
 
-			gm.GenerateNodalConstraint(++cur_constraint, line_vector[constr.GetNumberID() - 1].GetNodesetB() + 1,
+			gm.GenerateNodalConstraint(++cur_constraint, line_vector[constr.GetNumber() - 1].GetNodesetB() + 1,
 									   bt_vec[0], bt_vec[1], bt_vec[2], bt_vec[3], bt_vec[4], bt_vec[5]);
 		}
 	}
@@ -2271,7 +2265,7 @@ void MooringModel::GenerateConstraints()
 	
 	//Vessel
 	///Default constraint (all fixed)
-	if (!moor_constraint.ExistVesselConstraint())
+	if (vessel_constraints.empty())
 	{
 		//Vessel - fixed
 		U.Set(1, true);
@@ -2312,9 +2306,9 @@ void MooringModel::GenerateConstraints()
 		//Vessels with constraint defined
 		std::unordered_set<size_t> constrainted_vessels;
 
-		for (VesselConstraint& constr : moor_constraint.GetVesselConstraints())
+		for (MoorConstraint& constr : vessel_constraints)
 		{
-			constrainted_vessels.insert(constr.GetNumberID());
+			constrainted_vessels.insert(constr.GetNumber());
 			 
 			//BoolTables for the current vessel 
 			BoolTable vessel_X(boolX), vessel_Y(boolY), vessel_Z(boolZ),
@@ -2323,7 +2317,7 @@ void MooringModel::GenerateConstraints()
 			//Booltables
 			for (size_t i = 0; i < 6; i++)
 			{
-				auto const& c = constr.GetDoFConstraints(i);
+				auto const& c = constr.GetConstraint(i);
 				if (i == 0)			vessel_X.Multiple_Push_Back(c);
 				else if (i == 1)	vessel_Y.Multiple_Push_Back(c);
 				else if (i == 2)	vessel_Z.Multiple_Push_Back(c);
@@ -2332,7 +2326,7 @@ void MooringModel::GenerateConstraints()
 				else if (i == 5)	vessel_ROTZ.Multiple_Push_Back(c);
 			}
 
-			gm.GenerateNodalConstraint(++cur_constraint, vessel_vector[constr.GetNumberID() - 1].GetNodeset(), 
+			gm.GenerateNodalConstraint(++cur_constraint, vessel_vector[constr.GetNumber() - 1].GetNodeset(), 
 									   vessel_X, vessel_Y, vessel_Z, vessel_ROTX, vessel_ROTY, vessel_ROTZ);
 		}
 

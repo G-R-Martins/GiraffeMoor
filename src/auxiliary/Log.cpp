@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Log.h"
+#include "AuxFunctions.h"
 
 
 Log::Log()
@@ -10,72 +11,38 @@ Log::Log()
 {}
 
 
-/*****************
- * Add functions *
- *****************/
+/// 
+/// SETTERS
+/// 
 
-//Errors
-void Log::AddError_Impl(const SV& toAdd)
-{
-	UpdateErrorCounter();
-	error += toAdd;
-}
-void Log::AddError_Impl(const SSTREAM& toAdd)
-{
-	UpdateErrorCounter();
-	error += toAdd.str();
-}
-void Log::AddError_Impl(const STR& toAdd)
-{
-	UpdateErrorCounter();
-	error += toAdd;
-}
-void Log::AddError_Impl(const char* toAdd)
-{
-	UpdateErrorCounter();
-	error += toAdd;
-}
-//Warnings
-void Log::AddWarning_Impl(const SV& toAdd)
-{
-	UpdateWarningCounter();
-	warning += toAdd;
-}
-void Log::AddWarning_Impl(const SSTREAM& toAdd)
-{
-	UpdateWarningCounter();
-	warning += toAdd.str();
-}
-void Log::AddWarning_Impl(const STR& toAdd)
-{
-	UpdateWarningCounter();
-	warning += toAdd;
-}
-void Log::AddWarning_Impl(const char* toAdd)
-{
-	UpdateWarningCounter();
-	warning += toAdd;
-}
-void Log::AddWarning_Impl(Log::Warning type, VEC_STR toAdd)
+void Log::SetWarning_Impl(Log::Warning type, std::string_view block, int line, std::string_view name, int number)
 {
 	switch (type)
 	{
-	case Warning::Invalid_ID:
-		STR warning = "+ Invalid ID number for \'" + toAdd[0] + "\' defined at input file line " + toAdd[1];
+	case Warning::INVALID_ID:
+		m_warning << "\n  " << m_warning_ID << ")" << block << ": Invalid ID number for \'" << name << "\' at line " << line;
+	
+	case Warning::REMOVED_OBJECTS:
+		m_warning << "\n  " << m_warning_ID << ")" << block << ": " << number << " repeated \'" << name << "\' removed";
+	
+	case Warning::UNDEFINED_PARAMETERS:
+		m_warning << "\n  " << m_warning_ID << ")" << block << ": " << number << " undefined parameter(s) for " << name;
+	
+	case Warning::UNDEFINED_MANDATORY_BLOCK:
+		m_warning << "\n  " << m_warning_ID << ")" << block << ": " << number << " undefined mandatory block(s): ";
+		for (auto keyword : AuxFunctions::Reading::s_mandatory_keywords)
+			m_warning << "\n    - " << keyword;
+		
 		break;
 	}
-
 }
+
 //Final messages
-void Log::AddFinalMessage_Impl(const SV& toAdd)
+void Log::AddFinalMessage_Impl(std::string_view& toAdd)
 {
 	final_message += toAdd;
 }
-void Log::AddFinalMessage_Impl(const SSTREAM& toAdd)
-{
-	final_message += toAdd.str();
-}
-void Log::AddFinalMessage_Impl(const STR& toAdd)
+void Log::AddFinalMessage_Impl(const std::string& toAdd)
 {
 	final_message += toAdd;
 }
@@ -142,17 +109,17 @@ void Log::ShowFinalMessage_Impl()
  * Get functions *
  *****************/
 
-STR& Log::GetError()
+std::string& Log::GetError()
 {
-	return error;
+	return m_error.str();
 }
-STR& Log::GetWarning()
+std::string& Log::GetWarning()
 {
-	return warning;
+	return m_warning.str();
 }
-STR& Log::GetFinalMessage()
+std::string& Log::GetFinalMessage()
 {
-	return final_message;
+	return m_final_message.str();
 }
 
 
@@ -161,7 +128,7 @@ STR& Log::GetFinalMessage()
  ***********************/
 
 //Any keyword readed
-void Log::SetLastKeyword_Impl(const SV& key)
+void Log::SetLastKeyword_Impl(std::string_view key)
 {
 	last_keyword = key;
 }
@@ -169,12 +136,12 @@ void Log::SetLastKeyword_Impl(const char* key)
 {
 	last_keyword = key;
 }
-SV& Log::GetLastKeyword_Impl()
+std::string_view& Log::GetLastKeyword_Impl()
 {
 	return last_keyword;
 }
 //Valid keyword
-void Log::SetLastValidKeyword_Impl(const SV& key)
+void Log::SetLastValidKeyword_Impl(std::string_view key)
 {
 	last_valid_keyword = key;
 }
@@ -182,26 +149,28 @@ void Log::SetLastValidKeyword_Impl(const char* key)
 {
 	last_valid_keyword = key;
 }
-SV& Log::GetLastValidKeyword_Impl()
+std::string_view& Log::GetLastValidKeyword_Impl()
 {
 	return last_valid_keyword;
 }
 
 void Log::SetError_Impl(Log::Error error)
 {
-	STR reading_error;
+	std::string reading_error;
 
 	switch (error)
 	{
 	case Error::Reading:
-		reading_error = "\n   + Error at \"" + STR(last_keyword) + "\" block";
+		reading_error = "\n   + Error at \"" + std::string(last_keyword) + "\" block";
 		AddError_Impl(reading_error);
 		Log::AddFinalMessage("\n\nGiraffeMoor execution has failed during reading process.\nCheck your input file with the hint(s) from warning message(s).");
 		break;
+	
 	case Error::FEM_Generation:
 		AddError_Impl("\n   + Error generating FE model");
 		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during FE model construction. Please, check your input data.");
 		break;
+	
 	case Error::InputModel:
 		AddError_Impl("\n   + Error checking input data");
 		AddFinalMessage_Impl("\n\nGiraffeMoor execution has failed during input model checking. Please, check your input data.");
@@ -209,7 +178,7 @@ void Log::SetError_Impl(Log::Error error)
 	}
 }
 
-void Log::SetError_Impl(Log::Error error, const STR& msg)
+void Log::SetError_Impl(Log::Error error, const std::string& msg)
 {
 	// TODO: outro tipo de mensagem de erro?
 }

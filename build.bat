@@ -15,6 +15,6 @@ echo.
 echo ==========================================================
 echo.
 :: Build GiraffeMoor
-cmake --build .
+cmake --build . --config Release
 
 exit

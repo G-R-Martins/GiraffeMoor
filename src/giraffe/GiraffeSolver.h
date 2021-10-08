@@ -13,7 +13,7 @@ private:
 	// if is not direct, it will be defined as 'iterative'
 	bool m_is_direct;
 
-
+protected:
 	struct ConvergenceCriteria
 	{
 		double force_tol = 1.0e-4;		//Factor applied to the system force vector norm to establish convergence criterion
