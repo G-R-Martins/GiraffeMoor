@@ -2,21 +2,15 @@
 #include "VesselDisplacement.h"
 #include "IO.h" //to get the folder name
 
-
 VesselDisplacement::VesselDisplacement()
 	: m_vesselID(0), m_solution_step(0),
 	m_is_table(false), m_is_sine_wave(false), m_is_math_code(false), m_is_external_file(false),
 	m_file_name("\0"), m_header_lines(0), m_tot_steps(0),
-	m_ptr_time_series(nullptr), m_ptr_sine_wave(nullptr), m_ptr_math_code(nullptr)
+	m_ptr_time_series(nullptr), m_ptr_math_code(nullptr)
 {}
 VesselDisplacement::~VesselDisplacement()
 {
-	if (m_ptr_sine_wave)
-	{
-		delete m_ptr_sine_wave;
-		m_ptr_sine_wave = nullptr;
-	}
-	else if (m_ptr_math_code)
+	if (m_ptr_math_code)
 	{
 		delete m_ptr_math_code;
 		m_ptr_math_code = nullptr;
@@ -34,10 +28,7 @@ void VesselDisplacement::SetSolutionStep(size_t solution_step)
 }
 void VesselDisplacement::SetStartTime(double start)
 {
-	if (this->m_is_sine_wave)
-		this->m_ptr_sine_wave->SetStartTime(start);
-	else if (this->m_is_math_code)
-		this->m_ptr_math_code->SetEquationInitialTime(start);
+	this->m_ptr_math_code->SetEquationInitialTime(start);
 }
 void VesselDisplacement::SetStartTableTime(double start_time, size_t start_line)
 {
@@ -55,11 +46,6 @@ void VesselDisplacement::SetTimeSeries(std::ifstream& input)
 	m_ptr_time_series = new Table();
 
 	input >> m_ptr_time_series;
-}
-void VesselDisplacement::SetSineWave()
-{
-	m_is_sine_wave = true;
-	m_ptr_sine_wave = new SineWaveDisplacement();
 }
 void VesselDisplacement::SetMathCode()
 {

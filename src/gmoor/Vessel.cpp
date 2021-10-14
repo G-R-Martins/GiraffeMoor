@@ -50,11 +50,11 @@ void Vessel::SetElement(unsigned int element)
 	m_element = element;
 }
 
-void Vessel::SetMass(float mass)
+void Vessel::SetMass(double mass)
 {
 	m_mass = mass;
 }
-void Vessel::SetInertiaTensor(const std::array<float, 6>& inertia_tensor)
+void Vessel::SetInertiaTensor(const std::array<double, 6>& inertia_tensor)
 {
 	m_inertia_tensor = inertia_tensor;
 }

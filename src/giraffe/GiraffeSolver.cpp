@@ -12,12 +12,6 @@ GiraffeSolver::~GiraffeSolver()
 {}
 
 
-void GiraffeSolver::WriteGiraffeModelFile(std::ostream& fout) const
-{
-	fout << "\tProcessors " << m_cores <<
-		"\tLinSys " << (m_is_direct ? "Direct\n" : "Iterative\n");
-}
-
 
 ///
 /// SETTERS
@@ -71,4 +65,13 @@ std::ostream& operator<<(std::ostream& fout, const GiraffeSolver::ConvergenceCri
 		"\n";
 
 	return fout;
+}
+
+
+std::ostream& operator<<(std::ostream& out, const GiraffeSolver* obj)
+{
+	out << "\tProcessors " << obj->m_cores <<
+		"\tLinSys " << (obj->m_is_direct ? "Direct\n" : "Iterative\n");
+
+	return out;
 }

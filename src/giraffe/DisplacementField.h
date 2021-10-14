@@ -1,27 +1,28 @@
 #pragma once
 #include "Displacement.h"
 
+
 struct DispStruct
 {
 	std::array<double, 6> disp;
-	unsigned int node;
+	size_t node;
 };
+
 
 class DisplacementField : public Displacement
 {
+private:
+	size_t m_cs;
+	size_t m_solution_step;
+
+	std::vector<DispStruct> m_disp_data;
+
 public:
 	DisplacementField();
-	DisplacementField(unsigned int n_nodes);
+	DisplacementField(size_t cs, size_t solution_step);
 	~DisplacementField();
 
 	//============================================================================
-
-	/*-------
-	Functions
-	--------*/
-
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
 	
 	//Inserts displacement field (from a matrix of translations) in the vector of displacements
 	void InsertDisplacement(const int& node, Matrix& e_disp);
@@ -34,20 +35,30 @@ public:
 	//Inserts displacement field (from an array) in the vector of displacements
 	void InsertDisplacement(const unsigned int& node, std::array<double,6>& e_disp);
 
-	//============================================================================
 
-	/*-------
-	Variables
-	--------*/
+	/// 
+	/// SETTERS
+	/// 
 
-	//Vector with data
-	std::vector<DispStruct> disp_data;
+
+	void SetCoordinateSystem(size_t cs);
+	void SetSolutionStep(size_t solution_step);
 	
-	//Coordinate system
-	unsigned int cs;
 
-	//Solution step
-	unsigned int solution_step;
+	/// 
+	/// GETTERS
+	/// 
+
+	size_t GetCoordinateSystem() const { return m_cs; }
+	size_t GetSolutionStep() const { return m_solution_step; }
+
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const DisplacementField& obj);
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
+
 };
-
 

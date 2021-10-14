@@ -8,22 +8,13 @@ public:
 	Static();
 	~Static();
 	
-	//Writes output file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
-	
-	//============================================================================
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
 
-	/*-------
-	Variables
-	--------*/
 
-	double i_time_step;
-	double max_time_step;
-	double min_time_step;
-	int max_it;
-	int min_it;
-	int conv_increase;
-	double inc_factor;
-	int sample;
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ofstream& operator<<(std::ofstream& out, Static const& obj);
 };
 

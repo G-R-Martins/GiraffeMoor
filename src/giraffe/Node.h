@@ -3,29 +3,43 @@
 
 class Node
 {
+private:
+	size_t m_number;
+	std::array<double, 3> m_ref_coordinates;
+	std::string_view m_comment;
+
 public:
 	Node();
+	Node(size_t number, const std::array<double, 3>& m_ref_coordinates, std::string_view comment = "\0");
 	~Node();
 	
-	//Writes giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
-	//============================================================================
-
-	/*-------
-	Variables
-	--------*/
 	
-	//Node ID
-	unsigned int number;
-
-	//Mark to comment
-	bool mark_comment;
-
-	//Array with nodes coodinates at the reference configuration
-	std::array <double, 3> ref_coordinates;
+	///
+	/// SETTERS
+	/// 
 	
-	//Comment
-	char comment[100];
+	void SetIDNumber(size_t number);
+	void SetCoordinates(const std::array<double, 3>& ref_coordinates);
+	void SetComment(std::string_view comment);
+	
+
+	///
+	/// GETTERS
+	/// 
+	
+	inline size_t GetIDNumber() const							{ return m_number; }
+	inline const std::array<double, 3>& GetCoordinates() const	{ return m_ref_coordinates; }
+	inline std::array<double, 3>& GetCoordinates()				{ return m_ref_coordinates; }
+	inline const std::string_view& GetComment() const			{ return m_comment; }
+	inline std::string_view& GetComment()						{ return m_comment; }
+
+	
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const Node& obj);
+
 };
 

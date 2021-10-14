@@ -130,8 +130,8 @@ std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* line)
 			// Not all keywords defined
 			if (!names.empty())
 			{
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "LineDisplacementFields",
-					   std::to_string(AuxFunctions::Reading::GetCurrentLine(input)) });
+				//Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "LineDisplacementFields",
+				//	   std::to_string(AuxFunctions::Reading::GetCurrentLine(input)) });
 				std::exit(EXIT_FAILURE);
 			}
 

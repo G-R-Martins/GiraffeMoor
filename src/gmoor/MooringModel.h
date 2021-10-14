@@ -20,7 +20,6 @@
 #include "StiffnessMatrix.h"
 #include "SegmentSet.h"
 #include "SegmentProperty.h"
-#include "SineWaveDisplacement.h"
 
 #include "MathCode.h"
 
@@ -42,17 +41,17 @@ public:
 	size_t cur_line;
 	unsigned int tot_elem;			//per line
 
-	unsigned int cur_node_mesh;
-	unsigned int cur_elem;
-	unsigned int cur_cs;			//Start with '2', because the first one will be the global coordinate system
-	unsigned int cur_node_set;
-	unsigned int cur_vessel;
-	unsigned int cur_special_constraint;
-	unsigned int cur_node_set_constraint;
-	unsigned int cur_constraint;
-	unsigned int cur_load;
-	unsigned int cur_disp;
-	unsigned int cur_rbdata;
+	size_t cur_node_mesh;
+	size_t cur_elem;
+	size_t cur_cs;			//Start with '2', because the first one will be the global coordinate system
+	size_t cur_node_set;
+	size_t cur_vessel;
+	size_t cur_special_constraint;
+	size_t cur_node_set_constraint;
+	size_t cur_constraint;
+	size_t cur_load;
+	size_t cur_disp;
+	size_t cur_rbdata;
 	unsigned int node_set_contact;	//nodes of all lines
 	unsigned int pil_node_set;		//seabed nodeset
 	bool TDZ;
@@ -98,9 +97,9 @@ public:
 	std::vector<double> line_seabed_epsilon;
 
 	// Dynamic relaxation data
-	std::vector<double> rho_eq;	///equivalent specific mass for each  line
-	std::vector<double> area_eq;	///equivalent cross section area for each line
-	double rot_fairlead;			///fairlead rotation
+	std::vector<double> rho_eq;		// equivalent specific mass for each  line
+	std::vector<double> area_eq;	// equivalent cross section area for each line
+	double rot_fairlead;			// fairlead rotation
 
 	//============================================================================
 
@@ -132,31 +131,14 @@ public:
 	Containers with objects composing the programa Database
 	-----------------------------------------------------*/
 
-	//Vector with line objects (before move assignments)
 	std::vector<Line> line_vector;
-
-	//Vector with vessel objects
 	std::vector<Vessel> vessel_vector;
-
-	//Vector with keypoints objects
 	std::vector<Keypoint> keypoint_vector;
-
-	//Vector with segment properties objects
 	std::vector<SegmentProperty> segment_property_vector;
-
-	//Deque with nodal force objects
 	std::deque<MoorLoad> moorload_vector;
-
-	//Vector with platform objects
 	std::vector<Platform> platform_vector;
-
-	//Deque with vessel displacements
 	std::deque<VesselDisplacement> vessel_disp_vector;
-
-	//Vector with segment sets
 	std::vector<SegmentSet> segment_set_vector;
-
-	//Vector with displacement fields
 	std::vector<LineDisplacementField> disp_field_vector;
 
 	std::vector<MoorConstraint> anchor_constraints;
@@ -216,7 +198,7 @@ public:
 
 	void ImposePenetration(Line& line);
 
-	void GenerateCatenaryDisplacement(Line& line, const unsigned int& n_segs, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
+	void GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
 									  std::vector<std::vector<double>>& xcat_n, std::vector<std::vector<double>>& zcat_n, std::vector<std::vector<double>>& roty_n);
 
 

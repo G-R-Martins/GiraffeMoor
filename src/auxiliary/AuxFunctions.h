@@ -79,7 +79,7 @@ namespace AuxFunctions
 				return false;
 
 			do { input >> readed; 
-			} while (CheckComment(input, readed));
+			} while (CheckComment(input, readed) && !input.eof());
 
 			return true;
 		}
@@ -124,7 +124,7 @@ namespace AuxFunctions
 			return true;
 		}
 
-		inline bool CheckUpperKeyword(const USET_SV& upper_keywords, const STR& readed)
+		inline bool CheckUpperKeyword(const USET_SV& upper_keywords, const std::string& readed)
 		{
 			return upper_keywords.find(readed) != upper_keywords.end();
 		}
@@ -181,8 +181,7 @@ namespace AuxFunctions
 			size_t removed = before - c.size();
 			if (removed > 0)
 			{
-				std::string warning = "\n   + " + std::to_string(removed) + " repeated \"" + name + "(s)\" removed.";
-				Log::AddWarning(warning);
+				Log::SetWarning(Log::Warning::REMOVED_OBJECTS, name);
 			}
 			c.shrink_to_fit();
 		}
@@ -291,6 +290,7 @@ namespace AuxFunctions
 		{
 			try
 			{
+				input >> readed;
 				return std::stoull(readed);
 			}
 			catch (const std::exception&)

@@ -1,33 +1,40 @@
 #pragma once
-
+#include "SegmentProperty.h"
 
 class PipeSection
 {
+private:
+	size_t m_number;
+	bool m_is_beam;
+	double m_diameter;
+	double m_rho;
+	double m_EA;
+	double m_EI;
+	double m_GJ;
+	double m_GA;
+	double m_CDt;
+	double m_CDn;
+	double m_CAt;
+	double m_CAn;
+	double m_E;
+	double m_nu;
+
 public:
 	PipeSection();
-	PipeSection(const size_t& num, bool isbeam, const double& d, const double& r,
-				const double& ea, const double& ei, const double& gj, const double& ga,
-				const double& cdt, const double& cdn, const double& cat, const double& can,
-				const double& young, const double& poisson);
+	PipeSection(size_t number, bool is_beam, double d, double rho,
+				double EA, double EI, double GJ, double GA,
+				double CDt, double CDn, double CAt, double CAn,
+				double E, double nu);
+	PipeSection(const SegmentProperty& moor_prop);
+
 	~PipeSection();
 	
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;	
 
-	//Variables
-	size_t number;
-	bool isBeam;
-	double diameter;
-	double rho;
-	double EA;
-	double EI;
-	double GJ;
-	double GA;
-	double CDt;
-	double CDn;
-	double CAt;
-	double CAn;
-	double E;
-	double nu;
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const PipeSection& obj);
+
 };
 

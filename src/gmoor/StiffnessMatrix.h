@@ -3,6 +3,7 @@
 
 class StiffnessMatrix
 {
+private:
 	// Booleans to indicate which type of stiffness matrix will be calculated
 	bool m_exist_analytical;
 	bool m_exist_numerical;

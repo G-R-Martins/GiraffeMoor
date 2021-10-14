@@ -61,15 +61,13 @@ public:
 	static bool ReadPostFiles(std::string& readed);
 	static bool ReadCADs(std::string& readed);
 	static bool ReadPlatformCAD(std::string& readed);
-	static bool ReadAnalyticalStiffnessMatrix(std::string& readed);
-	static bool ReadNumericalStiffnessMatrix(std::string& readed);
 	static bool ReadLineDisplacementFields(std::string& readed);
 	static bool ReadConstraints(std::string& readed);
 	static bool ReadRunOption(std::string& readed);
 	static bool ReadProcessors(std::string& readed);
 	static bool ReadConvergenceCriteria(std::string& readed);
 	static bool ReadVesselDisplacement(std::string& readed);
-	static void ReadStiffnessMatrix(std::string& readed);
+	static bool ReadStiffnessMatrix(std::string& readed);
 	static void ReadNodalLoads(std::string& readed);
 
 

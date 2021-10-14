@@ -38,7 +38,7 @@ BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bo
 	}
 }
 
-BoolTable::BoolTable(BoolTable &copied)
+BoolTable::BoolTable(const BoolTable &copied)
 {
 	data_table = copied.data_table;
 }

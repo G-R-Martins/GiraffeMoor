@@ -39,10 +39,6 @@ public:
 	~GiraffeSolver();
 
 	
-	//Writes Giraffe input file (.inp)
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
-
 	///
 	/// SETTERS
 	///
@@ -69,5 +65,6 @@ public:
 	/// 
 	
 	friend std::ostream& operator<<(std::ostream& fout, const GiraffeSolver::ConvergenceCriteria& conv_criteria);
+	friend std::ostream& operator<<(std::ostream& out, const GiraffeSolver* obj);
 };
 

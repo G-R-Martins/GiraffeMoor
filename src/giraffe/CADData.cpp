@@ -12,12 +12,6 @@ CADData::~CADData()
 
 
 
-void CADData::WriteGiraffeModelFile(std::ostream& fout) const
-{
-	fout << "\tSTLSurface " << m_number << 
-		"\t" << m_name << "\n";
-}
-
 
 /// 
 /// SETTERS
@@ -57,4 +51,14 @@ bool operator==(const CADData& obj1, const CADData& obj2)
 bool operator!=(const CADData& obj1, const CADData& obj2)
 {
 	return !(obj1 == obj2);
+}
+
+
+
+std::ostream& operator<<(std::ostream& out, const CADData& obj)
+{
+	out << "\tSTLSurface " << obj.m_number << 
+		"\t" << obj.m_name << "\n";
+
+	return out;
 }

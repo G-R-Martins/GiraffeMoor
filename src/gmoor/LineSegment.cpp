@@ -52,15 +52,15 @@ void LineSegment::SetDiscretization(unsigned int discretization)
 {
 	this->m_discretization = discretization;
 }
-void LineSegment::SetNNodes(unsigned int nodes)
+void LineSegment::SetNNodes(size_t nodes)
 {
 	this->m_tot_nodes = nodes;
 }
-void LineSegment::SetNElements(unsigned int elements)
+void LineSegment::SetNElements(size_t elements)
 {
 	this->m_tot_elements = elements;
 }
-void LineSegment::SetNodeSet(unsigned int nodeset)
+void LineSegment::SetNodeSet(size_t nodeset)
 {
 	this->m_nodeset = nodeset;
 }

@@ -8,7 +8,12 @@ public:
 	RigidBody();
 	~RigidBody();
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const RigidBody& obj);
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
 };
 

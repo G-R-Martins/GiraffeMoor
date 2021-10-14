@@ -4,23 +4,32 @@
 
 class SpecialConstraint
 {
+private:
+	size_t m_number;
+protected:
+	BoolTable m_booltable;
+
 public:
 	SpecialConstraint();
+	SpecialConstraint(size_t number, const BoolTable& booltable);
 	virtual ~SpecialConstraint();
 
-	//Interface
-	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
+	virtual inline std::ofstream& WriteGiraffeFile(std::ofstream& out) = 0;
+
+	/// 
+	/// SETTERS
+	/// 
 	
-	//============================================================================
+	void SetIDNumber(size_t number);
+	void SetBoolTable(const BoolTable& booltable);
 
-	/*-------
-	Variables
-	--------*/
 
-	//Special constraint ID
-	unsigned int number;
+	/// 
+	/// GETTERS
+	/// 
 
-	//Special constraint booltable
-	BoolTable bool_table;
+	inline size_t GetIDNumber() const { return m_number; }
+	inline const BoolTable& GetBoolTable() const { return m_booltable; }
+	inline BoolTable& GetBoolTable() { return m_booltable; }
 };
 

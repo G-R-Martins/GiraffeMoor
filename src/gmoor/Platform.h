@@ -61,7 +61,7 @@ public:
 	bool Read(FILE *f);
 
 	//Generates rigid body elements from concentrated mass
-	bool GenerateRigidBodyElements(unsigned int& element, unsigned int &nodeset, unsigned int &rb_data, unsigned int &special_constraint, unsigned int &nodal_constraint) const;
+	bool GenerateRigidBodyElements(size_t element, unsigned int &nodeset, unsigned int &rb_data, unsigned int &special_constraint, unsigned int &nodal_constraint) const;
 	
 	//Generates node sets, rigid node sets 
 	bool GenerateNodeSetsSpecialConstraints(unsigned int &nodeset, unsigned int &nodal_constraint, unsigned int &special_constraint);

@@ -20,19 +20,17 @@ namespace aux_read = AuxFunctions::Reading;
 
 // Static variables
 
-std::string IO::folder_name, IO::input_name, IO::name;
+std::string IO::folder_name;
+std::string IO::input_name;
+std::string IO::name;
+
 std::ifstream IO::s_inp;
 
 std::string IO::version = std::to_string(GiraffeMoor_VERSION_MAJOR)
 	/*-- The following option to check and introduce '0' if n < 10 is quite inefficient, but one of the shortest ways to do it --*/
 	+ "." + std::string(2 - std::to_string(GiraffeMoor_VERSION_MINOR).length(), '0') + std::to_string(GiraffeMoor_VERSION_MINOR) 
 	+ "." + std::string(2 - std::to_string(GiraffeMoor_VERSION_PATCH).length(), '0') + std::to_string(GiraffeMoor_VERSION_PATCH) 
-	+ "-a ";
-
-
-//MAP_FUNC{{ "Analytical", &IO::ReadAnalyticalStiffnessMatrix }, { "Numerical", &IO::ReadNumericalStiffnessMatrix }}
-
-
+	+ "a";
 
 
 //Reads GiraffeMoor input file
@@ -43,77 +41,73 @@ bool IO::ReadFile()
 	std::cout << "|                        GiraffeMoor                           |\n";
 	std::cout << "|               University of Sao Paulo - Brazil               |\n";
 	std::cout << "|                                                              |\n";
-	std::cout << "|                                                v. " << IO::version << " |\n";
+	std::cout << "|                                                v. " << IO::version << "  |\n";
 	std::cout << "|______________________________________________________________|\n\n";
 	
 
-	//while (true)
-	//{
-	//	if (__argc > 1)
-	//	{
-	//		//passed only the input file name (solution folder in the same location of the executable)
-	//		if (__argc == 2)
-	//		{ 
-	//			input_name = __argv[1]; 
-	//			folder_name = "./" + input_name + "/"; 
-	//		}
-	//		//passed the folder name and the input file name
-	//		else if (__argc == 3)	
-	//		{ 
-	//			input_name = __argv[2]; 
-	//			folder_name = std::string(__argv[1]) + input_name + "/"; 
-	//		}
-	//		else
-	//			std::cerr << "invalid number of arguments passed to GiraffeMoor"; std::exit( EXIT_FAILURE );
-	//	}
-	//	else
-	//	{
-	//		std::cout << "Enter the name of the input file: ";
-	//		std::getline(std::cin, input_name);
-	//		
-	//		//folder in the same location of the executable
-	//		folder_name = "./" + input_name + "/";
-	//	}
-	//
-	//
-	//	name = folder_name + input_name + ".gmr";
-	//
-	//	std::cout << "\n";
-	//	
-	//	//tries to read the same location of the executable file of Giraffe
-	//	s_inp.open(name);
-	//	if (!s_inp.is_open())
-	//	{
-	//		folder_name = "C:/Users/Public/Documents/GiraffeMoor/";
-	//		
-	//		//checks if there isn't a 'GiraffeMoor' folder in public documents
-	//		if (!std::filesystem::is_directory(folder_name))
-	//			std::filesystem::create_directory(folder_name);
-	//
-	//		name = folder_name + input_name + ".gmr";
-	//		s_inp.open(name);
-	//		if (!s_inp.is_open())
-	//			std::cout << "Error reading the input file. Try again.\n";
-	//		else
-	//			break;
-	//	}
-	//	else
-	//	{
-	//		if ( __argc > 1 )
-	//			std::cout << "Running file \"" << input_name << ".gmr\" . . .\n\n\n";
-	//		break;
-	//	}
-	//}
-
-
-
-	std::string file_name = "oc4.gmr";
-	s_inp.open(file_name);
-	if (!s_inp.is_open())
+	while (true)
 	{
-		Log::AddError(std::string("Error trying to open the file \"") + file_name + "\"");
-		return false;
+		if (__argc == 1)
+		{
+			std::cout << "Enter the name of the input file: ";
+			std::getline(std::cin, input_name);
+
+			//folder in the same location of the executable
+			folder_name = "./" + input_name + "/";
+		}
+		//passed only the input file name (solution folder in the same location of the executable)
+		else if (__argc == 2)
+		{
+			input_name = __argv[1];
+			folder_name = "./" + input_name + "/";
+		}
+		//passed the folder name and the input file name
+		else if (__argc == 3)
+		{
+			input_name = __argv[2];
+			folder_name = std::string(__argv[1]) + input_name + "/";
+		}
+		else
+		{
+			std::cerr << "invalid number of arguments passed to GiraffeMoor"; 
+			std::exit(EXIT_FAILURE);
+		}
+		name = folder_name + input_name + ".gmr";
+	
+		std::cout << "\n";
+		
+		//tries to read the same location of the executable file of Giraffe
+		s_inp.open(name);
+		if (!s_inp.is_open())
+		{
+			folder_name = "C:/Users/Public/Documents/GiraffeMoor/";
+			
+			//checks if there isn't a 'GiraffeMoor' folder in public documents
+			if (!std::filesystem::is_directory(folder_name))
+				std::filesystem::create_directory(folder_name);
+	
+			name = folder_name + input_name + ".gmr";
+			s_inp.open(name);
+			if (!s_inp.is_open())
+				std::cout << "Error reading the input file. Try again.\n";
+			else
+				break;
+		}
+		else
+		{
+			if ( __argc > 1 )
+				std::cout << "Running file \"" << input_name << ".gmr\" . . .\n\n\n";
+			break;
+		}
 	}
+
+	//std::string file_name = "oc4.gmr";
+	//s_inp.open(file_name);
+	//if (!s_inp.is_open())
+	//{
+	//	//Log::AddError(std::string("Error trying to open the file \"") + file_name + "\"");
+	//	return false;
+	//}
 
 	std::string word;
 	s_inp >> word;
@@ -127,9 +121,8 @@ bool IO::ReadFile()
 			if (aux_read::TryComment(s_inp, word))
 				continue;
 			
-			std::cout << "\"" << word << "\" is not a valid keyword or it has been already defined.";
-			std::cout << "\nulitma linha: " << aux_read::GetCurrentLine(s_inp) << "\n";
-
+			Log::SetWarning(Log::Warning::INVALID_KEYWORD, Log::GetLastValidKeyword(), aux_read::GetCurrentLine(s_inp), word);
+			
 			return false;
 		}
 
@@ -138,8 +131,8 @@ bool IO::ReadFile()
 		{
 			if (!aux_read::Loop(s_inp, mm.keypoint_vector, word, 
 				MAP_FUNC{ { "Keypoint", &IO::ReadKeypoint } }))
-				std::cout << "\nErro lendo Keypoints! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Keypoints", aux_read::GetCurrentLine(s_inp), "Segment");
+			
 			aux_read::RemoveDuplicates(mm.keypoint_vector, "Keypoint");
 		}
 		else if (word == "SegmentSets")
@@ -193,10 +186,10 @@ bool IO::ReadFile()
 		}
 		else if (word == "Constraints")
 		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{ 
+			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{
 					{ "AnchorConstraints", &IO::ReadConstraints },
 					{ "LineConstraints", &IO::ReadConstraints },
-					{ "VesselConstraints", &IO::ReadConstraints } 
+					{ "VesselConstraints", &IO::ReadConstraints }
 				}))
 				std::cout << "\nErro lendo Solution! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
 
@@ -236,6 +229,13 @@ bool IO::ReadFile()
 
 			aux_read::RemoveDuplicates(mm.disp_field_vector, "VesselDisplacements");
 		}
+		else if (word == "StiffnessMatrix")
+		{
+			if (!IO::ReadStiffnessMatrix(word))
+				std::cout << "\nErro lendo DisplacementFields! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
+
+			aux_read::RemoveDuplicates(mm.disp_field_vector, "VesselDisplacements");
+		}
 		else
 		{
 			std::cout << "\nErro lendo linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
@@ -257,7 +257,6 @@ bool IO::ReadKeypoint(std::string& readed)
 	double num;
 
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	keypoint->SetIDNumber(num_ID);
 
@@ -270,7 +269,9 @@ bool IO::ReadKeypoint(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::INVALID_ID, "Keypoint", aux_read::GetCurrentLine(s_inp));
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Keypoints", aux_read::GetCurrentLine(s_inp), "Keypoint");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Keypoints", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -298,14 +299,12 @@ bool IO::ReadSegmentSet(std::string& readed)
 	std::unordered_set<std::string_view> upper_keywords{ "Set" };
 
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	set->SetIDNumber(num_ID);
 
-	if (!aux_read::NestedLoop(s_inp, set->GetAllSegment(), upper_keywords, readed, 
+	if (!aux_read::NestedLoop(s_inp, set->GetAllSegment(), upper_keywords, readed,
 		MAP_FUNC{ { "Length", &IO::ReadSegment } }))
-		std::cout << "\nErro lendo SegmentSets"; // TODO: verificar erro leitura
-	
+		return false; //TODO: verificar erro
 
 	// All OK while reading
 	return true;
@@ -325,7 +324,9 @@ bool IO::ReadSegment(std::string& readed)
 			// If is not a valid node handle, then check if all parameters were defined
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Segment", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "SegmentSet", aux_read::GetCurrentLine(s_inp), "Segment");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentSet", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -356,7 +357,6 @@ bool IO::ReadLine(std::string& readed)
 	size_t num;
 
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	line->SetIDNumber(num_ID);
 
@@ -364,7 +364,7 @@ bool IO::ReadLine(std::string& readed)
 
 	// If is shared, one MUST define "Fairleads" or "VesselIDs" after the ID number
 	// thus, it CAN NOT be "SegmentSet" in this case!
-	if (name == "Fairleads" || name == "VesselIDs")
+	if (readed == "Fairleads" || readed == "VesselIDs")
 	{
 		names = { "Fairleads", "VesselIDs", "SegmentSet" };
 		line->SetSharedOpt(true);
@@ -379,7 +379,9 @@ bool IO::ReadLine(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Keypoint", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Lines", aux_read::GetCurrentLine(s_inp), "Line");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Lines", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -438,7 +440,6 @@ bool IO::ReadVessel(std::string& readed)
 	std::unordered_set<std::string_view> optional{ "InertiaTensor", "Mass" };
 	
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	vessel->SetIDNumber(num_ID);
 
@@ -456,8 +457,10 @@ bool IO::ReadVessel(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Vessel", std::to_string(aux_read::GetCurrentLine(s_inp)) });
-				
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Vessels", aux_read::GetCurrentLine(s_inp), "Vessel");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Vessels", aux_read::GetCurrentLine(s_inp), readed);
+
 				return all_parameters_readed;
 			}
 		}
@@ -466,13 +469,13 @@ bool IO::ReadVessel(std::string& readed)
 		
 		if (name == "InertiaTensor")
 		{
-			vessel->SetInertiaTensor(aux_read::ReadFixedContainer<std::array<float, 6>, 6>(s_inp));
+			vessel->SetInertiaTensor(aux_read::ReadFixedContainer<std::array<double, 6>, 6>(s_inp));
 			continue;
 		}
 
 		s_inp >> readed;
 
-		if (name == "PilotNode")	vessel->SetNode(std::stoul(readed));
+		if (name == "PilotNode")	vessel->SetKeypoint(std::stoul(readed));
 		else if (name == "Mass")	vessel->SetMass(std::stof(readed));
 
 	} while (true);
@@ -522,7 +525,9 @@ bool IO::ReadDynRelaxLines(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "DynamicRelaxation", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "DynamicRelaxation |> LineStatics");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -570,7 +575,9 @@ bool IO::ReadDynRelaxVessels(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "DynamicRelaxation", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "DynamicRelaxation |> VesselStatics");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -619,7 +626,9 @@ bool IO::ReadSeaCurrentStep(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "SeaCurrentStep", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "SeaCurrentStep");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -662,7 +671,6 @@ bool IO::ReadSolutionStep(std::string& readed)
 	std::unordered_set<std::string_view> mandatory, optional, invalid;
 	
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	step->SetIDNumber(num_ID);
 	
@@ -682,7 +690,7 @@ bool IO::ReadSolutionStep(std::string& readed)
 	}
 	else
 	{
-		Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Solution step", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 		return false;
 	}
 
@@ -701,7 +709,9 @@ bool IO::ReadSolutionStep(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Solution step", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "Analysis |> Step");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -760,7 +770,6 @@ bool IO::ReadSegmentProperty(std::string& readed)
 	double num;
 
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	prop->SetIDNumber(num_ID);
 
@@ -790,7 +799,7 @@ bool IO::ReadSegmentProperty(std::string& readed)
 	}
 	else
 	{
-		Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "SegmentProperty", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentProperties", aux_read::GetCurrentLine(s_inp), readed);
 		return false;
 	}
 
@@ -809,7 +818,9 @@ bool IO::ReadSegmentProperty(std::string& readed)
 			{
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
-					Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "SegmentProperty", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "SegmentProperties", aux_read::GetCurrentLine(s_inp), "SegmentProperty");
+				else
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentProperties", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -818,7 +829,7 @@ bool IO::ReadSegmentProperty(std::string& readed)
 		std::string_view name = nh.value();
 
 		s_inp >> num;
-				
+		
 		if (name == "SpecificGravity")			prop->SetSG(num);
 		else if (name == "SpecificMass")		prop->SetMass(num);
 		else if (name == "Diameter")			prop->SetDiameter(num);
@@ -856,7 +867,9 @@ bool IO::ReadEnvGeneral(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Environment general properties", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "General");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -890,7 +903,7 @@ bool IO::ReadSeabed(std::string& readed)
 		seabed->SetFlatOption(true);
 	else
 	{
-		Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Seabed", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
 		return false;
 	}
 
@@ -902,7 +915,9 @@ bool IO::ReadSeabed(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Seabed", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "Seabed");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -949,7 +964,9 @@ bool IO::ReadSeaCurrentAt(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Sea current", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "SeaCurrent");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -977,8 +994,7 @@ bool IO::ReadRunOption(std::string& readed)
 	s_inp >> std::boolalpha;
 	s_inp >> option;
 	gm.gir_solver.SetRunGiraffeOpt(option);
-	
-	
+		
 	s_inp >> std::noboolalpha;
 	s_inp >> readed;
 	
@@ -1000,7 +1016,9 @@ bool IO::ReadProcessors(std::string& readed)
 		{
 			bool all_parameters_readed = names.empty();
 			if (!all_parameters_readed)
-				Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "Solver", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), "Processors");
+			else
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), readed);
 
 			return all_parameters_readed;
 		}
@@ -1115,7 +1133,6 @@ bool IO::ReadPlatformCAD(std::string& readed)
 	CADData* cad = &mm.moorpost.GetAllPlatformCADs().back();
 
 	// Read the ID number
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	cad->SetIDNumber(num_ID);
 	
@@ -1123,7 +1140,7 @@ bool IO::ReadPlatformCAD(std::string& readed)
 	s_inp >> readed;
 	if (readed != "Name")
 	{
-		Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "PlatformCAD", std::to_string(aux_read::GetCurrentLine(s_inp)) });
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), readed);
 		return false;
 	}
 
@@ -1137,20 +1154,22 @@ bool IO::ReadPlatformCAD(std::string& readed)
 	return true;
 }
 
-bool IO::ReadAnalyticalStiffnessMatrix(std::string& readed)
+bool IO::ReadStiffnessMatrix(std::string& readed)
 {
+	s_inp >> readed;
+	if (readed != "Analytical") return false;
+
 	bool option;
 
 	s_inp >> std::boolalpha >> option;
+	mm.stiff_matrix = std::make_unique<StiffnessMatrix>();
 	mm.stiff_matrix->SetAnalyticalStiffnessOpt(option);
 
 	s_inp >> std::noboolalpha >> readed;
 
 	// All OK while reading
 	return true;
-}
-bool IO::ReadNumericalStiffnessMatrix(std::string& readed)
-{
+
 	// TODO: adaptar
 	/*if (!strcmp(str, "Numerical"))
 	{
@@ -1167,7 +1186,6 @@ bool IO::ReadNumericalStiffnessMatrix(std::string& readed)
 			}
 		}
 	}*/
-	return false;
 }
 
 bool IO::ReadVesselDisplacement(std::string& readed)
@@ -1177,7 +1195,6 @@ bool IO::ReadVesselDisplacement(std::string& readed)
 	bool step_defined = false, disp_type_defined = false;
 
 	// Read the vessel ID 
-	s_inp >> readed;
 	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
 	disp->SetVesselID(num_ID);
 
@@ -1217,7 +1234,10 @@ bool IO::ReadVesselDisplacement(std::string& readed)
 			disp_type_defined = true;
 		}
 		else
+		{
+			Log::SetWarning(Log::Warning::INVALID_KEYWORD, "VesselDisplacement", aux_read::GetCurrentLine(s_inp), readed);
 			return false;
+		}
 
 		aux_read::TryCommentAndContinue(s_inp, readed);
 	}
@@ -1295,10 +1315,6 @@ bool IO::ReadConstraints(std::string& readed)
 	return true;
 }
 
-void IO::ReadStiffnessMatrix(std::string& readed)
-{
-
-}
 void IO::ReadNodalLoads(std::string& readed)
 {
 
@@ -1500,12 +1516,12 @@ bool IO::CheckModel()
 
 	// Checking status
 	bool modelOk = true;
-
+	
 	/// Approach for check empty stringstream adapted from 
 	/// https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null/36327567
 	if (ss.peek() != decltype(ss)::traits_type::eof())
 	{
-		Log::AddWarning(ss);
+		Log::SetWarning(ss.str());
 		modelOk = false;
 	}
 
@@ -1517,11 +1533,12 @@ bool IO::CheckModel()
 void IO::WriteGiraffeModelFile()
 {
 	//Giraffe input file
-	std::ofstream fgir(folder_name + input_name + ".inp", std::ofstream::out);
+	std::string full_name(folder_name + input_name + ".inp");
+	std::ofstream fgir(full_name, std::ofstream::out);
 
 	fgir << "/////////////////////////////////////////////////////////////////////////////\n";
 	fgir << "//                                                                         //\n";
-	fgir << "//   GIRAFFE input file generated automatically by GIRAFFEMoor v" << version << " //\n";
+	fgir << "//   GIRAFFE input file generated automatically by GIRAFFEMoor v" << version << "  //\n";
 	fgir << "//                                                                         //\n";
 	fgir << "/////////////////////////////////////////////////////////////////////////////\n\n";
 
@@ -1532,92 +1549,82 @@ void IO::WriteGiraffeModelFile()
 	fgir << std::setprecision(8);			//Default precision for float points
 
 	fgir << "\nSolutionSteps\t" << gm.solution_vector.size() << "\n";
-	for (const Solution* sol : gm.solution_vector )
-		sol->WriteGiraffeModelFile(fgir);
+	
+	for (Solution* sol: gm.solution_vector)
+		sol->WriteGiraffeFile(fgir);
 
-	fgir << "\nMonitor\n";
-	gm.monitor.WriteGiraffeModelFile(fgir);
-
-	fgir << "\nPostFiles\n";
-	gm.post.WriteGiraffeModelFile(fgir);
-
-	fgir << "\nSolverOptions\n";
-	gm.gir_solver.WriteGiraffeModelFile(fgir);
+	fgir << "\nMonitor\n" << gm.monitor 
+		 << "\nPostFiles\n" << &gm.post
+		 << "\nSolverOptions\n" << &gm.gir_solver;
 
 	fgir << "\nConvergenceCriteria\n" << gm.gir_solver.GetConvCriteria();
 
-	/************************
-	 * SORT NODE SET VECTOR *
-	 ************************/
-	std::sort(gm.node_set_vector.begin(), gm.node_set_vector.end());
-
 	fgir << "\nNodeSets\t" << gm.node_set_vector.size() << "\n";
-	for (NodeSet& ns : gm.node_set_vector )
-		ns.WriteGiraffeModelFile(fgir);
+	for (const NodeSet& ns : gm.node_set_vector)
+		fgir << ns;
 
 	fgir << "\nPipeSections\t" << gm.pipe_section_vector.size() << "\n";
-	for (const PipeSection& ps : gm.pipe_section_vector )
-		ps.WriteGiraffeModelFile(fgir);
+	for (const PipeSection& section : gm.pipe_section_vector)
+		fgir << section;
 
 	fgir << "\nRigidBodyData\t" << gm.rbdata_vector.size();
-	for ( const RigidBodyData& rbdata : gm.rbdata_vector )
-		rbdata.WriteGiraffeModelFile(fgir);
+	for (const RigidBodyData& rb_data : gm.rbdata_vector)
+		fgir << rb_data;
 	fgir << "\n";
 
 	if ( !gm.post.GetAllCADs().empty() )
 	{
 		fgir << "\nCADData\t" << gm.post.GetAllCADs().size() << "\n";
 		for (const CADData& cad : gm.post.GetAllCADs())
-			cad.WriteGiraffeModelFile(fgir);
+			fgir << cad;
 	}
 
 	fgir << "\nConstraints\t" << gm.constraint_vector.size() << "\n";
-	for (const Constraint* constraint : gm.constraint_vector )
-		constraint->WriteGiraffeModelFile(fgir);
+	for (Constraint* constraint : gm.constraint_vector)
+		constraint->WriteGiraffeFile(fgir);
 
-	fgir << "\nEnvironment\n";
-	gm.environment.WriteGiraffeModelFile(fgir);
+	fgir << "\nEnvironment\n" << gm.environment;
 
 	fgir << "\nContacts\t" << gm.contact_vector.size() << "\n";
-	for (const Contact* cont : gm.contact_vector )
-		cont->WriteGiraffeModelFile(fgir);
+	for (Contact* contact : gm.contact_vector)
+		contact->WriteGiraffeFile(fgir);
 
 	fgir << "\nSurfaces\t" << gm.oscillatory_vector.size() << "\n";
-	for (const OscillatorySurf& osc_surf : gm.oscillatory_vector )
-		osc_surf.WriteGiraffeModelFile(fgir);
+	for (const OscillatorySurf& surface : gm.oscillatory_vector)
+		fgir << surface;
 
 	fgir << "\nSurfaceSets\t" << gm.surface_set_vector.size() << "\n";
-	for (const SurfaceSet& surf_set : gm.surface_set_vector )
-		surf_set.WriteGiraffeModelFile(fgir);
+	for (const SurfaceSet& surface_set : gm.surface_set_vector)
+		fgir << surface_set;
 
 	fgir << "\nCoordinateSystems\t" << gm.cs_vector.size() << "\n";
-	for (const CoordinateSystem& cood_sys : gm.cs_vector )
-		cood_sys.WriteGiraffeModelFile(fgir);
+	for (const CoordinateSystem& coord_system : gm.cs_vector)
+		fgir << coord_system;
 
 	fgir << "\nSpecialConstraints\t" << gm.special_constraint_vector.size() << "\n";
-	for (const SpecialConstraint* spec_constr : gm.special_constraint_vector )
-		spec_constr->WriteGiraffeModelFile(fgir);
+	for (SpecialConstraint* special_constraint : gm.special_constraint_vector )
+		special_constraint->WriteGiraffeFile(fgir);
 
 	fgir << "\nElements\t" << gm.element_vector.size() << "\n";
-	for (const Element* element : gm.element_vector )
-		element->WriteGiraffeModelFile(fgir);
-
+	for (Element* element : gm.element_vector)
+		element->WriteGiraffeFile(fgir);
+	
 	fgir << "\nNodes\t" << gm.node_vector.size() << "\n";
-	for (const Node& node : gm.node_vector )
-		node.WriteGiraffeModelFile(fgir);
+	for (const Node& node : gm.node_vector)
+		fgir << node;
 
 	//Chenge precision for displacements and loads
-	fgir << std::setprecision( 16 );
+	fgir << std::setprecision(16);
 
 	fgir << "\nDisplacements\t" << gm.displacement_vector.size() << "\n";
-	for (const Displacement* disp : gm.displacement_vector )
-		disp->WriteGiraffeModelFile(fgir);
+	for (Displacement* disp : gm.displacement_vector)
+		disp->WriteGiraffeFile(fgir);
 
 	if ( !gm.load_vector.empty() )
 	{
 		fgir << "\nLoads\t" << gm.load_vector.size() << "\n";
-		for (const Load* load : gm.load_vector )
-			load->WriteGiraffeModelFile(fgir);
+		for (Load* load : gm.load_vector)
+			load->WriteGiraffeFile(fgir);
 	}
 
 	fgir.close();

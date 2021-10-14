@@ -4,7 +4,7 @@
 
 class Post
 {
-public:
+private:
 	double m_mag_factor;  //Magnification factor of displacements
 	WritingFlags m_writing_flags;
 
@@ -15,17 +15,8 @@ public:
 	~Post();
 
 
-					/*-------
-					Functions
-					--------*/
-
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
-	// Creates seabed VTK file
+	// Create VTK files
 	bool CreateSeabedVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
-	
-	//Creates water surface VTK file
 	bool CreateWaterVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
 
 
@@ -37,7 +28,7 @@ public:
 	void SetMagFactor(double mag_factor);
 	void SetAllCADs(const std::vector<CADData>& cad_vector);
 	void SetAllCADs(std::vector<CADData>&& cad_vector);
-
+	void SetFlags(WritingFlags&& flags);
 
 	/// 
 	/// GETTERS
@@ -53,5 +44,12 @@ public:
 	inline const std::vector<CADData>& GetAllCADs() const { return m_cad_vector; }
 	inline std::vector<CADData>& GetAllCADs() { return m_cad_vector; }
 
+
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const Post* obj);
 };
 

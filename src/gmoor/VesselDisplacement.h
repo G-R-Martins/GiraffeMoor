@@ -1,5 +1,5 @@
 #pragma once
-#include "SineWaveDisplacement.h"
+#include "MathCode.h"
 
 
 class VesselDisplacement
@@ -22,7 +22,6 @@ private:
 	
 
 	Table* m_ptr_time_series;
-	SineWaveDisplacement* m_ptr_sine_wave;
 	MathCode* m_ptr_math_code;
 
 public:
@@ -62,7 +61,6 @@ public:
 
 	inline Table* GetTimeSeries() const					{ return m_ptr_time_series; }
 	inline Table* GetTimeSeries()						{ return m_ptr_time_series; }
-	inline SineWaveDisplacement* GetSineWave() const	{ return m_ptr_sine_wave; }
 	inline MathCode* GetMathCode() const				{ return m_ptr_math_code; }
 	inline MathCode* GetMathCode()						{ return m_ptr_math_code; }
 

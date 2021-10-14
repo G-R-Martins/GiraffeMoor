@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "Summary.h"
-#include "MooringModel.h"
 #include "Log.h"
+#include "MooringModel.h"
 
 
 //Global object
@@ -23,7 +23,7 @@ void Summary::CreateSumFile_Impl(const std::string& name_with_folder, const std:
 	std::ofstream sum_file(summ_name, std::ios::out | std::ios::binary);
 	if (!sum_file)
 	{
-		Log::AddWarning("The summary file could not be created.\n");
+		Log::SetWarning("The summary file could not be created.\n");
 		return;
 	}
 	sum_file << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
@@ -57,7 +57,7 @@ void Summary::CreateSumFile_Impl(const std::string& name_with_folder, std::strin
 	std::ofstream sum_file(summ_name, std::ios::out | std::ios::binary);
 	if ( !sum_file )
 	{
-		Log::AddWarning("The summary file could not be created.\n");
+		Log::SetWarning("The summary file could not be created.\n");
 		return;
 	}
 	sum_file << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
@@ -92,7 +92,7 @@ void Summary::Append2File_Impl()
 	std::ofstream sum_file(summ_name, std::ofstream::app);
 	if (!sum_file.good())
 	{
-		Log::AddWarning("Cannot open the summary file!\n");
+		Log::SetWarning("Cannot open the summary file!\n");
 		return;
 	}
 
@@ -202,10 +202,10 @@ void Summary::Append2File_Impl()
 	sum_file.close();
 }
 
-void Summary::AddLine_Impl(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
-					  const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
-					  const unsigned int& number, const std::string_view& configuration,
-					  bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs)
+void Summary::AddLine_Impl(const std::array<size_t, 2>& nodes, const std::array<size_t, 2>& elements,
+					  const std::array<size_t, 2>& nodesets, const std::array<double, 2>& tensions,
+					  const size_t& number, const std::string_view& configuration,
+					  bool TDP, const double& x_tdp, const double& total_length, const size_t& segs)
 {
 	lines.emplace_back(SummLines());
 	lines.back().extremities = std::make_pair(Summary::LineExtremities({ nodes[0], elements[0], nodesets[0], tensions[0] }), Summary::LineExtremities({ nodes[1], elements[1], nodesets[1], tensions[1] }));

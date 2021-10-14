@@ -112,7 +112,7 @@ bool operator!= (const Line& line1, const unsigned int& line2)
 
 
 
-void Line::IncrementTotNodes(unsigned int add_nodes)
+void Line::IncrementTotNodes(size_t add_nodes)
 {
 	this->m_tot_nodes += add_nodes;
 }
@@ -169,29 +169,30 @@ void Line::SetVesselID(size_t vesselID)
 }
 void Line::SetSegmentSet(size_t segment_set)
 {
-	m_segment_set = m_segment_set;
+	m_segment_set = segment_set;
+	m_using_segment_set = true;
 }
-void Line::SetNodeA(unsigned int node_A)
+void Line::SetNodeA(size_t node_A)
 {
 	m_node_A = node_A;
 }
-void Line::SetNodeB(unsigned int node_B)
+void Line::SetNodeB(size_t node_B)
 {
 	m_node_B = node_B;
 }
-void Line::SetTotalNumNodes(unsigned int tot_nodes)
+void Line::SetTotalNumNodes(size_t tot_nodes)
 {
 	m_tot_nodes = tot_nodes;
 }
-void Line::SetNodesetA(unsigned int nodeset_A)
+void Line::SetNodesetA(size_t nodeset_A)
 {
 	m_nodeset_A = nodeset_A;
 }
-void Line::SetNodesetB(unsigned int nodeset_B)
+void Line::SetNodesetB(size_t nodeset_B)
 {
 	m_nodeset_B = nodeset_B;
 }
-void Line::SetCoordinateSystem(unsigned int coordinate_system)
+void Line::SetCoordinateSystem(size_t coordinate_system)
 {
 	m_coordinate_system = coordinate_system;
 }

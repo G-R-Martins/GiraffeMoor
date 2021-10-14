@@ -128,7 +128,7 @@ bool SolutionStep::SetNewmarkDamping(std::string_view damping)
 ///	}
 
 	// ERROR: invalid numerical damping
-	Log::AddWarning(R"(
+	Log::SetWarning(R"(
    + Please define one of these keywords for setting numerical damping parameters:
 
 	 ------------------------------

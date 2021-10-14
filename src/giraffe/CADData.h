@@ -12,8 +12,6 @@ public:
 	CADData();
 	~CADData();
 
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
 	
 	/// 
 	/// SETTERS
@@ -40,5 +38,6 @@ public:
 	friend bool operator==(const CADData& obj1, const CADData& obj2);
 	friend bool operator!=(const CADData& obj1, const CADData& obj2);
 
+	friend std::ostream& operator<<(std::ostream& out, const CADData& obj);
 };
 

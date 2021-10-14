@@ -4,15 +4,13 @@
 class Load
 {
 protected:
-	//Load ID
-	unsigned int number;
-
-	// Coordinate system ID
-	unsigned int CS; 
+	size_t m_number;
+	size_t m_cs; 
 
 	//Booleans to indicate if current nodal force uses math code or an external file
 	///otherwise, must be defined in the GiraffeMoor input file after 'TimeSeries' keyword
-	bool isMathCode, extFile;
+	bool m_is_math_code;
+	bool m_is_external_file;
 
 	//==========================================================================================================================
 
@@ -20,27 +18,27 @@ public:
 	Load();
 	virtual ~Load();
 
-	//Set functions
-	void SetNumber(unsigned int ID);
-	void SetCoordinateSystem(unsigned int CS);
-	void DefineMathCodeOption();
-	void DefineExternalFileOption();
+	virtual inline std::ofstream& WriteGiraffeFile(std::ofstream& out) = 0;
 
-	//Get functions
-	unsigned int GetNumber();
-	unsigned int GetCoordinateSystem();
-	bool CheckIfIsMathCode();
-	bool CheckIfIsExternalFile();
-
+	/// 
+	/// SETTERS
+	/// 
+	
+	void SetNumber(size_t number);
+	void SetCoordinateSystem(size_t cs);
+	void SetMathCodeOpt(bool option);
+	void SetExternalFileOpt(bool option);
 
 
-	//==========================================================================================================================
-
-				/*----------------
-				|Virtual functions|
-				-----------------*/
-
-	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline size_t GetNumber() const { return m_number; }
+	inline size_t GetCoordinateSystem() const { return m_cs; }
+	
+	inline bool IsMathCode() const { return m_is_math_code; }
+	inline bool IsExternalFile() const { return m_is_external_file; }
 
 };
 

@@ -12,13 +12,6 @@ public:
 	/*-------
 	Functions
 	--------*/
-
-	//Reads input file
-	bool Read(FILE *f);
-
-	//Writes Giraffe file data
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
 	//============================================================================
 
 	/*------------------------------------------
@@ -55,4 +48,11 @@ public:
 	bool bool_elements_vessel;
 	bool bool_contact_seabed_moor;
 
+
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const Monitor& obj);
 };

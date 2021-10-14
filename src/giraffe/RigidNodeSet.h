@@ -4,25 +4,31 @@
 
 class RigidNodeSet : public SpecialConstraint
 {
+private:
+	size_t m_pilot_node;
+	size_t m_node_set;
+	std::string m_comment;
+
 public:
 	RigidNodeSet();
+	RigidNodeSet(size_t pilot_node, size_t node_set, const std::string& comment = "");
 	~RigidNodeSet();
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
 
-	//============================================================================
+	/// 
+	/// GETTERS
+	/// 
 
-	/*-------
-	Variables
-	--------*/
+	inline size_t GetNodeSet() const { return m_node_set; }
+	inline const std::string& GetComment() const { return m_comment; }
+	inline std::string& GetComment() { return m_comment; }
 
-	//Rigid NS -> pilot node ID
-	unsigned int pilot_node;
 
-	//Rigid NS -> node set ID
-	unsigned int node_set;
-	
-	std::string comment;
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const RigidNodeSet& obj);
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
 };
 

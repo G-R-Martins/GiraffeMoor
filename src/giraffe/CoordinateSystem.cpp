@@ -3,57 +3,59 @@
 
 
 CoordinateSystem::CoordinateSystem()
-	: number(0), E1({0.,0.,0.}), E3({0.,0.,0.})
+	: m_number(0), m_E1({0.,0.,0.}), m_E3({0.,0.,0.})
 {}
-CoordinateSystem::CoordinateSystem(unsigned int ID, const std::array<double,3>& e1, const std::array<double,3>& e3)
-	: number(ID), E1(e1), E3(e3)
+CoordinateSystem::CoordinateSystem(size_t ID, const std::array<double,3>& E1, const std::array<double,3>& E3)
+	: m_number(ID), m_E1(E1), m_E3(E3)
 {}
 
 CoordinateSystem::~CoordinateSystem()
 {}
 
 
-void CoordinateSystem::WriteGiraffeModelFile(std::ostream& fout) const
+
+/// 
+/// SETTERS
+/// 
+
+void CoordinateSystem::SetIDNumber(size_t ID)
 {
-	fout << "\tCS " << number <<
-		std::setprecision(11) << 
-		"\tE1 " << E1[0] << " " << E1[1] << " " << E1[2] <<
-		"\tE3 " << E3[0] << " " << E3[1] << " " << E3[2] <<
-		std::setprecision(8) << 
-		"\n";
+	m_number = ID;
 }
-
-
-//Set functions
-void CoordinateSystem::SetCSID(unsigned int ID)
-{ this->number = ID; }
 
 void CoordinateSystem::SetE1(const std::array<double, 3>& coordinates)
-{ this->E1 = coordinates; }
+{
+	m_E1 = coordinates;
+}
 
 void CoordinateSystem::SetE3(const std::array<double, 3>& coordinates)
-{ this->E3 = coordinates; }
-
-void CoordinateSystem::SetCoordinateSystem(const std::array<double, 3>& e1, const std::array<double, 3>& e3)
-{ this->E1 = e1; this->E3 = e3; }
-
-
-//Get functions
-unsigned int CoordinateSystem::GetCSID()
-{ return this->number; }
-
-double CoordinateSystem::GetCoordinate(size_t versor_number, size_t coordinate)
 {
-	if ( versor_number == 1 )
-		return this->E1[coordinate];
-	else
-		return this->E3[coordinate];
+	m_E3 = coordinates;
 }
 
-std::array<double, 3> const& CoordinateSystem::GetVersor(size_t versor_number)
+void CoordinateSystem::SetVersor(const std::array<double, 3>& E1, const std::array<double, 3>& E3)
 {
-	if ( versor_number == 1 )
-		return this->E1;
-	else
-		return this->E3;
+	m_E1 = E1;
+	m_E3 = E3;
 }
+
+
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const CoordinateSystem& obj)
+{
+	out << "\tCS " << obj.m_number 
+		<< std::setprecision(11) 
+		<< "\tE1 " << obj.m_E1[0] << " " << obj.m_E1[1] << " " << obj.m_E1[2] 
+		<< "\tE3 " << obj.m_E3[0] << " " << obj.m_E3[1] << " " << obj.m_E3[2] <<
+		std::setprecision(8) << 
+		"\n";
+
+	return out;
+}
+
+
+

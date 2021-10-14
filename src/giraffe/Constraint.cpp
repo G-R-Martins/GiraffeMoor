@@ -2,10 +2,15 @@
 #include "Constraint.h"
 
 Constraint::Constraint()
-	: number(0)
+	: m_number(0)
 {
 }
 
 
 Constraint::~Constraint()
 {}
+
+void Constraint::SetIDNumber(size_t number)
+{
+	m_number = number;
+}

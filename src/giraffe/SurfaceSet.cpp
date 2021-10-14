@@ -3,21 +3,31 @@
 
 
 SurfaceSet::SurfaceSet()
-	: number(0)
+	: m_number(0)
 {}
 
-SurfaceSet::SurfaceSet(unsigned int n, std::vector<unsigned int> surf)
-	: number(n), surfaces(surf)
+SurfaceSet::SurfaceSet(size_t n, const std::vector<size_t>& surfaces)
+	: m_number(n), m_surfaces(surfaces)
 {}
 
 
 SurfaceSet::~SurfaceSet()
 {}
 
-void SurfaceSet::WriteGiraffeModelFile(std::ostream& fout) const
+
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const SurfaceSet& obj)
 {
-	fout << "\tSurfaceSet " << number << "\tSurfaces " << surfaces.size() << "\tList ";
-	for ( size_t i = 0; i < surfaces.size(); ++i )
-		fout << i + 1 << " ";
-	fout << "\n";
+	out << "\tSurfaceSet " << obj.m_number 
+		<< "\tSurfaces " << obj.m_surfaces.size() 
+		<< "\tList ";
+	for (size_t i = 0; i < obj.m_surfaces.size(); ++i)
+		out << i + 1 << " ";
+	out << "\n";
+
+	return out;
 }

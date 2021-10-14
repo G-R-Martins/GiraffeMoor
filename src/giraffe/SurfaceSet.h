@@ -3,23 +3,29 @@
 
 class SurfaceSet
 {
-	//Surface set ID
-	unsigned int number;
-
-	//Vector with surfaces identifications
-	std::vector<unsigned int> surfaces;
-
-	//============================================================================
+private:
+	size_t m_number;
+	std::vector<size_t> m_surfaces;
 
 public:
 	SurfaceSet();
-	SurfaceSet(unsigned int n, std::vector<unsigned int> surf);
+	SurfaceSet(size_t n, const std::vector<size_t>& surfaces);
 	~SurfaceSet();
+	
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline size_t GetNumber() const { return m_number; }
+	inline const std::vector<size_t>& GetSurfaces() const { return m_surfaces; }
+	inline std::vector<size_t>& GetSurfaces() { return m_surfaces; }
+	
+	
+	/// 
+	/// Overloaded operators
+	/// 
 
-
-
+	friend std::ostream& operator<<(std::ostream& out, const SurfaceSet& obj);
 };
 

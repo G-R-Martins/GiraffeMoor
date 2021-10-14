@@ -115,7 +115,7 @@ bool Platform::Read(FILE *f)
 }
 
 //Generates rigid body elements from concentrated mass(es)
-bool Platform::GenerateRigidBodyElements(unsigned int& element, unsigned int& nodeset, unsigned int &rb_data, unsigned int &special_constraint, unsigned int &nodal_constraint) const
+bool Platform::GenerateRigidBodyElements(size_t element, unsigned int& nodeset, unsigned int &rb_data, unsigned int &special_constraint, unsigned int &nodal_constraint) const
 {
 	///TODO: 'GenerateRigidBodyData' para plataformas em EF
 	//Generates rigid bodies data and elements

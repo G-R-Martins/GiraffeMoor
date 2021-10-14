@@ -3,48 +3,57 @@
 
 class NodeSet
 {
-public:
-	//Construct a empty nodeset -> list of nodes
-	NodeSet();
+private:
+	size_t m_number;
+	unsigned int m_total_nodes;
+	unsigned int m_node_init;  //Initial node (sequence)
+	unsigned int m_increment;
+	std::string m_comment;  //optional
 
+	std::vector<unsigned int> m_nodes;
+
+public:
+	NodeSet();
+	// Construct a list of nodesets
+	NodeSet(size_t number, const std::vector<unsigned int>& nodes, const std::string& comment="\0");
+	NodeSet(size_t number, const std::vector<unsigned int>& nodes, std::string& comment);
 	//Construct a nodeset to be used with sequence of nodes
-	NodeSet(const unsigned int& num_nodes, const unsigned int& node0, const unsigned int& inc);		
+	NodeSet(size_t number, unsigned int total_nodes, unsigned int node_init, 
+		unsigned int increment, const std::string& comment="\0");
+	NodeSet(size_t number, unsigned int total_nodes, unsigned int node_init, 
+		unsigned int increment, std::string& comment);
 	
 	//Destructor
 	~NodeSet();
 	
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
+
+	///
+	/// SETTERS
+	/// 
+
+	void SetIDNumber(size_t number);
+	void SetNNodes(unsigned int total_nodes);
+	void SetNodeInit(unsigned int node_init);
+	void SetIncrement(unsigned int increment);
+	void SetComment(const std::string& comment);
+	void SetNodes(std::vector<unsigned int> nodes);
+
+	///
+	/// GETTERS
+	/// 
 	
-	//============================================================================
+	inline size_t GetNumber() const { return m_number; };
+	inline unsigned int GetNNodes() const { return m_nodes.size(); };
+	inline unsigned int GetNodeInit() const { return m_node_init; };
+	inline unsigned int GetIncrement() const { return m_increment; };
+	inline const std::string& GetComment() const { return m_comment; };
+	inline std::string& GetComment() { return m_comment; };
+	inline const std::vector<unsigned int>& GetNodes() const { return m_nodes; };
 
-	/*-------
-	Variables
-	--------*/
-
-	//Node set ID (list)
-	unsigned int number;
-
-	//Number or nodes
-	unsigned int total_nodes;
 	
-	//Initial node (sequence)
-	unsigned int init;
-
-	//Increment (sequence)
-	unsigned int increment;
-
-	//Comment
-	char comment[100];
-
-	//Vector with nodes
-	std::vector <unsigned int> nodes;
-
-	//============================================================================
-
-	/*------------------
-	Overloaded operators
-	-------------------*/
+	/// 
+	/// Overloaded operators
+	/// 
 
 	friend bool operator<(const NodeSet& ns1, const NodeSet& ns2);
 	friend bool operator>(const NodeSet& ns1, const NodeSet& ns2);
@@ -57,5 +66,6 @@ public:
 	NodeSet(NodeSet&& other) noexcept = default;
 	NodeSet(const NodeSet& other) = default;
 
+	friend std::ostream& operator<<(std::ostream& out, const NodeSet& obj);
 };
 

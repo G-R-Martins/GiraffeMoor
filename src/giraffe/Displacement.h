@@ -3,18 +3,35 @@
 
 class Displacement
 {
+private:
+	size_t m_number;
+
+	bool m_is_math_code;  // using MathCode 
+	bool m_is_external_file;  // defined in external file (csv or txt)
+
 public:
 	Displacement();
+	Displacement(size_t number, bool is_math_code, bool is_external_file);
 	virtual ~Displacement();
 
-	//Interface
-	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
+	virtual inline std::ofstream& WriteGiraffeFile(std::ofstream& out) = 0;
+	
+	/// 
+	/// SETTERS
+	/// 
 
-	//Element ID
-	unsigned int number;
+	void SetIDNumber(size_t number);
+	void SetMathCodeOpt(bool option);
+	void SetExternalFileOpt(bool option);
 
-	//Booleans to indicate if current nodal force uses math code or an external file
-	///otherwise, must be defined in the GiraffeMoor input file after 'TimeSeries' keyword
-	bool isMathCode, extFile;
+
+	/// 
+	/// GETTERS
+	/// 
+
+	inline size_t GetNumber() const { return m_number; }
+	
+	inline bool IsMathCode() const { return m_is_math_code; }
+	inline bool IsExternalFile() const { return m_is_external_file; }
 };
 

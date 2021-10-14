@@ -4,20 +4,29 @@
 
 class SameRotation : public SpecialConstraint
 {
+private:
+	size_t m_node_A;
+	size_t m_node_B;
+
 public:
 	SameRotation();
+	SameRotation(size_t node_A, size_t node_B);
 	~SameRotation();
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
 
-	//============================================================================
+	/// 
+	/// GETTERS
+	/// 
 
-	/*---
-	Nodes
-	-----*/
+	inline size_t GetNodeA() const { return m_node_A; }
+	inline size_t GetNodeB() const { return m_node_B; }
 
-	unsigned int node_A;
-	unsigned int node_B;
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const SameRotation& obj);
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
 };
 

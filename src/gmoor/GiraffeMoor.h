@@ -31,18 +31,17 @@ namespace GiraffeMoor
 
 	void Run()
 	{
-		//Reading input data
-		if ( !IO::ReadFile() )
-			Log::SetError(Log::Error::Reading);
-		else if ( !IO::CheckModel() )
-			Log::SetError(Log::Error::InputModel);
+		if (!IO::ReadFile())
+			Log::SetError(Log::Error::READING);
+		else if (!IO::CheckModel())
+			Log::SetError(Log::Error::CHECKING_MODEL);
 		else
 		{
 			//Creates SummaryFile (with header)
 			Summary::CreateSumFile(IO::folder_name + IO::input_name, IO::version);
 
 			//Creates FEM model
-			if ( mm.GenerateGiraffeModel() )
+			if (mm.GenerateGiraffeModel())
 			{
 				//Add description to summary file 
 				Summary::Append2File();
@@ -54,8 +53,6 @@ namespace GiraffeMoor
 				RunGiraffe();
 #endif
 			}
-			else //ERROR
-				Log::SetError(Log::Error::FEM_Generation);
 		}
 	} //end funtion that run GiraffeMoor
 
@@ -70,6 +67,6 @@ namespace GiraffeMoor
 			system(GiraffeFile.c_str());
 		}
 		else //only prints this message if Giraffe solver is not called
-			Log::AddFinalMessage("\n\nGiraffeMoor execution has finished successfully!");
+			Log::SetFinalMessage("\n\nGiraffeMoor execution has finished successfully!");
 	}
 } //end GiraffeMoor namspace

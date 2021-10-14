@@ -23,7 +23,7 @@ void SegmentSet::SetIDNumber(size_t id)
 //Returns the number of 'LineSegment's in the set
 const size_t& SegmentSet::GetSegmentSetSize() const
 {
-	return this->n_segments;
+	return this->segments.size(); // TODO: verificar n_segments
 }
 
 

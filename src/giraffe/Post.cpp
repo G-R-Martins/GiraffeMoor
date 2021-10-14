@@ -10,17 +10,13 @@ Post::Post()
 Post::~Post()
 {}
 
-void Post::WriteGiraffeModelFile(std::ostream& fout) const
-{
-	fout << "\tMagFactor " << m_mag_factor << m_writing_flags << '\n';
-}
 
 bool Post::CreateSeabedVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth)
 {
 	std::ofstream vtk_file(folder + "seabed.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
-		Log::AddWarning("\n   + Seabed vtk file could not be created. Using Giraffe 'ContactSurfaces' instead.");
+		Log::SetWarning("\n  GIRAFFE |> Post files: Seabed surface VTK file could not be created. Using Giraffe 'ContactSurfaces' instead.");
 		return false;
 	}
 
@@ -47,7 +43,7 @@ bool Post::CreateWaterVTK(std::string& folder, const std::array<double, 2>& x, c
 	std::ofstream vtk_file(folder + "water.vtk", std::ios::out | std::ios::binary);
 	if (!vtk_file)
 	{
-		Log::AddWarning("\n   + Water surface vtk file could not be created");
+		Log::SetWarning("\n  GIRAFFE |> Post files: Water surface VTK file could not be created.");
 		return false;
 	}
 
@@ -84,3 +80,21 @@ void Post::SetAllCADs(std::vector<CADData>&& cad_vector)
 	m_cad_vector = std::move(cad_vector);
 }
 
+void Post::SetFlags(WritingFlags&& flags)
+{
+	this->m_writing_flags = flags;
+}
+
+
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const Post* obj)
+{
+	out << "\tMagFactor " << obj->m_mag_factor 
+		<< obj->m_writing_flags << '\n';
+
+	return out;
+}

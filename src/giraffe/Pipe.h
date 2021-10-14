@@ -8,7 +8,12 @@ public:
 	Pipe();
 	~Pipe();
 
-	//Writes GIRAFFE input file
-	void WriteGiraffeModelFile(std::ostream& fout) const override;
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const Pipe& obj);
+	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
 };
 
