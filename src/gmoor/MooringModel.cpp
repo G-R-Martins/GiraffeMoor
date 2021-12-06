@@ -294,8 +294,8 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 {
 	// Limits to the counters (force initial guess) and error
 	static constexpr int MAX_ITERATIONS_FH0 = 100;
-	static constexpr int MAX_ITERATIONS_FV0 = 100;
-	static constexpr int MAX_ITERATIONS_NEWTON = 50;
+	static constexpr int MAX_ITERATIONS_FV0 = 1000;
+	static constexpr int MAX_ITERATIONS_NEWTON = 100;
 	static constexpr double error_max = 1e-6;
 
 	// Residue
@@ -316,22 +316,26 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 	double gamma_min = 0.0, gamma_max = 0.0;
 	for (const LineSegment& seg : line.GetAllSegments())
 	{
-		if (seg.GetGamma() < gamma_min)			gamma_min = seg.GetGamma();
-		else if (seg.GetGamma() > gamma_max)	gamma_max = seg.GetGamma();
+		if (seg.GetGamma() < gamma_min)	gamma_min = seg.GetGamma();
+		if (seg.GetGamma() > gamma_max)	gamma_max = seg.GetGamma();
 	}
 	int m = static_cast<int>( ceil(log10(max(fabs(gamma_min), gamma_max))) );
+	//m = 3;
 
-	//Two times = before and after penetration
+#ifdef MAP_SOLUTION_ITERATIONS
+	std::cout << "gamma_min = " << gamma_min << "\tgamma_max = " << gamma_max << "\n\n";
+	std::cout << "m = " << m << "\n\n";
+	size_t it = 0;
+#endif
+
+	//Two times => before and after penetration
 	for (aux0 = 1; aux0 <= 2; aux0++)
 	{
 
-#ifdef MAP_SOLUTION_ITERATIONS
-		size_t it = 0;
-#endif
-
 		//Anchor and fairlead horizontal projections
-		Hf = sqrt(pow(( A(0, 0) - B(0, 0) ), 2) + pow(( A(1, 0) - B(1, 0) ), 2));
+		if (aux0 == 1) Hf = sqrt(pow(( A(0, 0) - B(0, 0) ), 2) + pow(( A(1, 0) - B(1, 0) ), 2));
 		Vf = B(2, 0) - A(2, 0);
+		//if (aux0 == 1)	Vf = B(2, 0) - A(2, 0);
 
 		//Updates FH initial guess 
 		for (aux1 = 1; aux1 <= MAX_ITERATIONS_FH0; aux1++)
@@ -403,8 +407,8 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 
 					F = F - (invert2x2(J) * E);
 
-					if ( FH0 < 0.0 ) F(0, 0) = abs(FH0);
-					if ( FV0 < 0.0 ) F(1, 0) = abs(FV0);
+					if (F(0, 0) < 0.0 ) F(0, 0) = abs(F(0, 0));
+					if (F(1, 0) < 0.0 ) F(1, 0) = abs(F(1, 0));
 
 					res = sqrt(pow(E(0, 0), 2) + pow(E(1, 0), 2));
 
@@ -415,6 +419,8 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 							  << "res: " << res << "\n";
 					std::cout << "F\n"; F.print();
 					std::cout << "E\n"; E.print();
+					std::cout << "J\n"; J.print();
+					std::cout << "h = " << h << "\t v = " << v << "\n";
 #endif
 
 					if (res < error_max) break;
@@ -458,19 +464,19 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 			//Otherwise, set segment to the first
 			else
 				line.SetTDPSegment(0);
-		}
 
-		//Recalculate the vertical point using the penetration of the first segment
-		if ( line.HasAnchor() && aux0 == 1 )
-		{
-			//Evaluate the penetration of the first segment
-			SegmentProperty* prop_ptr = &segment_property_vector[line.GetSegment(0).GetProperty() - 1];
+			//Recalculate the vertical point using the penetration of the first segment
+			if (line.HasAnchor())
+			{
+				//Evaluate the penetration of the first segment
+				SegmentProperty* prop_ptr = &segment_property_vector[line.GetSegment(0).GetProperty() - 1];
 
-			//Reset the vertical point
-			B(2, 0) = keypoint_vector[line.GetKeypointB() - 1].GetCoordinate('z') +
-				(prop_ptr->GetMass() * g) / (2.0 * environment.GetSeabed().GetStiffness() * prop_ptr->GetContactDiameter());
+				//Reset the vertical point
+				B(2, 0) = keypoint_vector[line.GetKeypointB() - 1].GetCoordinate('z') +
+					(prop_ptr->GetMass() * g) / (environment.GetSeabed().GetStiffness() * prop_ptr->GetContactDiameter());
+			}
+			else  break;
 		}
-		else  break;
 	}
 
 	//Line contribution to the stiffness matrix
@@ -511,7 +517,7 @@ void MooringModel::ImposePenetration(Line& line)
 
 		//Set penetration
 		penetration.emplace_front(std::array{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-		penetration.front().SetLine(std::array{ 1.0, 0.0, 0.0, -( prop_ptr->GetMass() * g ) / ( k_lin * 2.0 ), 0.0, 0.0, 0.0 });
+		penetration.front().SetLine(std::array{ 1.0, 0.0, 0.0, -( prop_ptr->GetMass() * g ) / ( k_lin ), 0.0, 0.0, 0.0 });
 		//penetration.back().SetLine(std::array{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
 		gm.GenerateNodalDisplacement(++cur_disp, seg_ptr->GetNodeSet(), 1, &penetration.front());
 		
@@ -737,8 +743,8 @@ void MooringModel::CheckSegmentsSize(Line& line, const unsigned int& seg_init)
 	for (LineSegment& cur_seg : line.GetAllSegments())
 	{
 		//Nodes of the segment
-		unsigned int n = segment_property_vector[cur_seg.GetProperty() - 1].IsTruss() ? 1 : 2;
-		unsigned int disc = cur_seg.GetDiscretization();
+		size_t n = segment_property_vector[cur_seg.GetProperty() - 1].IsTruss() ? 1 : 2;
+		size_t disc = (size_t)cur_seg.GetDiscretization();
 		cur_seg.SetNNodes(n * disc + 1);
 		//Elements of the segment
 		cur_seg.SetNElements(disc);
@@ -954,15 +960,14 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 		size_t n = isBeam ? 2 : 1;
 
 		//Generate nodeset for the current segment
-		comment << "Nodes of the segment " << seg + 1 << " of the line " << line.GetNumber();
 		seg_ptr->SetNodeSet(cur_node_set);
 		
 		//Defines number of nodes for beam/truss elements
 		size_t n_elem = seg_ptr->GetNElements() * n;
 		size_t addFirstNode = seg == 0 ? 1 : 0; //If is the first segment, the anchor node must be included
 		
-		gm.GenerateNodeSet(cur_node_set++, n_elem + addFirstNode, cur_node_mesh, 1, comment.str());
-
+		gm.GenerateNodeSet(cur_node_set++, n_elem + addFirstNode, cur_node_mesh, 1, std::string("Nodes of the segment ") + std::to_string(seg + 1) + " of the line " + std::to_string(line.GetNumber()));
+		
 		//Count number of nodes to generate line node set
 		nodes_line += seg_ptr->GetNNodes();
 
@@ -1127,6 +1132,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					++node_x0;
 				}
 			}
+			comment.str("");  //reset stringstream
 
 			//Generate elements
 			if (!isBeam)	gm.GenerateTrussElement(cur_elem, bool_first_element, (unsigned int)seg_ptr->GetProperty(), cur_node_mesh - 2, cur_node_mesh - 1);
@@ -1316,7 +1322,7 @@ void MooringModel::GenerateContacts()
 
 void MooringModel::GenerateDynamicRelaxation()
 {
-	auto& dyn_relax = moorsolution.GetStepDynRelaxLines();
+	auto dyn_relax = moorsolution.GetStepDynRelaxLines();
 
 	for ( Line& line : line_vector )
 	{
@@ -1767,7 +1773,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 		seacurrent_booltable += 2;
 
 		//Dynamic relaxation
-		auto& relax = moorsolution.GetStepDynRelaxVessels();
+		auto relax = moorsolution.GetStepDynRelaxVessels();
 		double timestep = relax->GetTimestep();
 		gm.GenerateDynamicSolutionStep(++step, start, start + timestep, 
 			timestep, relax->GetMaxTimestep(), relax->GetMinTimestep(), 20, 2, 4, 2, relax->GetSample(),
@@ -1791,7 +1797,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 		gm.environment.GetSeaCurrentBooltable().Push_Back(true);
 
 		//Solution step
-		auto& seacurrent_step = moorsolution.GetStepSeaCurrent();
+		auto seacurrent_step = moorsolution.GetStepSeaCurrent();
 		double timestep = seacurrent_step->GetTimestep();
 		gm.GenerateStaticSolutionStep(++step, start, start + timestep,
 			timestep, seacurrent_step->GetMaxTimestep(), seacurrent_step->GetMinTimestep(),

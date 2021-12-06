@@ -40,7 +40,7 @@ GiraffeModel::~GiraffeModel()
 
 }
 
-void GiraffeModel::GenerateNode(const size_t& number, Matrix& pos, std::string_view comment)
+void GiraffeModel::GenerateNode(const size_t& number, Matrix& pos, const std::string& comment)
 {
 	node_vector.emplace_back(number, std::array{ pos(0, 0), pos(1, 0), pos(2, 0) }, comment);
 }
@@ -48,7 +48,7 @@ void GiraffeModel::GenerateNode(const size_t& number, Matrix &pos)
 {
 	node_vector.emplace_back(number, std::array{ pos(0, 0), pos(1, 0), pos(2, 0) });
 }
-void GiraffeModel::GenerateNode(const size_t& number, double X, double Y, double Z, std::string_view comment)
+void GiraffeModel::GenerateNode(const size_t& number, double X, double Y, double Z, const std::string& comment)
 {
 	node_vector.emplace_back(number, std::array{ X, Y, Z }, comment);
 }
@@ -56,7 +56,7 @@ void GiraffeModel::GenerateNode(const size_t& number, double X, double Y, double
 {
 	node_vector.emplace_back(number, std::array{ X, Y, Z });
 }
-void GiraffeModel::GenerateNode(const size_t& number, const std::array<double,3>& coord, std::string_view comment)
+void GiraffeModel::GenerateNode(const size_t& number, const std::array<double,3>& coord, const std::string& comment)
 {
 	node_vector.emplace_back(number, coord, comment);
 }
@@ -64,7 +64,7 @@ void GiraffeModel::GenerateNode(const size_t& number, const std::array<double, 3
 {
 	node_vector.emplace_back(number, coord);
 }
-void GiraffeModel::GenerateNode(const size_t& number, const std::vector<double>& coord, std::string_view comment)
+void GiraffeModel::GenerateNode(const size_t& number, const std::vector<double>& coord, const std::string& comment)
 {
 	node_vector.emplace_back(number, std::array{coord[0], coord[1], coord[2] }, comment);
 }
@@ -83,7 +83,7 @@ void GiraffeModel::GenerateTrussElement(const size_t& number, const bool& segmen
 	ptr->SetIDNumber(number);
 	ptr->SetFirstElementOpt(segment_begin);
 	ptr->SetSection(section);
-	ptr->SetNodes({node1,node2});
+	ptr->SetNodes(std::vector{node1,node2});
 }
 void GiraffeModel::GenerateTrussElement(const size_t& number, const bool& segment_begin, const size_t& section, const unsigned int& node1, const unsigned int& node2, const std::string& comment)
 {
@@ -92,7 +92,7 @@ void GiraffeModel::GenerateTrussElement(const size_t& number, const bool& segmen
 	ptr->SetIDNumber(number);
 	ptr->SetFirstElementOpt(segment_begin);
 	ptr->SetSection(section);
-	ptr->SetNodes({node1,node2});
+	ptr->SetNodes(std::vector{node1,node2});
 	ptr->SetLabel(comment);
 }
 void  GiraffeModel::GenerateRigidBodyElement(const size_t& number, const unsigned int& RB_data, const size_t& cs, const unsigned int& node)
@@ -102,7 +102,7 @@ void  GiraffeModel::GenerateRigidBodyElement(const size_t& number, const unsigne
 	ptr->SetIDNumber(number);
 	ptr->SetMaterial(RB_data);
 	ptr->SetCS(cs);
-	ptr->SetNodes({node});
+	ptr->SetNodes(std::vector{node});
 }
 void  GiraffeModel::GenerateRigidBodyElement(const size_t& number, const unsigned int& RB_data, const size_t& cs, const unsigned int& node, const std::string& comment)
 {
@@ -111,7 +111,7 @@ void  GiraffeModel::GenerateRigidBodyElement(const size_t& number, const unsigne
 	ptr->SetIDNumber(number);
 	ptr->SetMaterial(RB_data);
 	ptr->SetCS(cs);
-	ptr->SetNodes({node});
+	ptr->SetNodes(std::vector{node});
 	ptr->SetLabel(comment);
 }
 void GiraffeModel::GeneratePipeElement(const size_t& number, const bool& segment_begin, const size_t& section, const unsigned int& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3)
@@ -122,7 +122,7 @@ void GiraffeModel::GeneratePipeElement(const size_t& number, const bool& segment
 	ptr->SetFirstElementOpt(segment_begin);
 	ptr->SetSection(section);
 	ptr->SetCS(cs);
-	ptr->SetNodes({node1,node2,node3});
+	ptr->SetNodes(std::vector{node1,node2,node3});
 }
 void GiraffeModel::GeneratePipeElement(const size_t& number, const size_t& section, const size_t& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment)
 {
@@ -132,7 +132,7 @@ void GiraffeModel::GeneratePipeElement(const size_t& number, const size_t& secti
 	ptr->SetFirstElementOpt(false);
 	ptr->SetSection(section);
 	ptr->SetCS(cs);
-	ptr->SetNodes({node1,node2,node3});
+	ptr->SetNodes(std::vector{node1,node2,node3});
 	ptr->SetLabel(comment);
 }
 void GiraffeModel::GenerateCoordinateSystem(const size_t& number, Matrix& E1, Matrix& E3)

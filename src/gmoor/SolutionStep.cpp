@@ -28,6 +28,8 @@ SolutionStep::~SolutionStep()
 /// SETTERS
 /// 
 
+
+
 void SolutionStep::SetIDNumber(size_t number)
 {
 	this->m_number = number;

@@ -5,7 +5,7 @@ Node::Node()
 	: m_number(0), m_ref_coordinates({0.,0.,0.}), m_comment("\0")
 {}
 
-Node::Node(size_t number, const std::array<double, 3>& m_ref_coordinates, std::string_view comment)
+Node::Node(size_t number, const std::array<double, 3>& m_ref_coordinates, std::string comment)
 	: m_number(number), m_ref_coordinates(m_ref_coordinates), m_comment(comment)
 {}
 
@@ -22,7 +22,7 @@ void Node::SetCoordinates(const std::array<double, 3>& ref_coordinates)
 	m_ref_coordinates = ref_coordinates;
 }
 
-void Node::SetComment(std::string_view comment)
+void Node::SetComment(std::string comment)
 {
 	m_comment = comment;
 }

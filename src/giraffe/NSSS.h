@@ -23,14 +23,14 @@ private:
 
 	BoolTable m_booltable;
 
-	std::string_view m_comment;
+	std::string m_comment;
 
 public:
 	NSSS();
 	NSSS(const size_t& number, const size_t& node_set, const size_t& surface_set,
 		double mu, double epn, double cn, double ept, double ct,
 		double pinball, double radius, unsigned int max_interactions,
-		BoolTable&& booltable, const  std::string_view& comment = "\0");
+		BoolTable&& booltable, const  std::string& comment = "\0");
 	~NSSS();
 
 
@@ -50,7 +50,7 @@ public:
 	inline double GetRadius() const						{ return m_radius; }
 	inline unsigned int GetMAxIterations() const		{ return m_max_interactions; }
 	inline const BoolTable& GetBoolTable() const		{ return m_booltable; }
-	inline const std::string_view& GetComment() const	{ return m_comment; }
+	inline const std::string& GetComment() const	{ return m_comment; }
 
 
 

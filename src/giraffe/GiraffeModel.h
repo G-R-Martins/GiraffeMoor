@@ -113,13 +113,13 @@ public:
 	Nodes and points
 	---------------*/
 	
-	void GenerateNode(const size_t& number, Matrix& pos, std::string_view comment);
+	void GenerateNode(const size_t& number, Matrix& pos, const std::string& comment);
 	void GenerateNode(const size_t& number, Matrix& pos);
-	void GenerateNode(const size_t& number, double X, double Y, double Z, std::string_view comment);
+	void GenerateNode(const size_t& number, double X, double Y, double Z, const std::string& comment);
 	void GenerateNode(const size_t& number, double X, double Y, double Z);
-	void GenerateNode(const size_t& number, const std::array<double, 3>& coord, std::string_view comment);
+	void GenerateNode(const size_t& number, const std::array<double, 3>& coord, const std::string& comment);
 	void GenerateNode(const size_t& number, const std::array<double, 3>& coord);
-	void GenerateNode(const size_t& number, const std::vector<double>& coord, std::string_view comment);
+	void GenerateNode(const size_t& number, const std::vector<double>& coord, const std::string& comment);
 	void GenerateNode(const size_t& number, const std::vector<double>& coord);
 	
 	//--------------------------------------------------------------------------------------------------------------------------

@@ -491,7 +491,7 @@ bool IO::ReadDynamicRelaxation(std::string& readed)
 		MAP_FUNC{ { "LineStatics", &IO::ReadDynRelaxLines }, { "VesselStatics", &IO::ReadDynRelaxVessels} }))
 	{
 		std::cout << "\nErro lendo DynamicRelaxation! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-		return false;
+		//return false;
 	}
 
 
@@ -501,15 +501,15 @@ bool IO::ReadDynamicRelaxation(std::string& readed)
 bool IO::ReadDynRelaxLines(std::string& readed)
 {
 	//Get last allocated object
-	auto& relax = mm.moorsolution.GetStepDynRelaxLines();
-	relax = std::make_shared<DynRelaxLinesConfig>(0.0, 0, 0, 0, false, true, 0.0, 0.0, 1.0, 1.0e-1, 1.0e-4, 1'000'000,
-		0.0, 0.0, 0.0, 0.0);
+	auto relax = mm.moorsolution.InitDynRelaxLines();
+	mm.moorsolution.SetDynRelaxExist(true);
+	mm.moorsolution.SetDynRelax_LinesConfigExist(true);
 
 	std::unordered_set<std::string_view> mandatory{ "Decrement", "Periods"};
 	std::unordered_set<std::string_view> optional{ "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
 	
-	relax->SetDynamicOpt(true);
-	relax->SetStaticOpt(false);
+	/*relax->SetDynamicOpt(true);
+	relax->SetStaticOpt(false);*/
 
 	do {
 		s_inp >> readed;
@@ -526,8 +526,9 @@ bool IO::ReadDynRelaxLines(std::string& readed)
 				bool all_parameters_readed = mandatory.empty();
 				if (!all_parameters_readed)
 					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "DynamicRelaxation |> LineStatics");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
+				//else
+					//aux_read::BackLastWord(s_inp, readed);
+					//Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
 
 				return all_parameters_readed;
 			}
@@ -656,7 +657,7 @@ bool IO::ReadAnalysis(std::string& readed)
 
 	if (!aux_read::NestedLoop(s_inp, mm.moorsolution.GetStepsVec(),
 		upper_keywords, readed, MAP_FUNC{ { "Step", &IO::ReadSolutionStep} }))
-		std::cout << "\nErro lendo SegmentSets"; // TODO: verificar erro leitura
+		std::cout << "\nErro lendo Analysis"; // TODO: verificar erro leitura
 
 
 	// All OK while reading

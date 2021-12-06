@@ -13,7 +13,7 @@ NSSS::NSSS()
 NSSS::NSSS(const size_t& number, const size_t& node_set, const size_t& surface_set,
 	double mu, double epn, double cn, double ept, double ct, 
 	double pinball, double radius, unsigned int max_interactions, 
-	BoolTable&& booltable, const std::string_view& comment)
+	BoolTable&& booltable, const std::string& comment)
 	: m_number(number), m_node_set(node_set), m_surface_set(surface_set),
 		m_mu(mu), m_epn(epn), m_cn(cn), m_ept(ept), m_ct(ct),
 		m_pinball(pinball), m_radius(radius), m_max_interactions(max_interactions),
