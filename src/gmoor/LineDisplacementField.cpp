@@ -1,24 +1,23 @@
 #include "PCH.h"
 #include "LineDisplacementField.h"
-#include "AuxFunctions.h"
 
 
 LineDisplacementField::LineDisplacementField()
-	: m_number(0), m_step(0), 
+	: m_number(0), m_step_id(0), 
 	m_is_harmonic(true), m_amplitude(0.0), m_mode(1)
 {}
 
 LineDisplacementField::~LineDisplacementField()
 {}
 
-void LineDisplacementField::SetIDNumber(size_t number)
+void LineDisplacementField::SetIDNumber(unsigned int number)
 {
 	m_number = number;
 }
 
-void LineDisplacementField::SetStep(size_t step)
+void LineDisplacementField::SetStep(unsigned int step_id)
 {
-	m_step = step;
+	m_step_id = step_id;
 }
 
 void LineDisplacementField::SetAmplitude(double amplitude)
@@ -108,51 +107,51 @@ bool operator!=(const LineDisplacementField& disp1, const LineDisplacementField&
 	return !( disp1 == disp2 );
 }
 
-
-std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* line)
-{
-	std::unordered_set<std::string_view> names{ "Step", "Harmonic", "Amplitude", "Mode" };
-
-	std::string readed;
-
-	// Object ID
-	input >> readed;
-	line->SetIDNumber(AuxFunctions::Reading::Try2GetObjectID<size_t>(input, readed));
-
-	do
-	{
-		input >> readed;
-
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			// Not all keywords defined
-			if (!names.empty())
-			{
-				//Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "LineDisplacementFields",
-				//	   std::to_string(AuxFunctions::Reading::GetCurrentLine(input)) });
-				std::exit(EXIT_FAILURE);
-			}
-
-			AuxFunctions::Reading::BackLastWord(input, readed);
-			break;
-		}
-
-		std::string_view name = nh.value();
-
-		if (name == "Harmonic")
-		{
-			line->m_is_harmonic = true;
-			continue; // no parameter
-		}
-
-		input >> readed;
-		if (name == "Step")			line->m_step = std::stoull(readed);
-		else if (name == "Amplitude")	line->m_amplitude = std::stod(readed);
-		else if (name == "Mode")		line->m_mode = std::stoul(readed);
-
-	} while (true);
-
-	return input;
-}
+//
+//std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* line)
+//{
+//	std::unordered_set<std::string_view> names{ "Step", "Harmonic", "Amplitude", "Mode" };
+//
+//	std::string readed;
+//
+//	// Object ID
+//	input >> readed;
+//	line->SetIDNumber(AuxFunctions::Reading::Try2GetObjectID(input, readed));
+//
+//	do
+//	{
+//		input >> readed;
+//
+//		// Extract node (handle) from set with names of the object parameters
+//		auto nh = names.extract(readed);
+//		if (nh.empty())
+//		{
+//			// Not all keywords defined
+//			if (!names.empty())
+//			{
+//				//Log::AddWarning(Log::Warning::Invalid_ID, VEC_STR{ "LineDisplacementFields",
+//				//	   std::to_string(AuxFunctions::Reading::GetCurrentLine(input)) });
+//				std::exit(EXIT_FAILURE);
+//			}
+//
+//			AuxFunctions::Reading::BackLastWord(input, readed);
+//			break;
+//		}
+//
+//		std::string_view name = nh.value();
+//
+//		if (name == "Harmonic")
+//		{
+//			line->m_is_harmonic = true;
+//			continue; // no parameter
+//		}
+//
+//		input >> readed;
+//		if (name == "Step")			line->m_step_id = std::stoul(readed);
+//		else if (name == "Amplitude")	line->m_amplitude = std::stod(readed);
+//		else if (name == "Mode")		line->m_mode = std::stoul(readed);
+//
+//	} while (true);
+//
+//	return input;
+//}

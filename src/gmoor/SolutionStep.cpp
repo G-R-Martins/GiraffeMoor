@@ -1,21 +1,23 @@
 #include "PCH.h"
 #include "SolutionStep.h"
-#include "Log.h"
+#include "AuxFunctions.h"
 
 
 SolutionStep::SolutionStep()
-	: m_number(0), m_is_static(true), m_is_dynamic(false),	m_global_start_time(0.0), 
-	m_end_time(0.0), m_timestep(0.0), m_max_timestep(0.0), m_min_timestep(0.0), 
-	m_sample(0.0), m_beta_new(0.0), m_gamma_new(0.0), m_alpha_ray(0.0), m_beta_ray(0.0)
+	: m_id(0), m_is_static(true), m_is_dynamic(false),	m_global_start_time(0.0), 
+	m_end_time(0.0), m_timestep(0.0), m_min_timestep(0.0), 
+	m_max_timestep(0.0), m_max_timestep_defined(false),
+	m_sample(0), m_beta_new(0.0), m_gamma_new(0.0), m_alpha_ray(0.0), m_beta_ray(0.0)
 {}
 
-SolutionStep::SolutionStep(size_t number, bool is_static, bool is_dynamic,
-	double global_start_time, double end_time, double timestep,
-	double max_timestep, double min_timestep, int sample,
+SolutionStep::SolutionStep(unsigned int id, bool is_static,
+	double global_start_time, double end_time, double timestep, double min_timestep, 
+	double max_timestep, bool max_timestep_defined, int sample,
 	double beta_new, double gamma_new, double alpha_ray, double beta_ray)
-	: m_number(number), m_is_static(is_static), m_is_dynamic(is_dynamic),
+	: m_id(id), m_is_static(is_static), m_is_dynamic(!is_static),
 	m_global_start_time(global_start_time), m_end_time(end_time),
-	m_timestep(timestep), m_max_timestep(max_timestep), m_min_timestep(min_timestep),
+	m_timestep(timestep), m_min_timestep(min_timestep),
+	m_max_timestep(max_timestep), m_max_timestep_defined(max_timestep_defined),
 	m_sample(sample), m_beta_new(beta_new), m_gamma_new(gamma_new),
 	m_alpha_ray(alpha_ray), m_beta_ray(beta_ray)
 {}
@@ -23,26 +25,35 @@ SolutionStep::SolutionStep(size_t number, bool is_static, bool is_dynamic,
 SolutionStep::~SolutionStep()
 {}
 
+void SolutionStep::CheckAndSetMaxTimeStep()
+{
+	if (!m_max_timestep_defined)
+	{
+		m_max_timestep = m_timestep;
+		m_max_timestep_defined = true;
+	}
+}
+
 
 /// 
 /// SETTERS
 /// 
 
-
-
-void SolutionStep::SetIDNumber(size_t number)
+void SolutionStep::SetIDNumber(unsigned int id)
 {
-	this->m_number = number;
+	this->m_id = id;
 }
 
 void SolutionStep::SetStaticOpt(bool is_static)
 {
 	this->m_is_static = is_static;
+	this->m_is_dynamic = !is_static;
 }
 
 void SolutionStep::SetDynamicOpt(bool is_dynamic)
 {
 	this->m_is_dynamic = is_dynamic;
+	this->m_is_static = !is_dynamic;
 }
 
 void SolutionStep::SetGlobalStartTime(double global_start_time)
@@ -63,6 +74,7 @@ void SolutionStep::SetTimestep(double timestep)
 void SolutionStep::SetMaxTimestep(double max_timestep)
 {
 	this->m_max_timestep = max_timestep;
+	this->m_max_timestep_defined = true;
 }
 
 void SolutionStep::SetMinTimeStep(double min_timestep)
@@ -75,7 +87,7 @@ void SolutionStep::SetSample(int sample)
 	this->m_sample = sample;
 }
 
-bool SolutionStep::SetNewmarkDamping(std::string_view damping)
+bool SolutionStep::SetNewmarkDamping(std::string_view damping, std::string& readed)
 {
 	if (damping == "null")
 	{
@@ -108,41 +120,9 @@ bool SolutionStep::SetNewmarkDamping(std::string_view damping)
 		return true;
 	}
 
-	// Or, defined each coefficient explicitly
-///	{
-///		std::unordered_set<std::string_view> coeffs = { "Beta", "Gamma" };
-///		for (int i = 0; i < 2; ++i)
-///		{
-///			auto nh = coeffs.extract(damping);
-///			if (nh.empty())
-///			{
-///				bool all_parameters_readed = coeffs.empty();
-///				if (!all_parameters_readed)
-///					Log::AddWarning("  + Error reading numerical damping");
-///
-///				return all_parameters_readed;
-///			}
-///
-///			if (name == "Beta")			ptr->SetBetaNewmark(std::stod(readed));
-///			else if (name == "Gamma")	ptr->SetGammaNewmark(std::stod(readed));
-///		}
-///
-///	}
-
-	// ERROR: invalid numerical damping
-	Log::SetWarning(R"(
-   + Please define one of these keywords for setting numerical damping parameters:
-
-	 ------------------------------
-	|  Keyword   |  Beta |  Gamma  |
-	|------------|-------|---------|
-	|  null      |  0.3  |  0.500  |
-	|  mild      |  0.3  |  0.505  |
-	|  moderate  |  0.3  |  0.520  |
-	|  high      |  0.3  |  0.550  |
-	|  extreme   |  0.3  |  0.600  |
-	 ------------------------------)");
-
+	// Set last readed word equals to 'damping' because in this case 
+	//each coefficient MUST be defined explicitly
+	readed = damping;
 	return false;
 }
 
@@ -174,7 +154,7 @@ void SolutionStep::SetBetaRayleigh(double beta_ray)
 
 bool operator<(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return obj1.m_number < obj2.m_number;
+	return obj1.m_id < obj2.m_id;
 }
 bool operator>(const SolutionStep& obj1, const SolutionStep& obj2)
 {
@@ -182,7 +162,7 @@ bool operator>(const SolutionStep& obj1, const SolutionStep& obj2)
 }
 bool operator==(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return obj1.m_number == obj2.m_number;
+	return obj1.m_id == obj2.m_id;
 }
 bool operator!=(const SolutionStep& obj1, const SolutionStep& obj2)
 {

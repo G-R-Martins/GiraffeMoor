@@ -13,7 +13,7 @@ public:
 	/// Overloaded operators
 	/// 
 
-	friend std::ostream& operator<<(std::ostream& out, const RigidBody& obj);
 	inline std::ofstream& WriteGiraffeFile(std::ofstream& out) override { operator<<(out, *this); return out; }
+	friend std::ostream& operator<<(std::ostream& out, const RigidBody& obj);
 };
 

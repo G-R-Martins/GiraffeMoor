@@ -5,7 +5,7 @@ class CADData
 {
 private:
 
-	size_t m_number;
+	unsigned int m_id;
 	std::string m_name;
 
 public:
@@ -17,7 +17,7 @@ public:
 	/// SETTERS
 	/// 
 
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 	void SetName(const std::string& name);
 
 
@@ -25,7 +25,7 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNumber() const { return m_number; }
+	inline unsigned int GetNumber() const { return m_id; }
 	inline const std::string& GetName() const { return m_name; }
 	
 	

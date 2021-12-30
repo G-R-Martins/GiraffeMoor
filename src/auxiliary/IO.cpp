@@ -33,6 +33,30 @@ std::string IO::version = std::to_string(GiraffeMoor_VERSION_MAJOR)
 	+ "a";
 
 
+static MAP_FUNC s_mandatory_keys_read_func = { 
+	{ "Keypoints", &IO::ReadKeypoints },
+	{ "SegmentSets", &IO::ReadSegmentSets },
+	{ "Lines", &IO::ReadLines },
+	{ "Vessels", &IO::ReadVessels },
+	{ "SegmentProperties", &IO::ReadSegmentProperties },
+	{ "Environment", &IO::ReadEnvironment},
+	{ "Solution", &IO::ReadSolution }
+};
+
+
+static MAP_FUNC s_optional_keys_read_func = { 
+	//{ "Monitors", &IO::ReadMonitors },
+	//{ "NodalForces", &IO::ReadNodalForces },
+	{ "GiraffeSolver", &IO::ReadGiraffeSolver },
+	{ "PostProcessing", &IO::ReadPostProcessing },
+	{ "StiffnessMatrix", &IO::ReadStiffnessMatrix },
+	{ "VesselDisplacements", &IO::ReadVesselDisplacements },
+	{ "Constraints", &IO::ReadConstraints }
+	//{ "DisplacementFields", &IO::ReadDisplacementFields }
+};
+
+
+
 //Reads GiraffeMoor input file
 bool IO::ReadFile()
 {	
@@ -59,7 +83,7 @@ bool IO::ReadFile()
 		else if (__argc == 2)
 		{
 			input_name = __argv[1];
-			folder_name = "./" + input_name + "/";
+			folder_name = input_name + "/";
 		}
 		//passed the folder name and the input file name
 		else if (__argc == 3)
@@ -76,7 +100,7 @@ bool IO::ReadFile()
 	
 		std::cout << "\n";
 		
-		//tries to read the same location of the executable file of Giraffe
+		//try to read the same location of the executable file of Giraffe
 		s_inp.open(name);
 		if (!s_inp.is_open())
 		{
@@ -101,1247 +125,1037 @@ bool IO::ReadFile()
 		}
 	}
 
-	//std::string file_name = "oc4.gmr";
-	//s_inp.open(file_name);
-	//if (!s_inp.is_open())
-	//{
-	//	//Log::AddError(std::string("Error trying to open the file \"") + file_name + "\"");
-	//	return false;
-	//}
+	std::string readed;
+	s_inp >> readed;
 
-	std::string word;
-	s_inp >> word;
-
+	s_inp >> std::boolalpha;  // to read 'true'/'false'
 	while (s_inp.good())
 	{
-		// Check for top level keyword...
-		if (!aux_read::CheckTopKeyword(word))
+		if (!aux_read::ReadBlock(s_inp, readed, s_mandatory_keys_read_func, s_optional_keys_read_func))
 		{
-			// ... if isn't, check if is a comment (line or block) ...
-			if (aux_read::TryComment(s_inp, word))
-				continue;
-			
-			Log::SetWarning(Log::Warning::INVALID_KEYWORD, Log::GetLastValidKeyword(), aux_read::GetCurrentLine(s_inp), word);
-			
+			Log::SetWarning(Log::Warning::INVALID_KEYWORD, Log::GetLastValidKeyword(), aux_read::GetCurrentLine(s_inp), readed);
 			return false;
 		}
-
-
-		if (word == "Keypoints")
-		{
-			if (!aux_read::Loop(s_inp, mm.keypoint_vector, word, 
-				MAP_FUNC{ { "Keypoint", &IO::ReadKeypoint } }))
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Keypoints", aux_read::GetCurrentLine(s_inp), "Segment");
-			
-			aux_read::RemoveDuplicates(mm.keypoint_vector, "Keypoint");
-		}
-		else if (word == "SegmentSets")
-		{
-			if (!aux_read::Loop(s_inp, mm.segment_set_vector, word, 
-				MAP_FUNC{ { "Set", &IO::ReadSegmentSet } }))
-				std::cout << " Erro lendo SegmentSets! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.segment_set_vector, "Set");
-		}
-		else if (word == "Lines")
-		{
-			if (!aux_read::Loop(s_inp, mm.line_vector, word, 
-				MAP_FUNC{ { "Line", &IO::ReadLine }, { "Cable", &IO::ReadLine } }))
-				std::cout << "\nErro lendo Lines! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.line_vector, "Line");
-		}
-		else if (word == "Vessels")
-		{
-			if (!aux_read::Loop(s_inp, mm.vessel_vector, word, 
-				MAP_FUNC{ { "Vessel", &IO::ReadVessel } }))
-				std::cout << "\nErro lendo Vessels! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.vessel_vector, "Vessel");
-		}
-		else if (word == "Environment")
-		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{ { "General", &IO::ReadEnvGeneral}, 
-					{ "Seabed", &IO::ReadSeabed}, { "SeaCurrent", &IO::ReadSeaCurrent} }))
-				std::cout << "\nErro lendo Environment! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-		}
-		else if (word == "SegmentProperties")
-		{
-			if (!aux_read::Loop(s_inp, mm.segment_property_vector, word, 
-				MAP_FUNC{ { "SegmentProperty", &IO::ReadSegmentProperty} }))
-				std::cout << "\nErro lendo SegmentProperties! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.segment_property_vector, "SegmentProperty");
-		}
-		else if (word == "Solution")
-		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{ 
-					{ "DynamicRelaxation", &IO::ReadDynamicRelaxation},
-					{ "SeaCurrentStep", &IO::ReadSeaCurrentStep},
-					{ "Analysis", &IO::ReadAnalysis} 
-				}))
-				std::cout << "\nErro lendo Solution! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-			
-			aux_read::RemoveDuplicates(mm.moorsolution.GetStepsVec(), "SolutionSteps");
-		}
-		else if (word == "Constraints")
-		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{
-					{ "AnchorConstraints", &IO::ReadConstraints },
-					{ "LineConstraints", &IO::ReadConstraints },
-					{ "VesselConstraints", &IO::ReadConstraints }
-				}))
-				std::cout << "\nErro lendo Solution! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.anchor_constraints, "AnchorConstraints");
-			aux_read::RemoveDuplicates(mm.line_constraints, "LineConstraints");
-			aux_read::RemoveDuplicates(mm.vessel_constraints, "VesselConstraints");
-		}
-		else if (word == "VesselDisplacements")
-		{
-			if (!aux_read::Loop(s_inp, mm.vessel_disp_vector, word, 
-				MAP_FUNC{ { "DispVesselID", &IO::ReadVesselDisplacement } }))
-				std::cout << "\nErro lendo VesselDisplacements! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.vessel_disp_vector, "VesselDisplacements");
-		}
-		else if (word == "GiraffeSolver")
-		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word, MAP_FUNC{
-					{ "Run", &IO::ReadRunOption }, { "Processors", &IO::ReadProcessors },
-					{ "ConvergenceCriteria", &IO::ReadConvergenceCriteria } 
-				}))
-				std::cout << "\nErro lendo Solution! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-		}
-		else if (word == "PostProcessing")
-		{
-			if (!aux_read::UniqueSubKeywords(s_inp, word,
-				MAP_FUNC{ { "PostFiles", &IO::ReadPostFiles }, { "CADs", &IO::ReadCADs } }))
-				std::cout << "\nErro lendo PostProcessing! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			if (!mm.moorpost.GetAllPlatformCADs().empty())
-				aux_read::RemoveDuplicates(mm.moorpost.GetAllPlatformCADs(), "VesselDisplacements");
-		}
-		else if (word == "DisplacementFields")
-		{
-			if (!IO::ReadLineDisplacementFields(word))
-				std::cout << "\nErro lendo DisplacementFields! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.disp_field_vector, "VesselDisplacements");
-		}
-		else if (word == "StiffnessMatrix")
-		{
-			if (!IO::ReadStiffnessMatrix(word))
-				std::cout << "\nErro lendo DisplacementFields! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-
-			aux_read::RemoveDuplicates(mm.disp_field_vector, "VesselDisplacements");
-		}
-		else
-		{
-			std::cout << "\nErro lendo linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-		}
-
-
-	} /* end while */
+ 	}
 
 	return true;
 }
 
 
-bool IO::ReadKeypoint(std::string& readed)
+bool IO::ReadKeypoints(std::string& readed)
 {
-	// Get last allocated object
-	Keypoint* keypoint = &mm.keypoint_vector.back();
-
-	std::unordered_set<std::string_view> names{ "X", "Y", "Z" };
-	double num;
-
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	keypoint->SetIDNumber(num_ID);
-
-	s_inp >> readed;
-	
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Keypoints", aux_read::GetCurrentLine(s_inp), "Keypoint");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Keypoints", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "X")		keypoint->SetX(num);
-		else if (name == "Y")	keypoint->SetY(num);
-		else if (name == "Z")	keypoint->SetZ(num);
-
-		s_inp >> readed;
-
-	} while (!names.empty());
-	
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadSegmentSet(std::string& readed)
-{
-	// Get last allocated object
-	SegmentSet* set = &mm.segment_set_vector.back();
-	
-	std::unordered_set<std::string_view> upper_keywords{ "Set" };
-
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	set->SetIDNumber(num_ID);
-
-	if (!aux_read::NestedLoop(s_inp, set->GetAllSegment(), upper_keywords, readed,
-		MAP_FUNC{ { "Length", &IO::ReadSegment } }))
-		return false; //TODO: verificar erro
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSegment(std::string& readed)
-{
-	// Get last allocated object
-	LineSegment* seg = &mm.segment_set_vector.back().GetLastSegment();
-	
-	std::unordered_set<std::string_view> names{ "Length", "Property", "Discretization" };
-
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty()) // invalid property
-		{ 
-			// If is not a valid node handle, then check if all parameters were defined
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "SegmentSet", aux_read::GetCurrentLine(s_inp), "Segment");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentSet", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> readed;
-
-		if (name == "Length")				seg->SetLength(std::stod(readed));
-		else if (name == "Property")		seg->SetProperty(std::stoul(readed));
-		else if (name == "Discretization")	seg->SetDiscretization(std::stoul(readed));
-
-		s_inp >> readed;
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadLine(std::string& readed)
-{
-	// Get last allocated object
-	Line* line = &mm.line_vector.back();
-
 	std::unordered_set<std::string_view> names;
-
-	size_t num;
-
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	line->SetIDNumber(num_ID);
-
+	
 	s_inp >> readed;
-
-	// If is shared, one MUST define "Fairleads" or "VesselIDs" after the ID number
-	// thus, it CAN NOT be "SegmentSet" in this case!
-	if (readed == "Fairleads" || readed == "VesselIDs")
+	while (s_inp.good())
 	{
-		names = { "Fairleads", "VesselIDs", "SegmentSet" };
-		line->SetSharedOpt(true);
-	}
-	else
-		names = { "Anchor", "Fairlead", "VesselID", "SegmentSet" };
-
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Lines", aux_read::GetCurrentLine(s_inp), "Line");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Lines", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "Anchor") { line->SetKeypointA(num); }
-		else if (name == "Fairlead") { line->SetKeypointB(num); }
-		else if (name == "VesselID") { line->SetVesselID(num); }
-		else if (name == "SegmentSet") { line->SetSegmentSet(num); }
-		// Shared line
-		else if (name == "Fairleads")
-		{
-			// First fairlead
-			line->SetKeypointA(num);
-
-			// Separator
-			char ch = s_inp.get();
-			if (ch != ',' && ch != ';')
-				return false;
-
-			// Second fairlead
-			s_inp >> num;
-			line->SetKeypointB(num);
-		}
-		else if (name == "VesselIDs")
-		{
-			// First vessel
-			line->SetVesselID(num);
-
-			// Separator
-			char ch = s_inp.get();
-			if (ch != ',' && ch != ';')
-				return false;
-
-			// Second vessel
-			s_inp >> num;
-			line->SetVesselID(num);
-		}
-
-		s_inp >> readed;
-
-	} while (!names.empty());
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadVessel(std::string& readed)
-{
-	//Get last allocated object
-	Vessel* vessel = &mm.vessel_vector.back();
-
-	std::unordered_set<std::string_view> mandatory{ "PilotNode" };
-	std::unordered_set<std::string_view> optional{ "InertiaTensor", "Mass" };
-	
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	vessel->SetIDNumber(num_ID);
-
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Vessels", aux_read::GetCurrentLine(s_inp), "Vessel");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Vessels", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-		
-		if (name == "InertiaTensor")
-		{
-			vessel->SetInertiaTensor(aux_read::ReadFixedContainer<std::array<double, 6>, 6>(s_inp));
-			continue;
-		}
-
-		s_inp >> readed;
-
-		if (name == "PilotNode")	vessel->SetKeypoint(std::stoul(readed));
-		else if (name == "Mass")	vessel->SetMass(std::stof(readed));
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadDynamicRelaxation(std::string& readed)
-{
-	if (!aux_read::UniqueSubKeywords(s_inp, readed, 
-		MAP_FUNC{ { "LineStatics", &IO::ReadDynRelaxLines }, { "VesselStatics", &IO::ReadDynRelaxVessels} }))
-	{
-		std::cout << "\nErro lendo DynamicRelaxation! Linha " << aux_read::GetCurrentLine(s_inp) << "\n"; // TODO: verificar erro leitura
-		//return false;
-	}
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadDynRelaxLines(std::string& readed)
-{
-	//Get last allocated object
-	auto relax = mm.moorsolution.InitDynRelaxLines();
-	mm.moorsolution.SetDynRelaxExist(true);
-	mm.moorsolution.SetDynRelax_LinesConfigExist(true);
-
-	std::unordered_set<std::string_view> mandatory{ "Decrement", "Periods"};
-	std::unordered_set<std::string_view> optional{ "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
-	
-	/*relax->SetDynamicOpt(true);
-	relax->SetStaticOpt(false);*/
-
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "DynamicRelaxation |> LineStatics");
-				//else
-					//aux_read::BackLastWord(s_inp, readed);
-					//Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-
-		s_inp >> readed;
-
-		if (name == "Decrement")			relax->SetDecrement(std::stod(readed));
-		else if (name == "Periods")			relax->SetPeriods(std::stoul(readed));
-		else if (name == "TimeStep")		relax->SetTimestep(std::stod(readed));
-		else if (name == "MaxTimeStep")		relax->SetMaxTimestep(std::stod(readed));
-		else if (name == "MinTimeStep")		relax->SetMinTimeStep(std::stod(readed));
-		else if (name == "Sample")			relax->SetSample(std::stoi(readed));
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadDynRelaxVessels(std::string& readed)
-{
-	// Get and initialize the step object
-	auto& relax = mm.moorsolution.GetStepDynRelaxVessels();
-	relax = std::make_shared<SolutionStep>(0, false, true, 0.0, 0.0, 1.0, 1.0e-1, 1.0e-4, 1'000'000,
-		0.0, 0.0, 0.0, 0.0);
-
-	std::unordered_set<std::string_view> mandatory{ "Time" };
-	std::unordered_set<std::string_view> optional{ "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
-
-
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "DynamicRelaxation |> VesselStatics");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-
-		s_inp >> readed;
-
-		if (name == "Time")					relax->SetEndTime(std::stod(readed));
-		else if (name == "TimeStep")		relax->SetTimestep(std::stod(readed));
-		else if (name == "MaxTimeStep")		relax->SetMaxTimestep(std::stod(readed));
-		else if (name == "MinTimeStep")		relax->SetMinTimeStep(std::stod(readed));
-		else if (name == "Sample")			relax->SetSample(std::stoi(readed));
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSeaCurrentStep(std::string& readed)
-{
-	// Get and initialize the step object
-	mm.moorsolution.SetStepSeaCurrent(0,true, false, 0.0, 0.0, 1.0, 1.0, 1.0e-5, 1'000'000,
-		0.0, 0.0, 0.0, 0.0);
-	auto& sc = mm.moorsolution.GetStepSeaCurrent();
-	
-	std::unordered_set<std::string_view> mandatory{ "Time" };
-	std::unordered_set<std::string_view> optional{ "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
-	
-	sc->SetStaticOpt(true);
-	sc->SetDynamicOpt(false);
-
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "SeaCurrentStep");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-
-		s_inp >> readed;
-
-		if (name == "Time")					sc->SetEndTime(std::stod(readed));
-		else if (name == "TimeStep")		sc->SetTimestep(std::stod(readed));
-		else if (name == "MaxTimeStep")		sc->SetMaxTimestep(std::stod(readed));
-		else if (name == "MinTimeStep")		sc->SetMinTimeStep(std::stod(readed));
-		else if (name == "Sample")			sc->SetSample(std::stoi(readed));
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadAnalysis(std::string& readed)
-{
-	std::unordered_set<std::string_view> upper_keywords{"SeaCurrentStep", "DynamicRelaxation" };
-
-	if (!aux_read::NestedLoop(s_inp, mm.moorsolution.GetStepsVec(),
-		upper_keywords, readed, MAP_FUNC{ { "Step", &IO::ReadSolutionStep} }))
-		std::cout << "\nErro lendo Analysis"; // TODO: verificar erro leitura
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSolutionStep(std::string& readed)
-{
-	//Get last allocated object
-	SolutionStep* step = &mm.moorsolution.GetStepsVec().back();
-
-	// Sets with keywords 
-	std::unordered_set<std::string_view> mandatory, optional, invalid;
-	
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	step->SetIDNumber(num_ID);
-	
-	// Read solution type 
-	s_inp >> readed;
-	if (readed == "static")
-	{
-		mandatory = { "Time", "TimeStep", "MinTimeStep", "Sample"};
-		optional = { "MaxTimeStep" };
-		invalid = { "NumericalDamping", "RayleighDamping"};
-	}
-	else if (readed == "dynamic")
-	{
-		mandatory = { "Time", "TimeStep", "MinTimeStep", "Sample", "NumericalDamping" };
-		optional = { "MaxTimeStep", "RayleighDamping" };
-		invalid = { };
-	}
-	else
-	{
-		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
-		return false;
-	}
-
-
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Solution", aux_read::GetCurrentLine(s_inp), "Analysis |> Step");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-
-		s_inp >> readed;
-
-		if (name == "Time")						step->SetEndTime(std::stod(readed));
-		else if (name == "TimeStep")			step->SetTimestep(std::stod(readed));
-		else if (name == "MaxTimeStep")			step->SetMaxTimestep(std::stod(readed));
-		else if (name == "MinTimeStep")			step->SetMinTimeStep(std::stod(readed));
-		else if (name == "Sample")				step->SetSample(std::stoi(readed));
-		else if (name == "NumericalDamping")	step->SetNewmarkDamping(readed);
-		else if (name == "RayleighDamping")
-		{
-			// Read two coefficients
-			for (int cont = 1; cont <= 2; ++cont)
-			{
-				s_inp >> readed;
-				if (readed == "Alpha")
-				{
-					s_inp >> readed;
-					step->SetAlphaRayleigh(std::stod(readed));
-				}
-				else if (readed == "Beta")
-				{
-					s_inp >> readed;
-					step->SetBetaRayleigh(std::stod(readed));
-				}
-				else
-				{
-					// The user can define only one coefficient
-					// 
-					// PS: if the user define only the keyword "RayleighDamping" and 
-					// and any coefficient, default (null) values will be considered
-					return mandatory.empty();
-				}
-			}
-		}
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadSegmentProperty(std::string& readed)
-{
-	// Get last allocated object
-	SegmentProperty* prop = &mm.segment_property_vector.back();
-
-	std::unordered_set<std::string_view> mandatory, optional, invalid;
-	double num;
-
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	prop->SetIDNumber(num_ID);
-
-	// Check segment type
-	s_inp >> readed;
-	if (readed == "truss")
-	{
-		prop->SetTrussOpt(true);
-		mandatory = { "SpecificMass", "Diameter", "EA", "CDt", "CDn", "CAt", "CAn" };
-		optional = { "SpecificGravity", "YoungModulus", "PoissonRatio", "InnerDiameter", "ContactDiameter" };
-		invalid = { "EI", "GJ", "GA" };
-	}
-	else if (readed == "beam")
-	{
-		prop->SetBeamOpt(true);
-		mandatory = { "SpecificMass", "Diameter", "EA", "CDt", "CDn", "CAt", "CAn", "EI", "GJ", "GA" };
-		optional = { "SpecificGravity", "YoungModulus", "PoissonRatio", "InnerDiameter", "ContactDiameter" };
-		invalid = {};
-	}
-	else if (readed == "chain")
-	{
-		prop->SetChainOpt(true);
-		mandatory = { "MBS" };
-		optional = {};
-		invalid = { "SpecificGravity", "SpecificMass", "Diameter" , "ContactDiameter", 
-			"InnerDiameter", "EA", "EI", "GA", "GJ", "CDt", "CDn", "CAt", "CAn" };
-	}
-	else
-	{
-		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentProperties", aux_read::GetCurrentLine(s_inp), readed);
-		return false;
-	}
-
-	// Read properties
-	do {
-		s_inp >> readed;
-
-		// Tries to extract node (handle) from set with mandatory names ...
-		auto nh = mandatory.extract(readed);
-		if (nh.empty())
-		{
-			// ... if fails, try from optional names ...
-			nh = optional.extract(readed);
-			// ... then, check for error and other words
-			if (nh.empty())
-			{
-				bool all_parameters_readed = mandatory.empty();
-				if (!all_parameters_readed)
-					Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "SegmentProperties", aux_read::GetCurrentLine(s_inp), "SegmentProperty");
-				else
-					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentProperties", aux_read::GetCurrentLine(s_inp), readed);
-
-				return all_parameters_readed;
-			}
-		}
-
-		std::string_view name = nh.value();
-
-		s_inp >> num;
-		
-		if (name == "SpecificGravity")			prop->SetSG(num);
-		else if (name == "SpecificMass")		prop->SetMass(num);
-		else if (name == "Diameter")			prop->SetDiameter(num);
-		else if (name == "ContactDiameter")		prop->SetContactDiameter(num);
-		else if (name == "InnerDiameter")		prop->SetInnerDiameter(num);
-		else if (name == "EA")					prop->SetEA(num);
-		else if (name == "EI")					prop->SetEI(num);
-		else if (name == "GA")					prop->SetGA(num);
-		else if (name == "GJ")					prop->SetGJ(num);
-		else if (name == "CDt")					prop->SetCDt(num);
-		else if (name == "CDn")					prop->SetCDn(num);
-		else if (name == "CAt")					prop->SetCAt(num);
-		else if (name == "CAn")					prop->SetCAn(num);
-		else if (name == "MBS")					prop->SetMBS(num);
-
-	} while (true);
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadEnvGeneral(std::string& readed)
-{
-	// Get last allocated object
-	MoorEnvironment* environment = &mm.environment;
-
-	std::unordered_set<std::string_view> names{ "Gravity", "RhoFluid", "WaterDepth" };
-	double num;
-
-	s_inp >> readed;
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "General");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "Gravity")			environment->SetGravity(num);
-		else if (name == "RhoFluid")	environment->SetRhoFluid(num);
-		else if (name == "WaterDepth")	environment->SetWaterDepth(num);
-
-		s_inp >> readed;
-
-	} while (!names.empty());
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSeabed(std::string& readed)
-{
-	// Get last allocated object
-	Seabed* seabed = &mm.environment.GetSeabed();
-
-	std::unordered_set<std::string_view> names{ "Stiffness", "Damping", "FrictionCoefficient" };
-	double num;
-
-	// Read seabed type (for now, it MUST be "flat")
-	s_inp >> readed;
-	if (readed == "flat")
-		seabed->SetFlatOption(true);
-	else
-	{
-		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
-		return false;
-	}
-
-	s_inp >> readed;
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "Seabed");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "Stiffness")				seabed->SetStiffness(num);
-		else if (name == "Damping")				seabed->SetDamping(num);
-		else if (name == "FrictionCoefficient")	seabed->SetFrictionCoefficient(num);
-
-		s_inp >> readed;
-
-	} while (!names.empty());
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSeaCurrent(std::string& readed)
-{
-	std::unordered_set<std::string_view> upper_keywords{ "Seabed", "General"};
-
-	if (!aux_read::NestedLoop(s_inp, mm.environment.GetSeaCurrentVec(),
-		upper_keywords, readed, MAP_FUNC{ { "Depth", &IO::ReadSeaCurrentAt } }))
-		std::cout << "\nErro lendo SeaCurrent"; // TODO: verificar erro leitura
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadSeaCurrentAt(std::string& readed)
-{
-	// Get last allocated object
-	SeaCurrent* sc = &mm.environment.GetSeaCurrentVec().back();
-
-	std::unordered_set<std::string_view> names{ "Azimuth", "Speed", "Depth" };
-	double num;
-
-	do {
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "Environment", aux_read::GetCurrentLine(s_inp), "SeaCurrent");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "Depth")			sc->SetDepth(num);
-		else if (name == "Speed")		sc->SetSpeed(num);
-		else if (name == "Azimuth")		sc->SetAzimuth(num);
-
-		s_inp >> readed;
-
-	} while (!names.empty());
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadRunOption(std::string& readed)
-{
-	bool option;
-	
-	s_inp >> std::boolalpha;
-	s_inp >> option;
-	gm.gir_solver.SetRunGiraffeOpt(option);
-		
-	s_inp >> std::noboolalpha;
-	s_inp >> readed;
-	
-	// All OK while reading
-	return true;
-}
-bool IO::ReadProcessors(std::string& readed)
-{
-	auto* solver = &gm.gir_solver;
-
-	std::unordered_set<std::string_view> names{ "Cores", "LinSys" };
-
-	do {
-		s_inp >> readed;
-
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-		{
-			bool all_parameters_readed = names.empty();
-			if (!all_parameters_readed)
-				Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), "Processors");
-			else
-				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), readed);
-
-			return all_parameters_readed;
-		}
-
-		std::string_view name = nh.value();
-		s_inp >> readed;
-
-		if (name == "Cores")		solver->SetCores(std::stoul(readed));
-		else if (name == "LinSys")	solver->SetLinSolverOpt(readed);
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadConvergenceCriteria(std::string& readed)
-{
-	auto* conv_criteria = &gm.gir_solver.GetConvCriteria();
-
-	std::unordered_set<std::string_view> names{ "ForceTolerance", "MomentTolerance", "ForceMinimumReference", "MomentMinimumReference",
-		"ConstraintMinimumReference", "DisplacementTolerance", "RotationTolerance", "LagrangeTolerance",
-		"DisplacementMinimumReference", "RotationMinimumReference", "LagrangeMinimumReference", "DivergenceReference" };
-
-	double num;
-
-	do {
 		aux_read::TryCommentAndContinue(s_inp, readed);
 
-		// Extract node (handle) from set with names of the object parameters
-		auto nh = names.extract(readed);
-		if (nh.empty())
-			break;
+		if (readed == "Keypoint")
+		{
+			// Create a new Keypoint object
+			Keypoint* keypoint = &mm.keypoints.emplace_back();
+			keypoint->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+			
+			names = { "X", "Y", "Z" };  // valid keywords
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+			
+			// Read keywords
+			while (s_inp >> readed && !names.empty())
+			{
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Keypoints", "Keypoint", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
 
-		std::string_view name = nh.value();
-		s_inp >> num;
-
-		if (name == "ForceTolerance")						conv_criteria->force_tol = num;
-		else if (name == "MomentTolerance")					conv_criteria->moment_min = num;
-		else if (name == "ForceMinimumReference")			conv_criteria->force_min = num;
-		else if (name == "MomentMinimumReference")			conv_criteria->moment_min = num;
-		else if (name == "ConstraintMinimumReference")		conv_criteria->constraint_min = num;
-		else if (name == "DisplacementTolerance")			conv_criteria->disp_tol = num;
-		else if (name == "RotationTolerance")				conv_criteria->rot_tol = num;
-		else if (name == "LagrangeTolerance")				conv_criteria->lag_tol = num;
-		else if (name == "DisplacementMinimumReference")	conv_criteria->disp_min = num;
-		else if (name == "RotationMinimumReference")		conv_criteria->rot_min = num;
-		else if (name == "LagrangeMinimumReference")		conv_criteria->lag_min = num;
-		else if (name == "DivergenceReference")				conv_criteria->divergence_ref = num;
-
-	} while (true);
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadPostFiles(std::string& readed)
-{
-	WritingFlags* flags = &mm.moorpost.GetWritingFlags();
-	
-	std::unordered_set<std::string_view> names{ "None", "Mesh", "RenderMesh", 
-		"RigidContactSurfaces", "FlexibleContactSurfaces", 
-		"Constraints", "Forces", "SpecialConstraints", "ContactForces", 
-		"RenderParticles", "RenderRigidBodies" };
-
-	do {
-		s_inp >> readed;
-
-		// Extract node (handle) from set with names of the object parameters
-		if (names.extract(readed).empty())
-			break;
-
-		if (readed == "None")
-		{ 
-			flags->SetAllFlags(false);
-			return true; 
+				std::string_view name = nh.value();
+				if (name == "X")		keypoint->SetX(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Y")	keypoint->SetY(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Z")	keypoint->SetZ(aux_read::ReadVariable<double>(s_inp));
+			}
 		}
-		else if (readed == "RenderRigidBodies")			flags->SetRenderRigidBodiesFlag(true);
-		else if (readed == "Forces")					flags->SetForcesFlag(true);
-		else if (readed == "ContactForces")				flags->SetContactForcesFlag(true);
-		else if (readed == "RigidContactSurfaces")		flags->SetRigidContactSurfacesFlag(true);
-		else if (readed == "RenderMesh")				flags->SetRenderMeshFlag(true);
-		else if (readed == "Constraints")				flags->SetConstraintsFlag(true);
-		else if (readed == "SpecialConstraints")		flags->SetSpecialConstraintsFlag(true);
-		else if (readed == "Mesh")						flags->SetMeshFlag(true);
-		else if (readed == "FlexibleContactSurfaces")	flags->SetFlexibleContactSurfacesFlag(true);
-		else if (readed == "RenderParticles")			flags->SetRenderParticlesFlag(true);
-		else if (readed == "All")						flags->SetAllFlags(true);
-
-	} while (true);
-
+		else 
+			break;
+	} 
 
 	// All OK while reading
+	aux_read::RemoveDuplicates(mm.keypoints, "Keypoint");
+	Log::SetLastValidKeyword("Keypoints");
 	return true;
 }
-bool IO::ReadCADs(std::string& readed)
+
+bool IO::ReadSegmentSets(std::string& readed)
 {
-	std::unordered_set<std::string_view> upper_keywords{ "PostFiles" };
-
-	if (!aux_read::NestedLoop(s_inp, mm.moorpost.GetAllPlatformCADs(), upper_keywords, 
-		readed, MAP_FUNC{ { "PlatformID", &IO::ReadPlatformCAD } }))
-		std::cout << "\nErro lendo PlatformCADs"; // TODO: verificar erro leitura
-
-
-	// All OK while reading
-	return true;
-}
-bool IO::ReadPlatformCAD(std::string& readed)
-{
-	// Get last allocated object
-	CADData* cad = &mm.moorpost.GetAllPlatformCADs().back();
-
-	// Read the ID number
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	cad->SetIDNumber(num_ID);
+	std::unordered_set<std::string_view> names;
 	
-	// Read name
 	s_inp >> readed;
-	if (readed != "Name")
+	while (s_inp.good())
 	{
-		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "GiraffeSolver", aux_read::GetCurrentLine(s_inp), readed);
-		return false;
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "Set")
+		{
+			// Create a new SegmentSet object
+			SegmentSet* set = &mm.segment_sets.emplace_back();
+			set->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+
+			// Read first keyword
+			s_inp >> readed;
+			while (s_inp.good())
+			{
+				LineSegment* seg;
+
+				names = { "Length", "Property", "Discretization" };  // Valid keywords
+				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+				// Try to create a new LineSegment object at the end of 'segmentsets' container
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Keypoints", "Keypoint", names);
+				if (nh.empty() || readed == "Set")	break;
+				else								seg = set->AddSegment();
+				
+				// Setting segment properties
+				while (!names.empty() || !nh.empty())
+				{
+					std::string_view name = nh.value();
+					if (name == "Length")				seg->SetLength(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "Property")		seg->SetProperty(aux_read::ReadVariable<unsigned int>(s_inp));
+					else if (name == "Discretization")	seg->SetDiscretization(aux_read::ReadVariable<unsigned int>(s_inp));
+
+					s_inp >> readed;
+					// Extract node
+					ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "SegmentSets", "SegmentSet", names);
+					if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+					else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+				} 
+			}
+		}
+		else 
+			break;
+	} 
+
+	// All OK while reading
+	aux_read::RemoveDuplicates(mm.segment_sets, "SegmentSet");
+	Log::SetLastValidKeyword("SegmentSets");
+	return true;
+}
+
+bool IO::ReadLines(std::string& readed)
+{
+	std::unordered_set<std::string_view> names;
+
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "Line")
+		{
+			// Create a new Keypoint object
+			Line* line = &mm.lines.emplace_back();
+			line->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+
+			/* If is shared, one MUST define "Fairleads" or "VesselIDs" after the ID number
+			   thus, it CAN NOT be "SegmentSet" in this case! */
+			if (readed == "Fairleads" || readed == "VesselIDs")
+			{
+				names = { "Fairleads", "VesselIDs", "SegmentSet" };
+				line->SetSharedOpt(true);
+			}
+			else
+				names = { "Anchor", "Fairlead", "VesselID", "SegmentSet" };
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Read keywords
+			while (s_inp >> readed && !names.empty())
+			{
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Lines", "Line", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Anchor") { line->SetKeypointA(aux_read::Try2GetObjectID(s_inp, readed)); }
+				else if (name == "Fairlead") { line->SetKeypointB(aux_read::Try2GetObjectID(s_inp, readed)); }
+				else if (name == "VesselID") { line->SetVesselID(aux_read::Try2GetObjectID(s_inp, readed)); }
+				else if (name == "SegmentSet") { line->SetSegmentSet(aux_read::Try2GetObjectID(s_inp, readed)); }
+				// Shared line
+				else if (name == "Fairleads")
+				{
+					// First fairlead
+					line->SetKeypointA(aux_read::Try2GetObjectID(s_inp, readed));
+					// Separator
+					char ch = s_inp.get();
+					if (ch != ',' && ch != ';')	return false;
+					// Second fairlead
+					line->SetKeypointB(aux_read::Try2GetObjectID(s_inp, readed));
+				}
+				else if (name == "VesselIDs")
+				{
+					// First vessel
+					line->SetVesselID(aux_read::Try2GetObjectID(s_inp, readed));
+					// Separator
+					char ch = s_inp.get();
+					if (ch != ',' && ch != ';')	return false;
+					// Second vessel
+					line->SetVesselID(aux_read::Try2GetObjectID(s_inp, readed));
+				}
+			}
+		}
+		else
+			break;
 	}
 
-	s_inp >> readed;
-	cad->SetName(readed);
+	// All OK while reading
+	aux_read::RemoveDuplicates(mm.lines, "Line");
+	Log::SetLastValidKeyword("Lines");
+	return true;
+}
 
-	// Read next word
+bool IO::ReadVessels(std::string& readed)
+{
+	std::unordered_set<std::string_view> mandatory_names, optional_names;
+	
 	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "Vessel")
+		{
+			// Create a new Keypoint object
+			Vessel* vessel = &mm.vessels.emplace_back();
+			vessel->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+
+			mandatory_names = { "PilotNode" };
+			optional_names = { "InertiaTensor", "Mass" };
+
+			NODE_HANDLE_USET_SV nh;
+			
+			// (try to) read first keyword before the do-while block 
+			// because when we have optional keys we check th node handle, not the set with keywords
+			s_inp >> readed;  
+			do {
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Vessels", "Vessel", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "InertiaTensor")
+				{
+					vessel->SetInertiaTensor(aux_read::ReadFixedContainer<std::array<double, 6>, 6>(s_inp));
+					continue;
+				}
+
+				if (name == "PilotNode")	vessel->SetKeypoint(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "Mass")	vessel->SetMass(aux_read::ReadVariable<float>(s_inp));
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else
+			break;
+	}
 
 	// All OK while reading
+	aux_read::RemoveDuplicates(mm.vessels, "Vessel");
+	Log::SetLastValidKeyword("Vessels");
+	return true;
+}
+
+bool IO::ReadSegmentProperties(std::string& readed)
+{
+	std::unordered_set<std::string_view> mandatory_names, optional_names;
+
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "SegmentProperty")
+		{
+			// Create a new Keypoint object
+			SegmentProperty* prop = &mm.segment_properties.emplace_back();
+			prop->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+
+			// Check segment type
+			s_inp >> readed;
+			if (readed == "truss")
+			{
+				prop->SetTrussOpt(true);
+				mandatory_names = { "SpecificMass", "Diameter", "EA", "CDt", "CDn", "CAt", "CAn" };
+				optional_names = { "SpecificGravity", "YoungModulus", "PoissonRatio", "InnerDiameter", "ContactDiameter", "MBS" };
+			}
+			else if (readed == "beam")
+			{
+				prop->SetBeamOpt(true);
+				mandatory_names = { "SpecificMass", "Diameter", "EA", "CDt", "CDn", "CAt", "CAn", "EI", "GJ", "GA" };
+				optional_names = { "SpecificGravity", "YoungModulus", "PoissonRatio", "InnerDiameter", "ContactDiameter", "MBS" };
+			}
+			else if (readed == "chain")
+			{
+				prop->SetChainOpt(true);
+				mandatory_names = { "Diameter", "Type" };
+				optional_names = { "MBS", "EA", "CDt", "CDn", "CAt", "CAn", "EI", "GJ", "GA", "InnerDiameter", "ContactDiameter" };
+			}
+			else
+			{
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SegmentProperties", aux_read::GetCurrentLine(s_inp), readed);
+				return false;
+			}
+
+			NODE_HANDLE_USET_SV nh;
+
+			// (try to) read first keyword before the do-while block 
+			// because when we have optional keys we check th node handle, not the set with keywords
+			s_inp >> readed;
+			do {
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "SegmentProperties", "SegmentProperty", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "SpecificGravity")			prop->SetSG(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "SpecificMass")		prop->SetMass(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Diameter")			prop->SetDiameter(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "ContactDiameter")		prop->SetContactDiameter(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "InnerDiameter")		prop->SetInnerDiameter(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "EA")					prop->SetEA(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "EI")					prop->SetEI(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "GA")					prop->SetGA(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "GJ")					prop->SetGJ(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "CDt")					prop->SetCDt(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "CDn")					prop->SetCDn(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "CAt")					prop->SetCAt(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "CAn")					prop->SetCAn(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "MBS")					prop->SetMBS(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Type")				prop->SetWizardType(aux_read::ReadVariable<std::string>(s_inp));
+
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else
+			break;
+	}
+
+	// All OK while reading
+	aux_read::RemoveDuplicates(mm.segment_properties, "SegmentProperty");
+	Log::SetLastValidKeyword("SegmentProperties");
+	return true;
+}
+
+bool IO::ReadEnvironment(std::string& readed)
+{
+	std::unordered_set<std::string_view> names;
+	std::unordered_set<std::string_view> blocks = { "General", "Seabed", "SeaCurrent" };
+
+	// Read first block
+	s_inp >> readed;	
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "General")
+		{
+			// Create a new Keypoint object
+			MoorEnvironment* env = &mm.environment;
+
+			names = { "Gravity", "RhoFluid", "WaterDepth" };  // valid keywords
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Read keywords
+			while (s_inp >> readed && !names.empty())
+			{
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "General", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Gravity")			env->SetGravity(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "RhoFluid")	env->SetRhoFluid(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "WaterDepth")	env->SetWaterDepth(aux_read::ReadVariable<double>(s_inp));
+			}
+		}
+		else if (key == "Seabed")
+		{
+			// Create a new Keypoint object
+			Seabed* seabed = &mm.environment.GetSeabed();
+
+			names = { "Stiffness", "Damping", "FrictionCoefficient" };  // valid keywords
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Read seabed type (for now, it MUST be "flat")
+			s_inp >> readed;
+			if (readed == "flat") 
+				seabed->SetFlatOption(true);
+			else
+			{
+				Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Environment |> Seabed", aux_read::GetCurrentLine(s_inp), readed);
+				return false;
+			}
+
+			// Read keywords
+			while (s_inp >> readed && !names.empty())
+			{
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "Seabed", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Stiffness")				seabed->SetStiffness(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Damping")				seabed->SetDamping(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "FrictionCoefficient")	seabed->SetFrictionCoefficient(aux_read::ReadVariable<double>(s_inp));
+			}
+		}
+		else if (key == "SeaCurrent")
+		{
+			s_inp >> readed;
+			while (s_inp.good())
+			{
+				SeaCurrent* sc;
+
+				names = { "Azimuth", "Speed", "Depth" };  // Valid keywords
+				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+				// Try to create a new SeaCurrent object at the end of 'sea_current' container
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "SeaCurrent", names);
+				// If is not a valid keyword or valid block, break loop ...
+				if (nh.empty() || blocks.count(readed) > 0)	break; 
+				// Otherise, append a new object to the container
+				else								sc = mm.environment.AddSeaCurrent();
+
+				// Setting segment properties
+				while (!names.empty() || !nh.empty())
+				{
+					std::string_view name = nh.value();
+					if (name == "Depth")			sc->SetDepth(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "Speed")		sc->SetSpeed(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "Azimuth")		sc->SetAzimuth(aux_read::ReadVariable<double>(s_inp));
+
+					s_inp >> readed;
+					// Extract node
+					ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "SeaCurrent", names);
+					if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+					else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+				}
+			}
+		}
+		else
+			break;
+	}
+
+	// All OK while reading
+	Log::SetLastValidKeyword("Environment");
+	return true;
+}
+
+bool IO::ReadSolution(std::string& readed)
+{
+	std::unordered_set<std::string_view> mandatory_names, optional_names;
+	std::unordered_set<std::string_view> blocks = { "Analysis", "SeaCurrentStep", "DynamicRelaxation" };
+
+	// Read first block
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "DynamicRelaxation")
+		{
+			auto step = mm.moorsolution.InitDynRelaxLines();
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			mandatory_names = { "Decrement", "Periods" };
+			optional_names = { "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
+				
+			// Setting solution properties
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "DynamicRelaxation", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Decrement")				step->SetDecrement(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Periods")				step->SetPeriods(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Time")				step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Sample")				step->SetSample(aux_read::ReadVariable<int>(s_inp));
+			} while (s_inp >> readed && !nh.empty());
+			step->CheckAndSetMaxTimeStep();
+		}
+		else if (key == "SeaCurrentStep")
+		{
+			auto step = mm.moorsolution.InitStepSeaCurrent();
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			mandatory_names = { "Time" };
+			optional_names = { "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
+
+			// Setting solution properties
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "SeaCurrentStep", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Time")						step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Sample")				step->SetSample(aux_read::ReadVariable<int>(s_inp));
+			} while (s_inp >> readed && !nh.empty());
+			step->CheckAndSetMaxTimeStep();
+		}
+		else if (key == "Analysis")
+		{
+			s_inp >> readed;
+			while (s_inp.good())
+			{
+				SolutionStep* step;
+				
+				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+				// Try to create a new SeaCurrent object at the end of 'sea_current' container
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", USET_SV{ "Step" });
+				// If is not a valid keyword or valid block, break loop ...
+				if (nh.empty() || blocks.count(readed) > 0)	break;
+				// ... otherise, append a new object to the container
+				else										step = mm.moorsolution.AddSolutionStep();
+
+				step->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+				// Read solution type 
+				s_inp >> readed;
+				if (readed == "static")
+				{
+					step->SetStaticOpt(true);
+					mandatory_names = { "Time", "TimeStep", "MinTimeStep", "Sample"};
+					optional_names = { "MaxTimeStep" };
+				}
+				else if (readed == "dynamic")
+				{
+					step->SetDynamicOpt(true);
+					mandatory_names = { "Time", "TimeStep", "MinTimeStep", "Sample", "NumericalDamping" };
+					optional_names = { "MaxTimeStep", "RayleighDamping" };
+				}
+				else
+				{
+					Log::SetWarning(Log::Warning::INVALID_KEYWORD, "Solution", aux_read::GetCurrentLine(s_inp), readed);
+					return false;
+				}
+
+				// Setting solution properties
+				while (s_inp >> readed && !nh.empty())
+				{
+					// Extract node
+					ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", mandatory_names, optional_names);
+					if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+					else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+					std::string_view name = nh.value();
+					if (name == "Time")						step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
+					else if (name == "Sample")				step->SetSample(aux_read::ReadVariable<int>(s_inp));
+					else if (name == "NumericalDamping")
+					{
+						// Try predefined parameter...
+						if (!step->SetNewmarkDamping(aux_read::ReadVariable<std::string>(s_inp), readed))
+						{
+							// ... or define each coefficient explicitly
+							std::unordered_set<std::string_view> coeffs = { "Beta", "Gamma" };
+							for (int i : {1, 2})
+							{
+								auto nh = coeffs.extract(readed);
+								if (nh.empty()) break;
+
+								name = nh.value();
+								if (name == "Beta")			step->SetBetaNewmark(aux_read::ReadVariable<double>(s_inp));
+								else if (name == "Gamma")	step->SetGammaNewmark(aux_read::ReadVariable<double>(s_inp));
+								
+								// read second keyword
+								if (i == 1) s_inp >> readed; 
+							}
+
+							if (coeffs.size())
+							{
+								Log::SetWarning(R"(
+   + 'NumericalDamping' was defined, but Beta and/or Gamma was/were not defined. 
+    You may want to defined both parameters or choose one of the following keywords for setting predefined parameters:
+
+	 ------------------------------
+	|  Keyword   |  Beta |  Gamma  |
+	|------------|-------|---------|
+	|  null      |  0.3  |  0.500  |
+	|  mild      |  0.3  |  0.505  |
+	|  moderate  |  0.3  |  0.520  |
+	|  high      |  0.3  |  0.550  |
+	|  extreme   |  0.3  |  0.600  |
+	 ------------------------------)");
+							}
+						}
+					}
+					else if (name == "RayleighDamping")
+					{
+						// Read two coefficients
+						for (int cont : {1, 2})
+						{
+							s_inp >> readed;
+							if (readed == "Alpha")		step->SetAlphaRayleigh(aux_read::ReadVariable<double>(s_inp));
+							else if (readed == "Beta")	step->SetBetaRayleigh(aux_read::ReadVariable<double>(s_inp));
+							else
+							{
+								Log::SetWarning("   + 'RayleighDamping' was defined, but Alpha and/or Beta was/were not defined.");
+								aux_read::BackLastWord(s_inp, readed);
+								break;
+							}
+						}
+					}
+				} /*-- properties setting --*/
+				step->CheckAndSetMaxTimeStep();
+			}
+		} /*-- end analysis --*/
+		else
+			break;
+	}
+
+	// If no analysis step is defined the user must be warned
+	if (mm.moorsolution.GetStepsVec().size() == 0) 
+		Log::SetWarning(R"(
+  No analysis step was defined, thus GiraffeMoor only create the 'setting' models. 
+  You can check the *.sum file and the user's manual for details.)");
+
+	// All OK while reading
+	Log::SetLastValidKeyword("Solution");
+	return true;
+}
+
+bool IO::ReadGiraffeSolver(std::string& readed)
+{
+	std::unordered_set<std::string_view> mandatory_names, optional_names;
+	std::unordered_set<std::string_view> blocks = { "Run", "Processors", "ConvergenceCriteria" };
+
+	// Read first block
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "Run")
+		{
+			// Read boolean
+			gm.gir_solver.SetRunGiraffeOpt(aux_read::ReadVariable<bool>(s_inp));
+
+			// Read next keyword
+			s_inp >> readed;
+		}
+		else if (key == "Processors")
+		{
+			GiraffeSolver* solver = &gm.gir_solver;
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			mandatory_names = { };
+			optional_names = { "Cores", "LinSys" };
+
+			// Setting solution properties
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "GiraffeSolver", "Processors", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Cores")		solver->SetCores(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "LinSys")	solver->SetLinSolverOpt(aux_read::ReadVariable<std::string>(s_inp));
+
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else if (key == "ConvergenceCriteria")
+		{
+			ConvergenceCriteria* conv_criteria = &gm.gir_solver.GetConvCriteria();
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			mandatory_names = { };
+			optional_names = { "ForceTolerance", "MomentTolerance", "ForceMinimumReference", "MomentMinimumReference",
+				"ConstraintMinimumReference", "DisplacementTolerance", "RotationTolerance", "LagrangeTolerance",
+				"DisplacementMinimumReference", "RotationMinimumReference", "LagrangeMinimumReference", "DivergenceReference" };
+
+			// Setting Convergence criteria 
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "GiraffeSolver", "ConvergenceCriteria", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "ForceTolerance")						conv_criteria->force_tol = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "MomentTolerance")					conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "ForceMinimumReference")			conv_criteria->force_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "MomentMinimumReference")			conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "ConstraintMinimumReference")		conv_criteria->constraint_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "DisplacementTolerance")			conv_criteria->disp_tol = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "RotationTolerance")				conv_criteria->rot_tol = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "LagrangeTolerance")				conv_criteria->lag_tol = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "DisplacementMinimumReference")	conv_criteria->disp_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "RotationMinimumReference")		conv_criteria->rot_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "LagrangeMinimumReference")		conv_criteria->lag_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "DivergenceReference")				conv_criteria->divergence_ref = aux_read::ReadVariable<double>(s_inp);
+			
+			} while (s_inp >> readed && !nh.empty());
+			
+		} 
+		else
+			break;
+	}
+
+
+	// All OK while reading
+	Log::SetLastValidKeyword("GiraffeSolver");
+	return true;
+}
+
+bool IO::ReadPostProcessing(std::string& readed)
+{
+	std::unordered_set<std::string_view> mandatory_names, optional_names;
+	std::unordered_set<std::string_view> blocks = { "PostFiles", "CADs"};
+
+	// Read first block
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "PostFiles")
+		{
+			WritingFlags* flags = &mm.moorpost.GetWritingFlags();
+
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			mandatory_names = { };
+			optional_names = { "none", "Mesh", "RenderMesh", "RigidContactSurfaces", 
+				"FlexibleContactSurfaces", "Constraints", "Forces", "SpecialConstraints", 
+				"ContactForces", "RenderParticles", "RenderRigidBodies" };
+
+			// Setting post files options
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "PostProcessing", "PostFiles", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (readed == "none")
+				{ 
+					flags->SetAllFlags(false);
+					break;
+				}
+				else if (readed == "RenderRigidBodies")			flags->SetRenderRigidBodiesFlag(true);
+				else if (readed == "Forces")					flags->SetForcesFlag(true);
+				else if (readed == "ContactForces")				flags->SetContactForcesFlag(true);
+				else if (readed == "RigidContactSurfaces")		flags->SetRigidContactSurfacesFlag(true);
+				else if (readed == "RenderMesh")				flags->SetRenderMeshFlag(true);
+				else if (readed == "Constraints")				flags->SetConstraintsFlag(true);
+				else if (readed == "SpecialConstraints")		flags->SetSpecialConstraintsFlag(true);
+				else if (readed == "Mesh")						flags->SetMeshFlag(true);
+				else if (readed == "FlexibleContactSurfaces")	flags->SetFlexibleContactSurfacesFlag(true);
+				else if (readed == "RenderParticles")			flags->SetRenderParticlesFlag(true);
+				else if (readed == "All")						flags->SetAllFlags(true);
+
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else if (key == "CADs")
+		{
+			s_inp >> readed;
+			while (!s_inp.eof())
+			{
+				CADData* cad;
+
+				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+				mandatory_names = { "VesselID", "FileName" };
+
+				// Try to create a new CADData object at the end of 'vessel_cads' container
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", mandatory_names);
+				// If is not a valid keyword or valid block, break loop ...
+				if (nh.empty() || blocks.count(readed) > 0)	break;
+				// ... otherise, append a new object to the container
+				else										cad = mm.moorpost.AddVesselCAD();
+
+				// Setting CAD properties
+				do {
+					std::string_view name = nh.value();
+					if (name == "VesselID")			cad->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+					else if (name == "FileName")	cad->SetName(aux_read::ReadVariable<std::string>(s_inp));
+					
+					// Extract node
+					s_inp >> readed;
+					auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", mandatory_names);
+					if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+					else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				} while (!nh.empty());
+			}
+		}
+		else
+			break;
+	}
+
+
+	// All OK while reading
+	Log::SetLastValidKeyword("PostProcessing");
 	return true;
 }
 
 bool IO::ReadStiffnessMatrix(std::string& readed)
 {
-	s_inp >> readed;
-	if (readed != "Analytical") return false;
-
-	bool option;
-
-	s_inp >> std::boolalpha >> option;
 	mm.stiff_matrix = std::make_unique<StiffnessMatrix>();
-	mm.stiff_matrix->SetAnalyticalStiffnessOpt(option);
 
-	s_inp >> std::noboolalpha >> readed;
+	std::unordered_set<std::string_view> names;
+	std::unordered_set<std::string_view> blocks = { "Analytical" };
+
+	// Read blocks
+	while (s_inp >> readed)
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "Analytical")
+			mm.stiff_matrix->SetAnalyticalStiffnessOpt(aux_read::ReadVariable<bool>(s_inp));
+		else
+			break;
+	}
 
 	// All OK while reading
+	Log::SetLastValidKeyword("StiffnessMatrix");
 	return true;
+}
 
-	// TODO: adaptar
-	/*if (!strcmp(str, "Numerical"))
+bool IO::ReadVesselDisplacements(std::string& readed)
+{
+	//TODO: retirar 'insert's e melhorar leitura de cada tipo de deslocamento
+
+	std::unordered_set<std::string_view> names;
+
+	s_inp >> readed;
+	while (s_inp.good())
 	{
-		if (fscanf(f, "%s", str) != EOF && (!strcmp(str, "true") || !strcmp(str, "1")))
-		{
-			bool_num = true;
+		aux_read::TryCommentAndContinue(s_inp, readed);
 
-			if (fscanf(f, "%s %lf", str, &time_matrix) == EOF || strcmp(str, "Time") ||
-				fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &disp_matrix_x, &disp_matrix_y, &disp_matrix_z,
-					&rot_matrix_x, &rot_matrix_y, &rot_matrix_z) == EOF || strcmp(str, "Offsets"))
+		if (readed == "DispVesselID")
+		{
+			// Create a new Keypoint object
+			VesselDisplacement* disp = &mm.vessel_displacements.emplace_back();
+			disp->SetVesselID(aux_read::Try2GetObjectID(s_inp, readed));
+
+			names = { "Step", "TimeSeries", "MathCode", "File" };  // valid keywords
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Setting properties
+			while (s_inp >> readed && !names.empty())
 			{
-				Log::AddWarning("\n   + Error reading numerical stiffness matrix data.\n");
-				return false;
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "VesselDisplacements", "VesselDisplacement", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK || nh.empty())	break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)			return false;
+
+				std::string_view name = nh.value();
+				if (name == "Step")		disp->SetSolutionStep(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "TimeSeries")
+				{
+					names.erase("MathCode");
+					names.erase("File");
+					names.insert("TimeSeriesData");
+					disp->SetTimeSeries();
+				}
+				else if (name == "TimeSeriesData")
+					*disp->GetTimeSeries() = aux_read::ReadTable(s_inp);
+				/*-- External file --*/
+				else if (name == "File")
+				{
+					// Remove other options...
+					names.erase("TimeSeries");
+					names.erase("MathCode");
+					//... and insert keywords to read external file
+					names.insert({ "FileName", "NTimes", "NHeaders" });
+				}
+				else if (name == "FileName")	disp->SetFileName(aux_read::ReadDelimitedString(s_inp, std::array{ '\"', '\"' }));
+				else if (name == "NTimes")		disp->SetFileNSteps(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "NHeaders")	disp->SetFileHeaders(aux_read::ReadVariable<unsigned int>(s_inp));
+				/*-- MathCode --*/
+				else if (name == "MathCode")
+				{
+					// Remove other options...
+					names.erase("TimeSeries");
+					names.erase("File");
+					//... and insert keywords to read MathCode (DOFs)
+					names.insert({ "X", "Y", "Z", "ROTX", "ROTY", "ROTZ" });
+
+					disp->SetMathCode();
+				}
+				else if (name == "X")		disp->GetMathCode()->SetEquation(0, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "Y")		disp->GetMathCode()->SetEquation(1, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "Z")		disp->GetMathCode()->SetEquation(2, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTX")	disp->GetMathCode()->SetEquation(3, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTY")	disp->GetMathCode()->SetEquation(4, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTZ")	disp->GetMathCode()->SetEquation(5, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
 			}
 		}
-	}*/
-}
-
-bool IO::ReadVesselDisplacement(std::string& readed)
-{
-	VesselDisplacement* disp = &mm.vessel_disp_vector.back();
-
-	bool step_defined = false, disp_type_defined = false;
-
-	// Read the vessel ID 
-	size_t num_ID = aux_read::Try2GetObjectID<size_t>(s_inp, readed);
-	disp->SetVesselID(num_ID);
-
-	s_inp >> readed;
-
-	// Read two coefficients
-	for (int aux : {1, 2})
-	{
-		if (!step_defined && readed == "Step")
-		{
-			s_inp >> readed;
-			disp->SetSolutionStep(std::stoull(readed));
-			step_defined = true;
-		}
-		else if (!disp_type_defined && readed == "TimeSeries")
-		{
-			disp->SetTimeSeries();
-			s_inp >> disp->GetTimeSeries();
-			disp_type_defined = true;
-		}
-		else if (!disp_type_defined && readed == "MathCode")
-		{
-			disp->SetMathCode();
-			s_inp >> disp->GetMathCode();
-			disp_type_defined = true;
-		}
-		else if (!disp_type_defined && readed == "File")
-		{
-			s_inp >> readed;
-			// TODO: ler arquivo externo
-			disp_type_defined = true;
-		}
-		else if (!disp_type_defined && readed == "SineWave")
-		{
-			s_inp >> readed;
-			// TODO: SineWave-like
-			disp_type_defined = true;
-		}
 		else
-		{
-			Log::SetWarning(Log::Warning::INVALID_KEYWORD, "VesselDisplacement", aux_read::GetCurrentLine(s_inp), readed);
-			return false;
-		}
-
-		aux_read::TryCommentAndContinue(s_inp, readed);
-	}
-
-
-	// All OK while reading
-	return true;
-}
-
-bool IO::ReadLineDisplacementFields(std::string& readed)
-{
-	// Object pointer
-	LineDisplacementField* line{};
-	const std::string_view keyword{ "DispLineID" };
-
-	while (true)
-	{
-		// Searches for keyword
-		aux_read::TryCommentAndContinue(s_inp, readed);
-		if (readed != keyword)
 			break;
-
-		line = &mm.disp_field_vector.emplace_back();
-
-		// Displacement data
-		s_inp >> line;
 	}
 
 	// All OK while reading
+	aux_read::RemoveDuplicates(mm.vessel_displacements, "VesselDisplacement");
+	Log::SetLastValidKeyword("VesselDisplacements");
 	return true;
 }
 
 bool IO::ReadConstraints(std::string& readed)
 {
-	// Constraint object 
-	MoorConstraint* obj{};
-	std::string_view keyword;
+	std::unordered_set<std::string_view> blocks = { "VesselConstraints", "AnchorConstraints", "LineConstraints" };
+
+	MoorConstraint* constraint{};  // Constraint object 
+	std::string_view keyword;  // ID identifier
 	
 	// Lambda function to create object and return a reference 
-	//std::function<MoorConstraint* (void)> emplace_constraint;
-	MoorConstraint* (*emplace_constraint)(void) {};
+	MoorConstraint* (*emplace_constraint)(void) {};  //std::function<MoorConstraint* (void)> emplace_constraint;
 
-	if (readed == "VesselConstraints")
+	// Read first block
+	s_inp >> readed;
+	while (s_inp.good())
 	{
-		keyword = "VesselID";
-		emplace_constraint = []() { return &mm.vessel_constraints.emplace_back(); };
-	}
-	else if (readed == "AnchorConstraints")
-	{
-		keyword = "LineID";
-		emplace_constraint = []() { return &mm.anchor_constraints.emplace_back(); };
-	}
-	else
-	{
-		keyword = "LineID";
-		emplace_constraint = []() { return &mm.line_constraints.emplace_back(); };
-	}
-
-
-	while (true)
-	{
-		// Searches for keyword
 		aux_read::TryCommentAndContinue(s_inp, readed);
-		if (readed != keyword)
+
+		if (readed == "VesselConstraints")
+		{
+			keyword = "VesselID";
+			emplace_constraint = []() { return &mm.vessel_constraints.emplace_back(); };
+		}
+		else if (readed == "AnchorConstraints")
+		{
+			keyword = "LineID";
+			emplace_constraint = []() { return &mm.anchor_constraints.emplace_back(); };
+		}
+		else if (readed == "LineConstraints")
+		{
+			keyword = "LineID";
+			emplace_constraint = []() { return &mm.line_constraints.emplace_back(); };
+		}
+		else
 			break;
 
-		obj = emplace_constraint();
+		s_inp >> readed;
+		while (s_inp.good())
+		{
+			// Searches for keyword
+			aux_read::TryCommentAndContinue(s_inp, readed);
+			
+			// Check if is from the same block
+			if (readed != keyword)	break;
+			
+			// Append a new MoorConstraint
+			constraint = emplace_constraint();
+			constraint->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
 
-		// Constraint data
-		s_inp >> obj;
+			// Read constraint data
+			std::unordered_set<std::string_view> DoFs{ "X", "Y", "Z", "ROTX", "ROTY", "ROTZ" };
+
+			unsigned int dof = 0;
+
+			// Read booltables
+			s_inp >> readed;
+			do {
+				// Check DoF
+				if (DoFs.count(readed) == 0)	break;
+				else							DoFs.erase(readed);
+
+				if (readed == "X")			dof = 0;
+				else if (readed == "Y")		dof = 1;
+				else if (readed == "Z")		dof = 2;
+				else if (readed == "ROTX")	dof = 3;
+				else if (readed == "ROTY")	dof = 4;
+				else if (readed == "ROTZ")	dof = 5;
+
+				// read options (MUST be '1' or '0')
+				while (s_inp >> readed && std::isdigit(readed[0]))
+					constraint->PushToDof(dof, readed[0] == '1');
+			} while (s_inp.good());
+		}
 	}
 
-
 	// All OK while reading
+	Log::SetLastValidKeyword("Constraints");
 	return true;
 }
 
-void IO::ReadNodalLoads(std::string& readed)
-{
-
-}
 
 
-//	//Checks if all mandatory blocks were defined
-//	if (!mandatory_keywords.empty())
-//	{
-//		//Initial message
-//		std::string w = std::string("\n   + ") + std::to_string(mandatory_keywords.size()) + " mandatory block(s) missed:\n";
-//		Log::AddWarning(w);
+/*--- ---*/
+
+
+//bool IO::ReadLineDisplacementFields(std::string& readed)
+//{
+//	// Object pointer
+//	LineDisplacementField* line{};
+//	const std::string_view keyword{ "DispLineID" };
 //
-//		//Appends missed mandatory keywords
-//		for (const std::string_view& missed_block : mandatory_keywords)
-//		{
-//			Log::AddWarning(missed_block);
-//			Log::AddWarning("\n");
-//		}
-//		return false;
+//	while (true)
+//	{
+//		// Searches for keyword
+//		aux_read::TryCommentAndContinue(s_inp, readed);
+//		if (readed != keyword)
+//			break;
+//
+//		line = &mm.line_disp_fields.emplace_back();
+//
+//		// Displacement data
+//		s_inp >> line;
 //	}
 //
-//
-//	//All ok while reading
+//	// All OK while reading
 //	return true;
 //}
+//
+
+
+
+bool IO::CheckAllMandatoryKeywords()
+{
+	//Checks if all mandatory blocks were defined
+	if (!s_mandatory_keys_read_func.empty())
+	{
+		//Initial message
+		std::string w = std::string("\n   + ") + std::to_string(s_mandatory_keys_read_func.size()) + " mandatory block(s) missed:\n";
+		Log::SetWarning(w);
+
+			//Appends missed mandatory keywords
+		for (auto const& element : s_mandatory_keys_read_func)
+		{
+			Log::SetWarning(element.first);
+			Log::SetWarning("\n");
+		}
+		return false;
+	}
+
+
+	//All ok while reading
+	return true;
+}
 
 
 //Check input data before trying to generate the FE model
@@ -1357,11 +1171,15 @@ bool IO::CheckModel()
 	/// <returns> booleano q indica se o modelo passou por todas as etapas </returns>
 
 
-	std::map<std::string_view, std::size_t> n_keywords{
+	std::map<std::string_view, size_t> n_keywords{
 		//Mandatory blocks
-		{"Keypoints", mm.keypoint_vector.size()}, {"Lines", mm.line_vector.size()}, {"Vessels", mm.vessel_vector.size()},
-		{"SegmentProperties", mm.segment_property_vector.size()}, {"SolSteps", mm.moorsolution.GetStepsVec().size()},
-		/*nothing to check:*/{"Environment", 1}, {"Solution", 1},
+		{"Keypoints", (unsigned int)mm.keypoints.size()}, 
+		{"Lines", (unsigned int)mm.lines.size()}, 
+		{"Vessels", (unsigned int)mm.vessels.size()},
+		{"SegmentProperties", (unsigned int)mm.segment_properties.size()}, 
+		{"SolSteps", (unsigned int)mm.moorsolution.GetStepsVec().size()},
+		/*nothing to check:*/
+		{"Environment", 1}, {"Solution", 1},
 	};
 
 	//Stream with warning message(s)
@@ -1372,16 +1190,16 @@ bool IO::CheckModel()
 	///
 	
 	/*--- Keypoints ---*/
-	if (mm.keypoint_vector.front().GetIDNumber() != 1 || mm.keypoint_vector.back().GetIDNumber() != n_keywords["Keypoints"])
+	if (mm.keypoints.front().GetIDNumber() != 1 || mm.keypoints.back().GetIDNumber() != n_keywords["Keypoints"])
 		ss << "\n   + Invalid keypoint numbering";
 	/*--- Segment properties ---*/
-	if (mm.segment_property_vector.front().GetNumber() != 1 || mm.segment_property_vector.back().GetNumber() == n_keywords["SegProp"])
+	if (mm.segment_properties.front().GetNumber() != 1 || mm.segment_properties.back().GetNumber() == n_keywords["SegProp"])
 		ss << "\n   + Invalid segment property numbering";
 	/*--- Lines ---*/
-	if (mm.line_vector.front().GetNumber() != 1 || mm.line_vector.back().GetNumber() != n_keywords["Lines"])
+	if (mm.lines.front().GetNumber() != 1 || mm.lines.back().GetNumber() != n_keywords["Lines"])
 		ss << "\n   + Invalid line numbering";
 	{
-		std::for_each(mm.line_vector.cbegin(), mm.line_vector.cend(), [&](const Line& line) {
+		std::for_each(mm.lines.cbegin(), mm.lines.cend(), [&](const Line& line) {
 			if (line.GetKeypointA() > n_keywords["Keypoints"] || line.GetKeypointB() > n_keywords["Keypoints"])
 				ss << "\n   + Invalid keypoint referenced at line number " << line.GetNumber();
 			if (!line.GetSegmentSetOpt())
@@ -1392,14 +1210,15 @@ bool IO::CheckModel()
 		});//end of first for_each (lines)
 	}
 	/*--- Vessels ---*/
-	if (mm.vessel_vector.front().GetNumber() != 1 || mm.vessel_vector.back().GetNumber() != n_keywords["Vessels"])
+	if (mm.vessels.front().GetNumber() != 1 || mm.vessels.back().GetNumber() != n_keywords["Vessels"])
 		ss << "\n   + Invalid vessel numbering";
 	{
-		std::for_each(mm.vessel_vector.cbegin(), mm.vessel_vector.cend(), [&](const Vessel& vessel) {
+		std::for_each(mm.vessels.cbegin(), mm.vessels.cend(), [&](const Vessel& vessel) {
 			if (vessel.GetKeypoint() > n_keywords["Keypoints"])
 				ss << "\n   + Invalid pilot node referenced at vessel number " << vessel.GetNumber(); }
 		);//end of for_each
 	}
+	/*--- Solution steps ---*/
 	if (mm.moorsolution.GetStepsVec().front().GetNumber() != 1 || mm.moorsolution.GetStepsVec().back().GetNumber() != n_keywords["SolSteps"])
 		ss << "\n   + Invalid solution steps numbering";
 	
@@ -1408,9 +1227,9 @@ bool IO::CheckModel()
 	/// 
 	
 	/*--- Segment sets ---*/
-	if (!mm.segment_set_vector.empty())
+	if (!mm.segment_sets.empty())
 	{
-		std::for_each(mm.segment_set_vector.cbegin(), mm.segment_set_vector.cend(), [&](const SegmentSet& set) {
+		std::for_each(mm.segment_sets.cbegin(), mm.segment_sets.cend(), [&](const SegmentSet& set) {
 			std::for_each(set.GetAllSegment().cbegin(), set.GetAllSegment().cend(), [&](const LineSegment& seg) {
 				if (seg.GetProperty() > n_keywords["Keypoints"])
 					ss << "\n   + Invalid segment property referenced at segment set number " << set.GetIDNumber();
@@ -1418,9 +1237,9 @@ bool IO::CheckModel()
 		});//end of first for_each (segment set)
 	}
 	/*--- Vessel displacements ---*/
-	if (!mm.vessel_disp_vector.empty())
+	if (!mm.vessel_displacements.empty())
 	{
-		std::for_each(mm.vessel_disp_vector.cbegin(), mm.vessel_disp_vector.cend(), [&](const VesselDisplacement& disp) {
+		std::for_each(mm.vessel_displacements.cbegin(), mm.vessel_displacements.cend(), [&](const VesselDisplacement& disp) {
 			if (disp.GetVesselID() > n_keywords["Vessels"]) 
 				ss << "\n   + Invalid vessel ID to apply displacement: " << disp.GetVesselID() ;
 			if (disp.GetStep() > n_keywords["SolSteps"] )
@@ -1428,17 +1247,17 @@ bool IO::CheckModel()
 		});//end for (vessel displacements)
 	}
 	/*--- Platforms ---*/
-	if (!mm.moorpost.GetAllPlatformCADs().empty())
+	if (!mm.moorpost.GetAllVesselCADs().empty())
 	{
-		std::for_each(mm.moorpost.GetAllPlatformCADs().cbegin(), mm.moorpost.GetAllPlatformCADs().cend(), [&](const CADData& c) {
+		std::for_each(mm.moorpost.GetAllVesselCADs().cbegin(), mm.moorpost.GetAllVesselCADs().cend(), [&](const CADData& c) {
 			if (c.GetNumber() > n_keywords["Vessels"]) 
 				ss << "\n   + \"" << c.GetNumber() << "\" is not a valid vessel ID to link a CAD file";
 		});
 	}
 	/*--- Displacement fields ---*/
-	if (!mm.disp_field_vector.empty())
+	if (!mm.line_disp_fields.empty())
 	{
-		std::for_each(mm.disp_field_vector.cbegin(), mm.disp_field_vector.cend(), [&](const LineDisplacementField& disp) {
+		std::for_each(mm.line_disp_fields.cbegin(), mm.line_disp_fields.cend(), [&](const LineDisplacementField& disp) {
 			if (disp.GetNumber() > n_keywords["Lines"]) 
 				ss << "\n   + Invalid line ID to apply displacement field: " << disp.GetNumber();
 			if (disp.GetStep() > n_keywords["SolSteps"])
@@ -1446,9 +1265,9 @@ bool IO::CheckModel()
 		});//end for (displacement fields)
 	}
 	/*--- Loads ---*/
-	if (!mm.moorload_vector.empty())
+	if (!mm.moor_loads.empty())
 	{
-		std::for_each(mm.moorload_vector.cbegin(), mm.moorload_vector.cend(), [&](const MoorLoad& load) {
+		std::for_each(mm.moor_loads.cbegin(), mm.moor_loads.cend(), [&](const MoorLoad& load) {
 			//Description
 			auto description = load.GetDescription();
 			
@@ -1463,24 +1282,24 @@ bool IO::CheckModel()
 				//Check line number
 				if (load.GetLineID() > n_keywords["Lines"])
 					ss << "\n   + Invalid line number to apply load: " << load.GetLineID();
-				if (size_t seg = load.GetSegmentID())
+				if (unsigned int seg = load.GetSegmentID())
 				{
 					//With segment defined (not using SegmentSet)
-					if (mm.line_vector[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
+					if (mm.lines[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])
 						ss << "\n   + Invalid segment number to apply load: " << load.GetNodeID() << " at line number " << load.GetLineID();
 					//Seg == 0 -> use SegmentSet 
 					else
 					{
 						// No segment set: 
-						if (mm.segment_set_vector.empty())
+						if (mm.segment_sets.empty())
 							ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ":  no SegmentSet defined";
 						else
 						{ // Check segment set
-							size_t segset_size = mm.segment_set_vector[mm.line_vector[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
+							unsigned int segset_size = mm.segment_sets[mm.lines[load.GetLineID() - 1].GetSegmentSet() - 1].GetSegmentSetSize();
 							if (seg > segset_size)
 							{
 								ss << "\n   + Invalid segment number to apply load at line number " << load.GetLineID() << ": segment number " <<
-									seg << " is not defined at SegmentSet number " << mm.line_vector[load.GetLineID() - 1].GetSegmentSet();
+									seg << " is not defined at SegmentSet number " << mm.lines[load.GetLineID() - 1].GetSegmentSet();
 							}
 						}
 					}// end 'seg == 0'

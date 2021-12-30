@@ -3,10 +3,10 @@
 
 
 CoordinateSystem::CoordinateSystem()
-	: m_number(0), m_E1({0.,0.,0.}), m_E3({0.,0.,0.})
+	: m_id(0), m_E1({0.,0.,0.}), m_E3({0.,0.,0.})
 {}
-CoordinateSystem::CoordinateSystem(size_t ID, const std::array<double,3>& E1, const std::array<double,3>& E3)
-	: m_number(ID), m_E1(E1), m_E3(E3)
+CoordinateSystem::CoordinateSystem(unsigned int id, const std::array<double,3>& E1, const std::array<double,3>& E3)
+	: m_id(id), m_E1(E1), m_E3(E3)
 {}
 
 CoordinateSystem::~CoordinateSystem()
@@ -18,9 +18,9 @@ CoordinateSystem::~CoordinateSystem()
 /// SETTERS
 /// 
 
-void CoordinateSystem::SetIDNumber(size_t ID)
+void CoordinateSystem::SetIDNumber(unsigned int id)
 {
-	m_number = ID;
+	m_id = id;
 }
 
 void CoordinateSystem::SetE1(const std::array<double, 3>& coordinates)
@@ -47,7 +47,7 @@ void CoordinateSystem::SetVersor(const std::array<double, 3>& E1, const std::arr
 
 std::ostream& operator<<(std::ostream& out, const CoordinateSystem& obj)
 {
-	out << "\tCS " << obj.m_number 
+	out << "\tCS " << obj.m_id
 		<< std::setprecision(11) 
 		<< "\tE1 " << obj.m_E1[0] << " " << obj.m_E1[1] << " " << obj.m_E1[2] 
 		<< "\tE3 " << obj.m_E3[0] << " " << obj.m_E3[1] << " " << obj.m_E3[2] <<

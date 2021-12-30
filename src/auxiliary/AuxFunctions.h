@@ -7,7 +7,7 @@ typedef std::unordered_set<std::string> USET_STR;
 typedef std::unordered_set<std::string_view>::iterator IT_USET_SV;
 typedef std::pair<bool, std::string_view> PAIR_BOOL_SV;
 typedef std::unordered_map<std::string_view, std::function<bool(std::string& readed)>> MAP_FUNC;
-
+typedef std::_Node_handle<std::allocator<std::_List_node<std::string_view, void*>>::value_type, std::allocator<std::string_view>, std::_Node_handle_set_base, std::string_view> NODE_HANDLE_USET_SV;
 
 namespace AuxFunctions
 {
@@ -31,15 +31,8 @@ namespace AuxFunctions
 		/// </summary>
 
 
-
-		static USET_SV s_mandatory_keywords = { "Environment",
-			"Keypoints", "Lines", "Vessels", "SegmentProperties", "Solution" };
-
-		static USET_SV s_optional_keywords = { "SegmentSets",
-			"VesselDisplacements", "Platforms", "GiraffeConvergenceCriteria",
-			"Monitors", "PostProcessing", "StiffnessMatrix", "GiraffeSolver",
-			"Constraints", "NodalForces", "DisplacementFields" };
-
+		/*-- Return type for node handle extraction function --*/
+		enum class NODE_EXTRACTION_STATUS { NONE = -1, FALSE, TRUE, BREAK };
 
 		/*=========================*
 		 *  Function declarations  *
@@ -47,43 +40,33 @@ namespace AuxFunctions
 
 		// Check if the current word is part of a comment and read next word
 		static void TryCommentAndContinue(std::ifstream& input, std::string& readed);
-		// Searches for at least one line/block of comment only read next word if found
-		static bool TryComment(std::ifstream& input, std::string& readed);
 
 		static bool ReadBlockComment(std::ifstream& input, std::string& readed);
 		static bool ReadLineComment(std::ifstream& input, std::string& readed);
 		static bool CheckComment(std::ifstream& input, std::string& readed);
 
-		static bool UniqueSubKeywords(std::ifstream& input, std::string& readed, MAP_FUNC& reading_func);
+		static bool ReadBlock(std::ifstream& input, std::string& readed, MAP_FUNC& mandatory_keys, MAP_FUNC& optional_keys);
 		
-		int GetCurrentLine(std::ifstream& input);  // https://stackoverflow.com/questions/4813129/how-to-get-the-line-number-from-a-file-in-c
+		static int GetCurrentLine(std::ifstream& input);  // Taken from https://stackoverflow.com/questions/4813129/how-to-get-the-line-number-from-a-file-in-c
 		static void BackLastWord(std::ifstream& input, std::string_view last_word);
 		static void BackLastWord(std::ifstream& input, std::string last_word);
+		static NODE_EXTRACTION_STATUS ExtractNodeHandle(std::ifstream& input, NODE_HANDLE_USET_SV& nh, std::string_view readed, std::string_view block, std::string_view name, USET_SV& mandatory_names, USET_SV& optional_names = USET_SV{});
+
+		static Table&& ReadTable(std::ifstream& input, size_t lines = 0);
+		static std::string ReadDelimitedString(std::ifstream& input, const std::array<char, 2>& delimeters);
+
+		/*====================*
+		 *  Static functions  *
+		 *====================*/
 
 
-		/*=============*
-		 *  Functions  *
-		 *=============*/
-
+		/*--- Read all comments and the next (key)word ---*/
 		static void TryCommentAndContinue(std::ifstream& input, std::string& readed)
 		{
-			CheckComment(input, readed);
-
-			do { input >> readed;
-			} while (CheckComment(input, readed));
+			while (CheckComment(input, readed))
+				input >> readed;
 		}
 		
-		static bool TryComment(std::ifstream& input, std::string& readed)
-		{
-			if (!CheckComment(input, readed))
-				return false;
-
-			do { input >> readed; 
-			} while (CheckComment(input, readed) && !input.eof());
-
-			return true;
-		}
-
 		static bool CheckComment(std::ifstream& input, std::string& readed)
 		{
 			return (readed[0] == '/' && 
@@ -112,23 +95,8 @@ namespace AuxFunctions
 			return false;
 		}
 
-		inline bool CheckTopKeyword(std::string_view readed)
-		{
-			// Try a mandatory ...
-			if (s_mandatory_keywords.find(readed) == s_mandatory_keywords.end() 
-				&& // ... and an optional keyword ...
-				(s_optional_keywords.find(readed) == s_optional_keywords.end()))
-				// ... finally, we can infer it is not a valid key
-				return false; 
-			
-			return true;
-		}
 
-		inline bool CheckUpperKeyword(const USET_SV& upper_keywords, const std::string& readed)
-		{
-			return upper_keywords.find(readed) != upper_keywords.end();
-		}
-
+		/*--- File ---*/
 		static int GetCurrentLine(std::ifstream& input)
 		{
 			int num_lines = 1;
@@ -162,10 +130,89 @@ namespace AuxFunctions
 			input.seekg(after_word - (std::streampos)last_word.size());
 		}
 
+		/*--- Reading ---*/
+
+		static bool ReadBlock(std::ifstream& input, std::string& readed, MAP_FUNC& mandatory_keys, MAP_FUNC& optional_keys)
+		{
+			TryCommentAndContinue(input, readed);
+			
+			// Try to extract node (handle) from map with mandatory blocks reading funcitons...
+			auto nh = mandatory_keys.extract(readed);
+			// ... check if is not a valid keyword ...
+			if (nh.empty())
+			{	
+				// ... try to extract from optional keywords ...
+				nh = optional_keys.extract(readed);
+				// ... if it fails, it is an invalid word
+				if (nh.empty()) 
+					return false;
+			}
+			
+			// Invoke the reading function (at IO class)
+			if (!nh.mapped()(readed))
+				return false; // ERROR while reading the input file
+
+			return true;
+		}
+
+		static NODE_EXTRACTION_STATUS ExtractNodeHandle(std::ifstream& input, NODE_HANDLE_USET_SV& nh, std::string_view readed, std::string_view block, std::string_view name, USET_SV& mandatory_names, USET_SV& optional_names)
+		{
+			nh = mandatory_names.extract(readed);
+			// If extracted node is empty, it not a mandatory keyword ...
+			if (nh.empty())
+			{
+				// ... then, try from optional keywords ...
+				nh = optional_names.extract(readed);
+
+				// ... finally, check for error and other words
+				if (nh.empty())
+				{
+					// Check if exist at least one mandatory keyword to read
+					if (!mandatory_names.empty())
+					{
+						Log::SetWarning(Log::Warning::UNDEFINED_PARAMETERS, block, GetCurrentLine(input), name);
+						return NODE_EXTRACTION_STATUS::FALSE;
+					}
+					return NODE_EXTRACTION_STATUS::BREAK;
+				}
+			}
+
+			return NODE_EXTRACTION_STATUS::NONE;
+		}
+
+		inline unsigned int Try2GetObjectID(std::ifstream& input, std::string& readed)
+		{
+			try
+			{
+				input >> readed;
+				return std::stoul(readed);
+			}
+			catch (const std::exception&)
+			{
+				//TODO: melhorar exception handling
+				std::cout << "Invalid ID number definition at line " << GetCurrentLine(input);
+				return 0;
+			}
+		}
 
 		/*======================*
 		 *  Template functions  *
 		 *======================*/
+
+		template<typename T>
+		inline T ReadVariable(std::ifstream& input)
+		{
+			T variable;
+			input >> variable;
+			return variable;
+		}
+
+		template<typename container>
+		inline std::string_view ExtractNodeValue(container& c, std::string_view readed)
+		{
+			auto nh = c.extract(readed);
+			return nh.empty() ? "\0" : nh.value();
+		}
 
 		template<typename container>
 		void RemoveDuplicates(container& c, std::string const& name)
@@ -180,93 +227,10 @@ namespace AuxFunctions
 			//Removed objects
 			size_t removed = before - c.size();
 			if (removed > 0)
-			{
 				Log::SetWarning(Log::Warning::REMOVED_OBJECTS, name);
-			}
 			c.shrink_to_fit();
 		}
-
-		template<typename container>
-		bool Loop(std::ifstream& input, container& c, std::string& readed, MAP_FUNC& reading_func)
-		{
-			TryCommentAndContinue(input, readed);
-			do {
-				// Checks if is a valid keyword ...
-				if (reading_func.count(readed) == 0)
-					return false;
-				// ... then, creates an object ...
-				c.emplace_back();
-				// ... and invokes the reading function (at IO class)
-				if (!reading_func[readed](readed))
-					return false; // ERROR while reading the object parameters
-
-				// Searches for comment, if founded read next word ...
-				TryComment(input, readed);
-				// ... then if it is a first level keyword ...
-				if (CheckTopKeyword(readed))
-					return true; // ... MUST jump out of the function
-
-			} while (true);
-			
-			return true;
-		}
-
-		// Althougth it is quite similar to "Loop" function, we MUST differ 
-		// 'keywords' and 'upper_keywords' to check in the first if statement
-		template<typename container>
-		bool NestedLoop(std::ifstream& input, container& c, USET_SV& upper_keywords,
-			std::string& readed, MAP_FUNC& reading_func)
-		{
-			TryCommentAndContinue(input, readed);
-			do {
-				// Checks if is a valid keyword ...
-				if (reading_func.count(readed) == 0)
-					return false;
-				// ... then, creates an object ...
-				c.emplace_back();
-				// ... and invokes the reading function (at IO class)
-				if (!reading_func[readed](readed))
-					return false; // ERROR while reading the object parameters
-
-				// Searches for comment, if founded read next word ...
-				TryComment(input, readed);
-				// ... then if it is a top OR upper level keyword ...
-				if (CheckTopKeyword(readed) || CheckUpperKeyword(upper_keywords, readed))
-					return true; // ... MUST jump out of the function
-
-			} while (true);
-			
-			return true;
-		}
-
-
-		static bool UniqueSubKeywords(std::ifstream& input, std::string& readed, MAP_FUNC& reading_func)
-		{
-			TryCommentAndContinue(input, readed);
-			do {
-				// Extract node (handle) from set with names of the object parameters ...
-				auto nh = reading_func.extract(readed);
-				// ... check if is a valid keyword ...
-				if (nh.empty())
-					// ... if is not, check if all keywords were readed
-					return reading_func.empty();
 				
-				// ... if is, invoke the reading function (at IO class)
-				if (!nh.mapped()(readed))
-					return false; // ERROR while reading the object parameters
-
-				// Searches for comment, if founded read next word ...
-				TryComment(input, readed);
-				// ... then if it is a first level keyword ...
-				if (CheckTopKeyword(readed))
-					return true; // ... MUST jump out of the function
-
-			} while (true);
-
-			return true;
-		}
-
-		
 		template<typename container, size_t size>
 		container ReadFixedContainer(std::ifstream& input)
 		{
@@ -284,23 +248,55 @@ namespace AuxFunctions
 				std::exit(EXIT_FAILURE);
 			}
 		}
+		
 
-		template<typename T>
-		inline T Try2GetObjectID(std::ifstream& input, std::string& readed)
+		Table&& ReadTable(std::ifstream& input, size_t lines)
 		{
-			try
+			auto table = new Table();
+
+			std::string time;
+			size_t cur_line = 0;
+			do
 			{
-				input >> readed;
-				return std::stoull(readed);
-			}
-			catch (const std::exception&)
-			{
-				//TODO: melhorar exception handling
-				std::cout << "Invalid number for keypoint at line " << GetCurrentLine(input);
-				return 0;
-			}
+				// Check the first number (TIME)
+				if (!(input >> time) || !std::isdigit(time[0]))
+				{
+					AuxFunctions::Reading::BackLastWord(input, std::string_view(time));
+					break;
+				}
+
+				// Pre-allocate next line with current time... 
+				table->SetLine(std::stod(time), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+				// ... and read values for all DoFs
+				input >> table->table[cur_line][1] >> table->table[cur_line][2] >> table->table[cur_line][3]
+					>> table->table[cur_line][4] >> table->table[cur_line][5] >> table->table[cur_line][6];
+
+				++cur_line;
+
+			} while (input.good());
+
+			return std::move(*table);
 		}
 
+		std::string ReadDelimitedString(std::ifstream& input, const std::array<char, 2>& delimeters)
+		{
+			// Buffer that will hold the equation
+			std::stringbuf buf;
+			char delimiter;
+
+			// Read until initial angular bracket, ...
+			input.get(buf, delimeters[0]);
+			input >> delimiter;
+			if (delimiter != delimeters[0])
+				std::exit(EXIT_FAILURE);
+			// ... clear whitspaces before FIRST DELIMITER from the buffer ...
+			buf.swap(std::stringbuf(""));
+			// ... read until the next angular bracket, ...
+			input.get(buf, delimeters[1]);
+			input >> delimiter;
+			// ... then, set the equation
+			return std::move(buf.str());
+		}
 
 	} /* namespace Reading */
 

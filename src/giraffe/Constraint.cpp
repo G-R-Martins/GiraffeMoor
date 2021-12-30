@@ -2,7 +2,7 @@
 #include "Constraint.h"
 
 Constraint::Constraint()
-	: m_number(0)
+	: m_id(0)
 {
 }
 
@@ -10,7 +10,7 @@ Constraint::Constraint()
 Constraint::~Constraint()
 {}
 
-void Constraint::SetIDNumber(size_t number)
+void Constraint::SetIDNumber(unsigned int id)
 {
-	m_number = number;
+	m_id = id;
 }

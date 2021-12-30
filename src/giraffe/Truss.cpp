@@ -18,8 +18,8 @@ std::ostream& operator<<(std::ostream& out, const Truss& obj)
 	else if (!obj.m_label.empty())
 		out << "\t//" << obj.m_label << "\n";
 	
-	out << "\tTruss_1 " << obj.m_number 
-		<< "\tPipeSec " << obj.m_section <<
+	out << "\tTruss_1 " << obj.m_id
+		<< "\tPipeSec " << obj.m_section_id <<
 		"\tNodes " << obj.m_nodes[0] << " " << obj.m_nodes[1] 
 		<< "\n";
 

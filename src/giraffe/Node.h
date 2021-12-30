@@ -4,13 +4,13 @@
 class Node
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 	std::array<double, 3> m_ref_coordinates;
 	std::string m_comment;
 
 public:
 	Node();
-	Node(size_t number, const std::array<double, 3>& m_ref_coordinates, std::string comment = "\0");
+	Node(unsigned int id, const std::array<double, 3>& m_ref_coordinates, std::string comment = "\0");
 	~Node();
 	
 	
@@ -18,7 +18,7 @@ public:
 	/// SETTERS
 	/// 
 	
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int number);
 	void SetCoordinates(const std::array<double, 3>& ref_coordinates);
 	void SetComment(std::string comment);
 	
@@ -27,7 +27,7 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetIDNumber() const							{ return m_number; }
+	inline unsigned int GetIDNumber() const							{ return m_id; }
 	inline const std::array<double, 3>& GetCoordinates() const	{ return m_ref_coordinates; }
 	inline std::array<double, 3>& GetCoordinates()				{ return m_ref_coordinates; }
 	inline const std::string& GetComment() const			{ return m_comment; }

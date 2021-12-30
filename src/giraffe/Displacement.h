@@ -4,14 +4,14 @@
 class Displacement
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 
 	bool m_is_math_code;  // using MathCode 
 	bool m_is_external_file;  // defined in external file (csv or txt)
 
 public:
 	Displacement();
-	Displacement(size_t number, bool is_math_code, bool is_external_file);
+	Displacement(unsigned int id, bool is_math_code, bool is_external_file);
 	virtual ~Displacement();
 
 	virtual inline std::ofstream& WriteGiraffeFile(std::ofstream& out) = 0;
@@ -20,7 +20,7 @@ public:
 	/// SETTERS
 	/// 
 
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 	void SetMathCodeOpt(bool option);
 	void SetExternalFileOpt(bool option);
 
@@ -29,7 +29,7 @@ public:
 	/// GETTERS
 	/// 
 
-	inline size_t GetNumber() const { return m_number; }
+	inline unsigned int GetNumber() const { return m_id; }
 	
 	inline bool IsMathCode() const { return m_is_math_code; }
 	inline bool IsExternalFile() const { return m_is_external_file; }

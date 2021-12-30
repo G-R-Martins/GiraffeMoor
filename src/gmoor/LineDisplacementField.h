@@ -5,8 +5,8 @@
 class LineDisplacementField
 {
 private:
-	size_t m_number;
-	size_t m_step;
+	unsigned int m_number;
+	unsigned int m_step_id;
 	
 	bool m_is_harmonic;
 	double m_amplitude;
@@ -26,8 +26,8 @@ public:
 	/// SETTERS
 	///				 
 	
-	void SetIDNumber(size_t number);
-	void SetStep(size_t step);
+	void SetIDNumber(unsigned int number);
+	void SetStep(unsigned int step_id);
 	void SetAmplitude(double amplitude);
 	void SetMode(unsigned int mode);
 	void SetHarmonicOpt(bool is_harmonic);
@@ -37,8 +37,8 @@ public:
 	/// GETTERS
 	///				 
 
-	size_t GetNumber() const		{ return m_number; }
-	size_t GetStep() const			{ return m_step; }
+	unsigned int GetNumber() const		{ return m_number; }
+	unsigned int GetStep() const			{ return m_step_id; }
 	double GetAmplitude() const		{ return m_amplitude; }
 	unsigned int GetMode() const	{ return m_mode; }
 	bool IsHarmonic() const			{ return m_is_harmonic; }
@@ -57,7 +57,7 @@ public:
 	LineDisplacementField& operator=(const LineDisplacementField&) = default;
 	LineDisplacementField& operator=(LineDisplacementField&&) = default;
 
-	friend std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* constraint);
+	//friend std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* constraint);
 
 };
 

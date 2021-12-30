@@ -1,6 +1,5 @@
 #include "PCH.h"
 #include "MoorEnvironment.h"
-#include "Log.h"
 
 double MoorEnvironment::s_gravity;
 
@@ -36,4 +35,18 @@ void MoorEnvironment::SetWaterDepth(double water_depth)
 void MoorEnvironment::SetBoolConstantSeaCurrent(bool is_constant)
 {
 	this->m_sea_current_is_constant = is_constant;
+}
+
+void MoorEnvironment::SetSeaCurrentOption(bool sea_current_exist)
+{
+	this->m_sea_current_exist = sea_current_exist;
+}
+
+SeaCurrent* MoorEnvironment::AddSeaCurrent()
+{
+	return &this->m_sea_current_vector.emplace_back();
+}
+void MoorEnvironment::PushBackSeaCurrent()
+{
+	this->m_sea_current_vector.emplace_back();
 }

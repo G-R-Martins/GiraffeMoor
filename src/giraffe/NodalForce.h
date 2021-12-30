@@ -6,7 +6,7 @@
 class NodalForce : public Load
 {
 private:
- 	size_t m_nodeset;
+ 	unsigned int m_nodeset_id;
 
 	//External file
 	std::string m_file_name;
@@ -23,29 +23,22 @@ public:
 	NodalForce();
 
 	NodalForce(Table* time_series);
-	NodalForce(size_t nodeset, Table* time_series);
+	NodalForce(unsigned int nodeset_id, Table* time_series);
 
 	NodalForce(MathCode* math_code);
-	NodalForce(size_t nodeset, MathCode* math_code);
+	NodalForce(unsigned int nodeset_id, MathCode* math_code);
 
 	NodalForce(const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps);
-	NodalForce(size_t nodeset, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps);
+	NodalForce(unsigned int nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps);
 
 	~NodalForce();
-
-
-	/// 
-	/// SETTERS
-	/// 
-
-
 
 
 	/// 
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNodeset() const				{ return m_nodeset; }
+	inline unsigned int GetNodeset() const				{ return m_nodeset_id; }
 	inline std::string const& GetFileName() const	{ return m_file_name; }
 	inline std::string& GetFileName()				{ return m_file_name; }
 	inline unsigned int GetNHeaderLines() const		{ return m_header_lines; }

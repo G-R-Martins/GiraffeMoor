@@ -35,7 +35,7 @@ public:
 	/// 
 	
 	size_t GetSize() const;
-	bool GetBoolOption(size_t pos) const;
+	bool GetBoolOption(unsigned int pos) const;
 
 
 	///

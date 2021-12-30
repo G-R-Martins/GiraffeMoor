@@ -4,9 +4,9 @@
 
 //Constructor
 SegmentSet::SegmentSet()
-	: ID(0), n_segments(0)
+	: m_id(0), m_tot_segments(0)
 {
-	segments.reserve(4);
+	m_segments.reserve(4);
 }
 
 
@@ -15,31 +15,11 @@ SegmentSet::SegmentSet()
 /// SETTERS
 /// 
 
-void SegmentSet::SetIDNumber(size_t id)
+void SegmentSet::SetIDNumber(unsigned int id)
 {
-	this->ID = id;
+	this->m_id = id;
 }
 
-//Returns the number of 'LineSegment's in the set
-const size_t& SegmentSet::GetSegmentSetSize() const
-{
-	return this->segments.size(); // TODO: verificar n_segments
-}
-
-
-const std::vector<LineSegment>& SegmentSet::GetAllSegment() const
-{
-	return this->segments;
-}
-std::vector<LineSegment>& SegmentSet::GetAllSegment()
-{
-	return this->segments;
-}
-
-LineSegment& SegmentSet::GetSegment(const size_t& seg)
-{
-	return this->segments[seg];
-}
 
 
 
@@ -49,7 +29,7 @@ LineSegment& SegmentSet::GetSegment(const size_t& seg)
 
 bool operator<(const SegmentSet& segset1, const SegmentSet& segset2)
 {
-	return segset1.ID < segset2.ID;
+	return segset1.m_id < segset2.m_id;
 }
 bool operator>(const SegmentSet& segset1, const SegmentSet& segset2)
 {
@@ -57,7 +37,7 @@ bool operator>(const SegmentSet& segset1, const SegmentSet& segset2)
 }
 bool operator==(const SegmentSet& segset1, const SegmentSet& segset2)
 {
-	return segset1.ID == segset2.ID;
+	return segset1.m_id == segset2.m_id;
 }
 bool operator!=(const SegmentSet& segset1, const SegmentSet& segset2)
 {

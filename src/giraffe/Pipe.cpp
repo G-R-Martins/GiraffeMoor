@@ -18,9 +18,9 @@ std::ostream& operator<<(std::ostream& out, const Pipe& obj)
 	else if ( !obj.m_label.empty() )
 		out << "\t//" << obj.m_label << "\n";
 
-	out << "\tPipe_1 " << obj.m_number 
-		<< "\tPipeSec " << obj.m_section 
-		<< "\tCS " << obj.m_cs 
+	out << "\tPipe_1 " << obj.m_id
+		<< "\tPipeSec " << obj.m_section_id
+		<< "\tCS " << obj.m_cs_id
 		<< "\tNodes " << obj.m_nodes[0] << " " << obj.m_nodes[1] << " " << obj.m_nodes[2] 
 		<< "\n";
 

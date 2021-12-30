@@ -1,7 +1,5 @@
 #include "PCH.h"
 #include "Monitor.h"
-#include "AuxFunctions.h"
-#include "Log.h"
 
 
 Monitor::Monitor()
@@ -22,31 +20,31 @@ Monitor::~Monitor()
 std::ostream& operator<<(std::ostream& out, const Monitor& obj)
 {
 	out << "\tSample "<< obj.sample << "\n";
-	if (!obj.nodes.empty())
+	if (!obj.nodes_id.empty())
 	{
 		out << "\tMonitorNodes\t";
-		for (const int& node : obj.nodes)
+		for (const unsigned int& node : obj.nodes_id)
 			out << node << " ";
 		out << "\n";
 	}
-	if (!obj.elements.empty())
+	if (!obj.elements_id.empty())
 	{
 		out << "\tMonitorElements\t";
-		for (const int& elem : obj.elements)
+		for (const unsigned int& elem : obj.elements_id)
 			out << elem << " ";
 		out << "\n";
 	}
-	if (!obj.contacts.empty())
+	if (!obj.contacts_id.empty())
 	{
 		out << "\tMonitorContacts\t";
-		for (const int& cont : obj.contacts)
+		for (const unsigned int& cont : obj.contacts_id)
 			out << cont << " ";
 		out << "\n";
 	}
-	if (!obj.node_sets.empty())
+	if (!obj.node_sets_id.empty())
 	{
 		out << "\tMonitorNodeSets\t";
-		for (const int& NS : obj.node_sets)
+		for (const unsigned int& NS : obj.node_sets_id)
 			out << NS << " ";
 		out << "\n";
 	}

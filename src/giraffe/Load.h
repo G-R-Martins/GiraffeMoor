@@ -4,8 +4,8 @@
 class Load
 {
 protected:
-	size_t m_number;
-	size_t m_cs; 
+	unsigned int m_id;
+	unsigned int m_cs_id;
 
 	//Booleans to indicate if current nodal force uses math code or an external file
 	///otherwise, must be defined in the GiraffeMoor input file after 'TimeSeries' keyword
@@ -24,8 +24,8 @@ public:
 	/// SETTERS
 	/// 
 	
-	void SetNumber(size_t number);
-	void SetCoordinateSystem(size_t cs);
+	void SetIDNumber(unsigned int id);
+	void SetCoordinateSystem(unsigned int cs);
 	void SetMathCodeOpt(bool option);
 	void SetExternalFileOpt(bool option);
 
@@ -34,8 +34,8 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNumber() const { return m_number; }
-	inline size_t GetCoordinateSystem() const { return m_cs; }
+	inline unsigned int GetNumber() const { return m_id; }
+	inline unsigned int GetCoordinateSystem() const { return m_cs_id; }
 	
 	inline bool IsMathCode() const { return m_is_math_code; }
 	inline bool IsExternalFile() const { return m_is_external_file; }

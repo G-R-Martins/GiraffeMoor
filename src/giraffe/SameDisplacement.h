@@ -5,13 +5,13 @@
 class SameDisplacement : public SpecialConstraint
 {
 private:
-	size_t m_node_A;
-	size_t m_node_B;
-	size_t m_initial_load_step;
+	unsigned int m_nodeA_id;
+	unsigned int m_nodeB_id;
+	unsigned int m_initial_load_step_id;
 
 public:
 	SameDisplacement();
-	SameDisplacement(size_t node_A, size_t node_B, size_t initial_load_step = 0);
+	SameDisplacement(unsigned int nodeA_id, unsigned int nodeB_id, unsigned int initial_load_step_id = 0);
 	~SameDisplacement();
 
 
@@ -19,9 +19,9 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNodeA() const { return m_node_A; }
-	inline size_t GetNodeB() const { return m_node_B; }
-	inline size_t GetInitialLoadStep() const { return m_initial_load_step; }
+	inline unsigned int GetNodeA() const { return m_nodeA_id; }
+	inline unsigned int GetNodeB() const { return m_nodeB_id; }
+	inline unsigned int GetInitialLoadStep() const { return m_initial_load_step_id; }
 
 
 	/// 

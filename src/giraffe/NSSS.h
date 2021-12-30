@@ -6,9 +6,9 @@
 class NSSS : public Contact
 {
 private:
-	size_t m_number;
-	size_t m_node_set;	//Node set ID
-	size_t m_surface_set;  //Surface set ID
+	unsigned int m_id;
+	unsigned int m_node_set_id;	//Node set ID
+	unsigned int m_surface_set_id;  //Surface set ID
 
 	double m_mu;
 	double m_epn;
@@ -27,7 +27,7 @@ private:
 
 public:
 	NSSS();
-	NSSS(const size_t& number, const size_t& node_set, const size_t& surface_set,
+	NSSS(const unsigned int& number, const unsigned int& node_set, const unsigned int& surface_set,
 		double mu, double epn, double cn, double ept, double ct,
 		double pinball, double radius, unsigned int max_interactions,
 		BoolTable&& booltable, const  std::string& comment = "\0");
@@ -38,9 +38,9 @@ public:
 	/// GETTERS
 	/// 
 
-	inline size_t GetNumber() const						{ return m_number; }
-	inline size_t GetNodeSet() const					{ return m_node_set; }
-	inline size_t GetSurfaceSet() const					{ return m_surface_set; }
+	inline unsigned int GetNumber() const						{ return m_id; }
+	inline unsigned int GetNodeSet() const					{ return m_node_set_id; }
+	inline unsigned int GetSurfaceSet() const					{ return m_surface_set_id; }
 	inline double GetFrictionCoefficient() const		{ return m_mu; }
 	inline double GetEPn() const						{ return m_epn; }
 	inline double GetCn() const							{ return m_cn; }

@@ -6,8 +6,8 @@ class Seabed
 private:
 	bool m_is_flat;
 
-	unsigned int m_pilot_node;
-	unsigned int m_nodeset;
+	unsigned int m_pilot_node_id;
+	unsigned int m_nodeset_id;
 	
 	double m_stiffness;  // used for penetration and NSSS contact
 	double m_damping;
@@ -24,9 +24,9 @@ public:
 	/// 
 
 	void SetFlatOption(bool is_flat);
-
-	void SetPilotNode(unsigned int pilot_node);
-	void SetNodeset(unsigned int nodeset);
+	void SetPilotNode(unsigned int pilot_node_id);
+	
+	void SetNodeset(unsigned int nodeset_id);
 
 	void SetStiffness(double stiffness);  
 	void SetDamping(double damping);

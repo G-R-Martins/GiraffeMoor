@@ -2,7 +2,7 @@
 #include "Load.h"
 
 Load::Load()
-	: m_number(0), m_cs(1), m_is_math_code(false), m_is_external_file(false)
+	: m_id(0), m_cs_id(1), m_is_math_code(false), m_is_external_file(false)
 {}
 
 Load::~Load()
@@ -14,13 +14,13 @@ Load::~Load()
 /// SETTERS
 /// 
 
-void Load::SetNumber(size_t number)
+void Load::SetIDNumber(unsigned int id)
 {
-	m_number = number;
+	m_id = id;
 }
-void Load::SetCoordinateSystem(size_t cs)
+void Load::SetCoordinateSystem(unsigned int cs_id)
 {
-	m_cs = cs;
+	m_cs_id = cs_id;
 }
 void Load::SetMathCodeOpt(bool option)
 {

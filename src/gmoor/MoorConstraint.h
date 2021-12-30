@@ -6,8 +6,8 @@ class MoorConstraint
 private:
 	// Constrained object ID
 	// -> anchor, line or vessel
-	size_t m_number;
-	size_t m_nodeset;
+	unsigned int m_id;
+	unsigned int m_nodeset_id;
 
 	//General container
 	std::vector<std::list<bool>> m_constraints;
@@ -24,10 +24,10 @@ public:
 	/// SETTERS
 	/// 
 
-	void SetIDNumber(size_t number);
-	void SetNodeset(size_t nodeset);
-	void SetDof(size_t dof, const std::list<bool>& constraints);
-	void PushToDof(size_t dof, bool constraint);
+	void SetIDNumber(unsigned int id);
+	void SetNodeset(unsigned int nodeset_id);
+	void SetDof(unsigned int dof_id, const std::list<bool>& constraints);
+	void PushToDof(unsigned int dof, bool constraint);
 	void PushX(bool constraint);
 	void PushY(bool constraint);
 	void PushZ(bool constraint);
@@ -41,12 +41,12 @@ public:
 	/// 
 
 	// anchors, line, or vessel
-	inline size_t GetNumber() const { return m_number; }
-	inline size_t GetNodeset() const { return m_nodeset; }
+	inline unsigned int GetNumber() const { return m_id; }
+	inline unsigned int GetNodeset() const { return m_nodeset_id; }
 
 	inline const std::vector<std::list<bool>>& GetAllConstraints() const { return m_constraints; }
 	inline std::vector<std::list<bool>>& GetAllConstraints() { return m_constraints; }
-	inline std::list<bool>const& GetConstraint(size_t dof) const { return m_constraints[dof]; }
+	inline std::list<bool>const& GetConstraint(unsigned int dof) const { return m_constraints[dof]; }
 	inline std::list<bool>const& GetX() const { return m_constraints[0]; }
 	inline std::list<bool>const& GetY() const { return m_constraints[1]; }
 	inline std::list<bool>const& GetZ() const { return m_constraints[2]; }
@@ -54,13 +54,13 @@ public:
 	inline std::list<bool>const& GetRotY() const { return m_constraints[4]; }
 	inline std::list<bool>const& GetRotZ() const { return m_constraints[5]; }
 
-	inline size_t GetNConstraintsDOF(unsigned int dof) const { return m_constraints[dof].size(); }
-	inline size_t GetNConstraintsX() const { return m_constraints[0].size(); }
-	inline size_t GetNConstraintsY() const { return m_constraints[1].size(); }
-	inline size_t GetNConstraintsZ() const { return m_constraints[2].size(); }
-	inline size_t GetNConstraintsRotX() const { return m_constraints[3].size(); }
-	inline size_t GetNConstraintsRotY() const { return m_constraints[4].size(); }
-	inline size_t GetNConstraintsRotZ() const { return m_constraints[5].size(); }
+	inline unsigned int GetNConstraintsDOF(unsigned int dof) const { return (unsigned int)m_constraints[dof].size(); }
+	inline unsigned int GetNConstraintsX() const { return (unsigned int)m_constraints[0].size(); }
+	inline unsigned int GetNConstraintsY() const { return (unsigned int)m_constraints[1].size(); }
+	inline unsigned int GetNConstraintsZ() const { return (unsigned int)m_constraints[2].size(); }
+	inline unsigned int GetNConstraintsRotX() const { return (unsigned int)m_constraints[3].size(); }
+	inline unsigned int GetNConstraintsRotY() const { return (unsigned int)m_constraints[4].size(); }
+	inline unsigned int GetNConstraintsRotZ() const { return (unsigned int)m_constraints[5].size(); }
 
 
 	/// 
@@ -74,10 +74,6 @@ public:
 
 	MoorConstraint& operator=(const MoorConstraint&) = default;
 	MoorConstraint& operator=(MoorConstraint&&) = default;
-
-	friend std::ifstream& operator>>(std::ifstream& input, MoorConstraint* constraint);
-
-
 
 };
 

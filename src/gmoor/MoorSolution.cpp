@@ -1,13 +1,10 @@
 #include "PCH.h"
 #include "MoorSolution.h"
-#include "LoopReading.h"
-#include "Log.h"
 
 
 MoorSolution::MoorSolution()
 	: m_steps_to_set_model(0), m_seacurrent_step_exist(false), 
-	m_dyn_relax_exist(false), m_lines_config_exist(false), 
-	m_vessel_forces_exist(false)
+	m_dyn_relax_exist(false), m_lines_config_exist(false)
 {
 	m_solution_steps.reserve(4);
 }
@@ -30,9 +27,14 @@ void MoorSolution::SetDynRelax_LinesConfigExist(bool exist)
 	this->m_lines_config_exist = exist;
 }
 
-void MoorSolution::SetDynRelax_VesselForcesExist(bool exist)
+
+
+
+SolutionStep* MoorSolution::AddSolutionStep()
 {
-	this->m_vessel_forces_exist = exist;
+	return &this->m_solution_steps.emplace_back();
 }
-
-
+void MoorSolution::PushBackSolutionStep()
+{
+	this->m_solution_steps.emplace_back();
+}

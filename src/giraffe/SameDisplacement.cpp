@@ -3,10 +3,10 @@
 
 
 SameDisplacement::SameDisplacement()
-	: m_node_A(0), m_node_B(0), m_initial_load_step(0)
+	: m_nodeA_id(0), m_nodeB_id(0), m_initial_load_step_id(0)
 {}
-SameDisplacement::SameDisplacement(size_t node_A, size_t node_B, size_t initial_load_step)
-	: m_node_A(node_A), m_node_B(node_B), m_initial_load_step(initial_load_step)
+SameDisplacement::SameDisplacement(unsigned int nodeA_id, unsigned int nodeB_id, unsigned int initial_load_step_id)
+	: m_nodeA_id(nodeA_id), m_nodeB_id(nodeB_id), m_initial_load_step_id(initial_load_step_id)
 {}
 
 SameDisplacement::~SameDisplacement()
@@ -22,7 +22,7 @@ SameDisplacement::~SameDisplacement()
 std::ostream& operator<<(std::ostream& out, const SameDisplacement& obj)
 {
 	out << "\tSameDisplacement " << obj.GetIDNumber() 
-		<< "\tNodes " << obj.m_node_A << " " << obj.m_node_B << " " 
+		<< "\tNodes " << obj.m_nodeA_id << " " << obj.m_nodeB_id << " "
 		<< obj.m_booltable;
 
 	return out;

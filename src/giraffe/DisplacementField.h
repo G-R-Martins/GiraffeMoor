@@ -5,35 +5,33 @@
 struct DispStruct
 {
 	std::array<double, 6> disp;
-	size_t node;
+	unsigned int node_id;
 };
 
 
 class DisplacementField : public Displacement
 {
 private:
-	size_t m_cs;
-	size_t m_solution_step;
+	unsigned int m_cs_id;
+	unsigned int m_solution_step_id;
 
 	std::vector<DispStruct> m_disp_data;
 
 public:
 	DisplacementField();
-	DisplacementField(size_t cs, size_t solution_step);
+	DisplacementField(unsigned int cs_id, unsigned int solution_step_id);
 	~DisplacementField();
 
 	//============================================================================
 	
 	//Inserts displacement field (from a matrix of translations) in the vector of displacements
-	void InsertDisplacement(const int& node, Matrix& e_disp);
-	void InsertDisplacement(const unsigned int& node, Matrix& e_disp);
+	void InsertDisplacement(const unsigned int& node_id, Matrix& e_disp);
 
 	//Inserts displacement field (from a matrix of translations and a matrix of rotations) in the vector of displacements
-	void InsertDisplacement(const int& node, Matrix& e_disp, Matrix& e_rot);
-	void InsertDisplacement(const unsigned int& node, Matrix& e_disp, Matrix& e_rot);
+	void InsertDisplacement(const unsigned int& node_id, Matrix& e_disp, Matrix& e_rot);
 
 	//Inserts displacement field (from an array) in the vector of displacements
-	void InsertDisplacement(const unsigned int& node, std::array<double,6>& e_disp);
+	void InsertDisplacement(const unsigned int& node_id, std::array<double, 6>& e_disp);
 
 
 	/// 
@@ -41,16 +39,16 @@ public:
 	/// 
 
 
-	void SetCoordinateSystem(size_t cs);
-	void SetSolutionStep(size_t solution_step);
+	void SetCoordinateSystem(unsigned int cs);
+	void SetSolutionStep(unsigned int solution_step);
 	
 
 	/// 
 	/// GETTERS
 	/// 
 
-	size_t GetCoordinateSystem() const { return m_cs; }
-	size_t GetSolutionStep() const { return m_solution_step; }
+	unsigned int GetCoordinateSystem() const { return m_cs_id; }
+	unsigned int GetSolutionStep() const { return m_solution_step_id; }
 
 
 	/// 

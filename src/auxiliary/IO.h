@@ -25,7 +25,8 @@ public:
 
 
 	//String (views) to input path
-	static std::string folder_name, input_name;
+	static std::string folder_name;
+	static std::string input_name;
 	static std::string name; //with directory and extension
 
 	//GiraffeMoor version (defined in '*.in.h' file)
@@ -38,41 +39,37 @@ public:
 					|   Functions   |
 					|               |
 					+-+-+-+-+-+-+-+-*/
+	///
+	/// Mandatory blocks
+	///
 
-	static bool ReadKeypoint(std::string& readed);
-	static bool ReadSegmentSet(std::string& readed);
-	static bool ReadSegment(std::string& readed);
-	static bool ReadLine(std::string& readed);
-	static bool ReadVessel(std::string& readed);
+	static bool ReadKeypoints(std::string& readed);
+	static bool ReadSegmentSets(std::string& readed);
+	static bool ReadLines(std::string& readed);
+	static bool ReadVessels(std::string& readed);
+	static bool ReadSegmentProperties(std::string& readed);
+	static bool ReadEnvironment(std::string& readed);
+	static bool ReadSolution(std::string& readed);
 
-	static bool ReadDynamicRelaxation(std::string& readed);
-	static bool ReadDynRelaxLines(std::string& readed);
-	static bool ReadDynRelaxVessels(std::string& readed);
-	static bool ReadSeaCurrentStep(std::string& readed);
-	static bool ReadAnalysis(std::string& readed);
-	static bool ReadSolutionStep(std::string& readed);
+	///
+	/// Optional blocks
+	///
 
-	static bool ReadEnvGeneral(std::string& readed);
-	static bool ReadSeabed(std::string& readed);
-	static bool ReadSeaCurrent(std::string& readed);
-	static bool ReadSeaCurrentAt(std::string& readed);
-
-	static bool ReadSegmentProperty(std::string& readed);
-	static bool ReadPostFiles(std::string& readed);
-	static bool ReadCADs(std::string& readed);
-	static bool ReadPlatformCAD(std::string& readed);
-	static bool ReadLineDisplacementFields(std::string& readed);
-	static bool ReadConstraints(std::string& readed);
-	static bool ReadRunOption(std::string& readed);
-	static bool ReadProcessors(std::string& readed);
-	static bool ReadConvergenceCriteria(std::string& readed);
-	static bool ReadVesselDisplacement(std::string& readed);
+	static bool ReadGiraffeSolver(std::string& readed);
+	static bool ReadPostProcessing(std::string& readed);
 	static bool ReadStiffnessMatrix(std::string& readed);
-	static void ReadNodalLoads(std::string& readed);
+	static bool ReadVesselDisplacements(std::string& readed);
+	static bool ReadConstraints(std::string& readed);
+
+	/*
+	static bool ReadLineDisplacementFields(std::string& readed);
+	*/
 
 
 	//Reads input file
 	static bool ReadFile();
+
+	static bool CheckAllMandatoryKeywords();
 
 	//Check input data before trying to generate the FE model
 	static bool CheckModel();

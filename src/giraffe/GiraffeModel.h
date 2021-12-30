@@ -9,7 +9,6 @@
 #include "Constraint.h"
 
 #include "Monitor.h"
-#include "ConvergenceCriteria.h"
 #include "CADData.h"
 #include "GiraffeSolver.h"
 #include "CoordinateSystem.h"
@@ -113,14 +112,14 @@ public:
 	Nodes and points
 	---------------*/
 	
-	void GenerateNode(const size_t& number, Matrix& pos, const std::string& comment);
-	void GenerateNode(const size_t& number, Matrix& pos);
-	void GenerateNode(const size_t& number, double X, double Y, double Z, const std::string& comment);
-	void GenerateNode(const size_t& number, double X, double Y, double Z);
-	void GenerateNode(const size_t& number, const std::array<double, 3>& coord, const std::string& comment);
-	void GenerateNode(const size_t& number, const std::array<double, 3>& coord);
-	void GenerateNode(const size_t& number, const std::vector<double>& coord, const std::string& comment);
-	void GenerateNode(const size_t& number, const std::vector<double>& coord);
+	void GenerateNode(const unsigned int& id, Matrix& pos, const std::string& comment);
+	void GenerateNode(const unsigned int& id, Matrix& pos);
+	void GenerateNode(const unsigned int& id, double X, double Y, double Z, const std::string& comment);
+	void GenerateNode(const unsigned int& id, double X, double Y, double Z);
+	void GenerateNode(const unsigned int& id, const std::array<double, 3>& coord, const std::string& comment);
+	void GenerateNode(const unsigned int& id, const std::array<double, 3>& coord);
+	void GenerateNode(const unsigned int& id, const std::vector<double>& coord, const std::string& comment);
+	void GenerateNode(const unsigned int& id, const std::vector<double>& coord);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -128,12 +127,12 @@ public:
 	Elements
 	-------*/
 
-	void GenerateTrussElement(const size_t& number, const bool& segment_begin, const size_t& section, const unsigned int& node1, const unsigned int& node2);
-	void GenerateTrussElement(const size_t& number, const bool& segment_begin, const size_t& section, const unsigned int& node1, const unsigned int& node2, const std::string& comment);
-	void GeneratePipeElement(const size_t& number, const bool& segment_begin, const size_t& section, const unsigned int& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3);
-	void GeneratePipeElement(const size_t& number, const size_t& section, const size_t& cs, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment);
-	void GenerateRigidBodyElement(const size_t& number, const unsigned int& RB_data, const size_t& cs, const unsigned int& node);
-	void GenerateRigidBodyElement(const size_t& number, const unsigned int& RB_data, const size_t& cs, const unsigned int& node, const std::string& comment);
+	void GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2);
+	void GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2, const std::string& comment);
+	void GeneratePipeElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3);
+	void GeneratePipeElement(const unsigned int& id, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment);
+	void GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node);
+	void GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node, const std::string& comment);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -141,9 +140,9 @@ public:
 	Constraints
 	----------*/
 
-	void GenerateNodalConstraint(size_t number, unsigned int node_set, BoolTable const& e_UX, BoolTable const& e_UY, BoolTable const& e_UZ, BoolTable const& e_ROTX, BoolTable const& e_ROTY, BoolTable const& e_ROTZ);
-	void GenerateSameDisplacement(const size_t& number, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
-	void GenerateSameRotation(const size_t& number, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
+	void GenerateNodalConstraint(unsigned int id, unsigned int nodeset_id, BoolTable const& e_UX, BoolTable const& e_UY, BoolTable const& e_UZ, BoolTable const& e_ROTX, BoolTable const& e_ROTY, BoolTable const& e_ROTZ);
+	void GenerateSameDisplacement(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
+	void GenerateSameRotation(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -151,11 +150,10 @@ public:
 	Displacements
 	------------*/
 	
-	void GenerateNodalDisplacement(const size_t& number, const size_t& node_set, const size_t& cs, Table* values);
-	void GenerateNodalDisplacement(const size_t& number, const size_t& node_set, const size_t& cs, MathCode* math_code);
-	void GenerateNodalDisplacement(const size_t& number, const size_t& node_set, const size_t& cs, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateDisplacementField(const size_t& number, const size_t& cs, const size_t& solution_step);
-	void GenerateDisplacementField(const size_t& number, const size_t& cs, const size_t& solution_step, const unsigned int& nodes);
+	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, Table* values);
+	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, MathCode* math_code);
+	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
+	void GenerateDisplacementField(const unsigned int& id, const unsigned int& cs_id, const unsigned int& solution_step);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -163,12 +161,12 @@ public:
 	Node sets
 	--------*/
 
-	void GenerateNodeSet(const size_t& number, const std::vector<unsigned int>& list, const std::string& comment);
-	void GenerateNodeSet(const size_t& number, const std::unordered_set<unsigned int>& list, const std::string& comment);
-	void GenerateNodeSet(const size_t& number, unsigned int node, const std::string& comment);
-	void GenerateNodeSet(const size_t& number, size_t tot_nodes, size_t node_init, unsigned int increment, const std::string& comment);
-	void GenerateRigidNodeSet(const size_t& number, const unsigned int& pilot_node, const size_t& node_set, BoolTable& bool_table);
-	void GenerateRigidNodeSet(const size_t& number, const unsigned int& pilot_node, const size_t& node_set, BoolTable& bool_table, const std::string& comment);
+	void GenerateNodeSet(const unsigned int& id, const std::vector<unsigned int>& list, const std::string& comment);
+	void GenerateNodeSet(const unsigned int& id, const std::unordered_set<unsigned int>& list, const std::string& comment);
+	void GenerateNodeSet(const unsigned int& id, unsigned int node, const std::string& comment);
+	void GenerateNodeSet(const unsigned int& id, unsigned int tot_nodes, unsigned int node_init, unsigned int increment, const std::string& comment);
+	void GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table);
+	void GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table, const std::string& comment);
 
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -176,11 +174,11 @@ public:
 	Surfaces and contact
 	-------------------*/
 
-	void GenerateOscillatorySurf(const size_t& number, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs, const unsigned int& pilot_node);
-	void GenerateSurfaceSet(const size_t& number, const std::vector<size_t>& list);
-	void GenerateNSSSContact(const size_t& number, const size_t& node_set, const size_t& surface_set,
+	void GenerateOscillatorySurf(const unsigned int& id, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs_id, const unsigned int& pilot_node_id);
+	void GenerateSurfaceSet(const unsigned int& id, const std::vector<unsigned int>& list);
+	void GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
 		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table);
-	void GenerateNSSSContact(const size_t& number, const size_t& node_set, const size_t& surface_set,
+	void GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
 		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table, const std::string& comment);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
@@ -189,8 +187,8 @@ public:
 	Solution
 	-------*/
 
-	void GenerateStaticSolutionStep(const size_t& number, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample);
-	void GenerateDynamicSolutionStep(const size_t& number, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample, const double& alpha, const double& beta, const unsigned int& update, const double& gamma_new, const double& beta_new);
+	void GenerateStaticSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample);
+	void GenerateDynamicSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample, const double& alpha, const double& beta, const unsigned int& update, const double& gamma_new, const double& beta_new);
 
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -198,10 +196,10 @@ public:
 	Forces
 	-----*/
 
-	void GenerateNodalForce(const size_t& number, const size_t& nodeset, Table* time_series);
-	void GenerateNodalForce(const size_t& number, const size_t& nodeset, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateNodalForce(const size_t& number, const size_t& nodeset, std::string_view file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateNodalForce(const size_t& number, const size_t& nodeset, MathCode* mathCode);
+	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, Table* time_series);
+	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
+	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, std::string_view file_name, const unsigned int& header_lines, const unsigned int& n_times);
+	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, MathCode* mathCode);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -210,16 +208,16 @@ public:
 	--------------*/
 	
 	//Rigid body data
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G);
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, std::string&& comment);
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& comment);
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, size_t cadID);
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, size_t cadID, std::string&& comment);
-	void GenerateRigidBodyData(const size_t& number, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, size_t cadID, const std::string& comment);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, std::string&& comment);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, const std::string& comment);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, unsigned int cadID);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, unsigned int cadID, std::string&& comment);
+	void GenerateRigidBodyData(const unsigned int& id, double mass, const std::array<double, 6>& J_G, const std::array<double, 3>& G, unsigned int cadID, const std::string& comment);
 	
 	//Coordinate system
-	void GenerateCoordinateSystem(const size_t& number, Matrix& E1, Matrix& E3);
-	void GenerateCoordinateSystem(const size_t& number, const std::array<double, 3>& E1, const std::array<double, 3>& E3);
+	void GenerateCoordinateSystem(const unsigned int& id, Matrix& E1, Matrix& E3);
+	void GenerateCoordinateSystem(const unsigned int& id, const std::array<double, 3>& E1, const std::array<double, 3>& E3);
 	
 	//==========================================================================================================================
 	

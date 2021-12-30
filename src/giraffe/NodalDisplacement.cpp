@@ -3,27 +3,27 @@
 
 
 NodalDisplacement::NodalDisplacement()
-	: m_node_set(0), m_cs(0), m_values(6),
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
 	m_table(nullptr), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {}	
 
 NodalDisplacement::NodalDisplacement(Table* table)
-	: m_node_set(0), m_cs(0), m_values(6),
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
 	m_table(nullptr), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {}
-NodalDisplacement::NodalDisplacement(size_t node_set, size_t cs, Table* table)
-	: m_node_set(node_set), m_cs(cs), m_values(6),
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, Table* table)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
 	m_table(table), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {}
 
 NodalDisplacement::NodalDisplacement(MathCode* math_code)
-	: m_node_set(0), m_cs(0), m_values(6),
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
 	m_table(nullptr), m_math_code(math_code), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {
 	SetMathCodeOpt(true);
 }
-NodalDisplacement::NodalDisplacement(size_t node_set, size_t cs, MathCode* math_code)
-	: m_node_set(node_set), m_cs(cs), m_values(6),
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, MathCode* math_code)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
 	m_table(nullptr), m_math_code(math_code), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 
 {
@@ -31,13 +31,13 @@ NodalDisplacement::NodalDisplacement(size_t node_set, size_t cs, MathCode* math_
 }
 
 NodalDisplacement::NodalDisplacement(const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps)
-	: m_node_set(0), m_cs(0), m_values(6),
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
 	m_table(nullptr), m_math_code(nullptr), m_file_name(file_name), m_header_lines(header_lines), m_tot_steps(tot_steps)
 {
 	SetExternalFileOpt(true);
 }
-NodalDisplacement::NodalDisplacement(size_t node_set, size_t cs, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps)
-	: m_node_set(node_set), m_cs(cs), m_values(6),
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
 	m_table(nullptr), m_math_code(nullptr), m_file_name(file_name), m_header_lines(header_lines), m_tot_steps(tot_steps)
 {
 	SetExternalFileOpt(true);
@@ -52,17 +52,17 @@ NodalDisplacement::~NodalDisplacement()
 /// SETTERS
 /// 
 
-void NodalDisplacement::SetNodeSet(size_t node_set)
+void NodalDisplacement::SetNodeSet(unsigned int node_set_id)
 {
-	m_node_set = node_set;
+	m_node_set_id = node_set_id;
 }
 
-void NodalDisplacement::SetCoordinateSystem(size_t cs)
+void NodalDisplacement::SetCoordinateSystem(unsigned int cs_id)
 {
-	m_cs = cs;
+	m_cs_id = cs_id;
 }
 
-void NodalDisplacement::SetNColumns(size_t values)
+void NodalDisplacement::SetNColumns(unsigned int values)
 {
 	m_values = values;
 }
@@ -101,8 +101,8 @@ void NodalDisplacement::SetTotSteps(unsigned int tot_steps)
 std::ostream& operator<<(std::ostream& out, NodalDisplacement const& obj)
 {
 	out << "\tNodalDisplacement " << obj.GetNumber()
-		<< "\tNodeSet " << obj.m_node_set
-		<< "\tCS " << obj.m_cs << "\t";
+		<< "\tNodeSet " << obj.m_node_set_id
+		<< "\tCS " << obj.m_cs_id << "\t";
 
 	if (obj.IsMathCode())
 		out << "MathCode\n" << obj.m_math_code;

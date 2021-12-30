@@ -110,7 +110,7 @@ void Summary::Append2File_Impl()
 	sum_file << ++cur_section << ") Vessels\n";
 
 	//Vessel data
-	for (Vessel& vessel : mm.vessel_vector)
+	for (Vessel& vessel : mm.vessels)
 	{
 		sum_file << "\tVessel: " << vessel.GetNumber() << "\n";
 		sum_file << "\t\tNode: " << vessel.GetNode() << "\n";
@@ -161,7 +161,7 @@ void Summary::Append2File_Impl()
 
 	//Seabead and friction data
 	sum_file << "\tSeabed:\n";
-	sum_file << "\t  NodeSet: " << mm.pil_node_set << '\n';
+	sum_file << "\t  NodeSet: " << mm.pil_node_set_id << '\n';
 	sum_file << "\t  Friction: ";
 	if (mm.environment.GetSeabed().GetFrictionCoefficient())
 		sum_file << "coefficient = " << mm.environment.GetSeabed().GetFrictionCoefficient() << "\n\n";
@@ -202,10 +202,10 @@ void Summary::Append2File_Impl()
 	sum_file.close();
 }
 
-void Summary::AddLine_Impl(const std::array<size_t, 2>& nodes, const std::array<size_t, 2>& elements,
-					  const std::array<size_t, 2>& nodesets, const std::array<double, 2>& tensions,
-					  const size_t& number, const std::string_view& configuration,
-					  bool TDP, const double& x_tdp, const double& total_length, const size_t& segs)
+void Summary::AddLine_Impl(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
+					  const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
+					  const unsigned int& number, const std::string_view& configuration,
+					  bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs)
 {
 	lines.emplace_back(SummLines());
 	lines.back().extremities = std::make_pair(Summary::LineExtremities({ nodes[0], elements[0], nodesets[0], tensions[0] }), Summary::LineExtremities({ nodes[1], elements[1], nodesets[1], tensions[1] }));

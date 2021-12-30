@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "GiraffeSolver.h"
 #include "Log.h"
-#include "AuxFunctions.h"
 
 
 GiraffeSolver::GiraffeSolver()
@@ -37,8 +36,8 @@ void GiraffeSolver::SetLinSolverOpt(std::string_view type)
 		this->m_is_direct = false;
 	else
 	{
-		std::cerr << "Invalid 'LinSys' definition";
-		std::exit(EXIT_FAILURE);
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SolverOptions", 0, "LinSys");
+		Log::SetWarning("\n  GiraffeMoor will set the default option: \'directive\'");
 	}
 }
 
@@ -47,7 +46,7 @@ void GiraffeSolver::SetLinSolverOpt(std::string_view type)
 /// Overloaded operators
 /// 
 
-std::ostream& operator<<(std::ostream& fout, const GiraffeSolver::ConvergenceCriteria& conv_criteria)
+std::ostream& operator<<(std::ostream& fout, const ConvergenceCriteria& conv_criteria)
 {
 	fout <<
 		"\tForceTolerance " << conv_criteria.force_tol <<

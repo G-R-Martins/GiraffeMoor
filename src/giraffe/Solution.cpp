@@ -3,7 +3,7 @@
 
 
 Solution::Solution()
-	: m_number(0), m_start_time(0.0), m_end_time(0.0),
+	: m_id(0), m_start_time(0.0), m_end_time(0.0),
 	m_time_step(0.0), m_max_time_step(0.0), m_min_time_step(0.0), 
 	m_max_it(0), m_min_it(0), 
 	m_convergence_increase(0), m_increase_factor(0.0),
@@ -18,9 +18,9 @@ Solution::~Solution()
 /// SETTERS
 /// 
 
-void Solution::SetIDNumber(size_t number)
+void Solution::SetIDNumber(unsigned int id)
 {
-	m_number = number;
+	m_id = id;
 }
 
 void Solution::SetStartTime(double start_time)

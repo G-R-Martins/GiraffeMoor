@@ -39,8 +39,8 @@ public:
 	inline const WritingFlags& GetWritingFlags() const { return m_writing_flags; }
 	inline WritingFlags& GetWritingFlags() { return m_writing_flags; }	
 
-	inline const CADData& GetCAD(size_t platform) const { return m_cad_vector[platform]; }
-	inline CADData& GetCAD(size_t platform) { return m_cad_vector[platform]; }
+	inline const CADData& GetCAD(unsigned int platform) const { return m_cad_vector[platform]; }
+	inline CADData& GetCAD(unsigned int platform) { return m_cad_vector[platform]; }
 	inline const std::vector<CADData>& GetAllCADs() const { return m_cad_vector; }
 	inline std::vector<CADData>& GetAllCADs() { return m_cad_vector; }
 

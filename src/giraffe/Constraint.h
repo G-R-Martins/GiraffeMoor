@@ -3,7 +3,7 @@
 
 class Constraint
 {
-	size_t m_number;
+	unsigned int m_id;
 public:
 	Constraint();
 	virtual ~Constraint();
@@ -15,12 +15,12 @@ public:
 	/// SETTERS
 	/// 
 
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 
 	/// 
 	/// GETTERS
 	/// 
 
-	inline size_t GetNumber() const { return m_number; }
+	inline unsigned int GetNumber() const { return m_id; }
 };
 

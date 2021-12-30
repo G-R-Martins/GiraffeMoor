@@ -4,7 +4,7 @@
 class Solution
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 	double m_start_time;
 	double m_end_time;
 
@@ -27,7 +27,7 @@ public:
 	/// SETTERS
 	/// 
 	
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 	void SetStartTime(double start_time);
 	void SetEndTime(double end_time);
 
@@ -49,7 +49,7 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNumber() const				{ return m_number; }
+	inline unsigned int GetNumber() const				{ return m_id; }
 	inline double GetStartTime() const			{ return m_start_time; }
 	inline double GetEndTime() const			{ return m_end_time; }
 	

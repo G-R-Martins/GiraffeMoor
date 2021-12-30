@@ -5,13 +5,13 @@
 class RigidNodeSet : public SpecialConstraint
 {
 private:
-	size_t m_pilot_node;
-	size_t m_node_set;
+	unsigned int m_pilot_node_id;
+	unsigned int m_node_set_id;
 	std::string m_comment;
 
 public:
 	RigidNodeSet();
-	RigidNodeSet(size_t pilot_node, size_t node_set, const std::string& comment = "");
+	RigidNodeSet(unsigned int pilot_node_id, unsigned int node_set_id, const std::string& comment = "");
 	~RigidNodeSet();
 
 
@@ -19,7 +19,8 @@ public:
 	/// GETTERS
 	/// 
 
-	inline size_t GetNodeSet() const { return m_node_set; }
+	inline unsigned int GetPilotNodeID() const { return m_pilot_node_id; }
+	inline unsigned int GetNodeSet() const { return m_node_set_id; }
 	inline const std::string& GetComment() const { return m_comment; }
 	inline std::string& GetComment() { return m_comment; }
 

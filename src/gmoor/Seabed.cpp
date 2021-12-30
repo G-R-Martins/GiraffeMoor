@@ -3,7 +3,7 @@
 
 
 Seabed::Seabed()
-	: m_is_flat(true), m_pilot_node(0), m_nodeset(0),
+	: m_is_flat(true), m_pilot_node_id(0), m_nodeset_id(0),
 	m_stiffness(0.0), m_damping(0.0), m_mu(0.0),
 	m_pinball(0.0), m_radius(0.0)
 {}
@@ -20,16 +20,14 @@ void Seabed::SetFlatOption(bool is_flat)
 {
 	this->m_is_flat = is_flat;
 }
-
-void Seabed::SetPilotNode(unsigned int pilot_node)
+void Seabed::SetPilotNode(unsigned int pilot_node_id)
 {
-	this->m_pilot_node = pilot_node;
+	this->m_pilot_node_id = pilot_node_id;
 }
-void Seabed::SetNodeset(unsigned int nodeset)
+void Seabed::SetNodeset(unsigned int nodeset_id)
 {
-	this->m_nodeset = nodeset;
+	this->m_nodeset_id = nodeset_id;
 }
-
 void Seabed::SetStiffness(double stiffness)
 {
 	this->m_stiffness = stiffness;

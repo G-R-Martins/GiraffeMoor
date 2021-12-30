@@ -25,10 +25,10 @@ public:
 	--------*/
 
 	//Vectors with monitor numbers
-	std::forward_list<unsigned int> nodes;
-	std::forward_list<unsigned int> elements;
-	std::forward_list<unsigned int> contacts;
-	std::forward_list<unsigned int> node_sets;
+	std::forward_list<unsigned int> nodes_id;
+	std::forward_list<unsigned int> elements_id;
+	std::forward_list<unsigned int> contacts_id;
+	std::forward_list<unsigned int> node_sets_id;
 	
 	//Containers with structs to create monitors
 	std::forward_list<SequenceNodes> seq_nodes;

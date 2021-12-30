@@ -4,7 +4,7 @@
 class NodeSet
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 	unsigned int m_total_nodes;
 	unsigned int m_node_init;  //Initial node (sequence)
 	unsigned int m_increment;
@@ -15,12 +15,12 @@ private:
 public:
 	NodeSet();
 	// Construct a list of nodesets
-	NodeSet(size_t number, const std::vector<unsigned int>& nodes, const std::string& comment="\0");
-	NodeSet(size_t number, const std::vector<unsigned int>& nodes, std::string& comment);
+	NodeSet(unsigned int id, const std::vector<unsigned int>& nodes, const std::string& comment="\0");
+	NodeSet(unsigned int id, const std::vector<unsigned int>& nodes, std::string& comment);
 	//Construct a nodeset to be used with sequence of nodes
-	NodeSet(size_t number, unsigned int total_nodes, unsigned int node_init, 
+	NodeSet(unsigned int id, unsigned int total_nodes, unsigned int node_init, 
 		unsigned int increment, const std::string& comment="\0");
-	NodeSet(size_t number, unsigned int total_nodes, unsigned int node_init, 
+	NodeSet(unsigned int id, unsigned int total_nodes, unsigned int node_init, 
 		unsigned int increment, std::string& comment);
 	
 	//Destructor
@@ -31,7 +31,7 @@ public:
 	/// SETTERS
 	/// 
 
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 	void SetNNodes(unsigned int total_nodes);
 	void SetNodeInit(unsigned int node_init);
 	void SetIncrement(unsigned int increment);
@@ -42,8 +42,8 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNumber() const { return m_number; };
-	inline unsigned int GetNNodes() const { return m_nodes.size(); };
+	inline unsigned int GetNumber() const { return m_id; };
+	inline unsigned int GetNNodes() const { return (unsigned int)m_nodes.size(); };
 	inline unsigned int GetNodeInit() const { return m_node_init; };
 	inline unsigned int GetIncrement() const { return m_increment; };
 	inline const std::string& GetComment() const { return m_comment; };

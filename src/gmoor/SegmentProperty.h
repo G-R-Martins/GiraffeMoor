@@ -1,9 +1,18 @@
 #pragma once
 
+
+enum class WizardType { 
+	NONE = 0, STUDLINK, STUDLESS
+};
+enum class Grade { 
+	NONE = 0, ORQ, TWO, THREE, R4
+};
+
+
 class SegmentProperty
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 
 	double m_rho;
 	double m_diameter;
@@ -26,19 +35,19 @@ private:
 	bool m_is_truss;
 	bool m_is_beam;
 
+	WizardType m_wizard;
+	Grade m_grade;
+
 public:
 	SegmentProperty();
 	~SegmentProperty();
 
 
-	//Writes Giraffe file data
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
 	/// 
 	/// SETTERS
 	/// 
 	
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int id);
 	void SetMass(double rho);
 	void SetDiameter(double diameter);
 	void SetInnerDiameter(double diameter_inner);
@@ -55,20 +64,24 @@ public:
 	void SetPoisson(double nu);
 	void SetSG(double SG);
 	void SetMBS(double MBS);
-	
+	void SetMBSFromWizard(double d);
+	void SetGrade(std::string_view grade);
+
 	void SetChainOpt(bool is_chain);
 	void SetTrussOpt(bool is_truss);
 	void SetBeamOpt(bool is_beam);
-
-	bool SetWizardStudless(double d, std::string_view grade);
-	bool SetWizardStudlink(double d, std::string_view grade);
+	
+	void SetWizardType(std::string_view type);
+	void SetWizard(double d);
+	void SetWizardStudless(double d);
+	void SetWizardStudlink(double d);
 	
 	
 	/// 
 	/// GETTERS
 	/// 
 	
-	inline const size_t GetNumber() const			{ return m_number; }
+	inline const unsigned int GetNumber() const		{ return m_id; }
 	inline const double GetMass() const				{ return m_rho; }
 	inline const double GetDiameter() const			{ return m_diameter; }
 	inline const double GetInnerDiameter() const	{ return m_diameter_inner; }
@@ -86,10 +99,9 @@ public:
 	inline const double GetSG() const				{ return m_SG; }
 	inline const double GetMBS() const				{ return m_MBS; }
 	
-	inline const bool IsTruss() const		{ return (m_is_truss || m_is_chain); }
-	inline const bool IsChain() const		{ return (m_is_truss || m_is_chain); }
+	inline const bool IsTruss() const		{ return m_is_truss; }
+	inline const bool IsChain() const		{ return m_is_chain; }
 	inline const bool IsBeam() const		{ return m_is_beam; }
-
 
 
 	/*-------------------

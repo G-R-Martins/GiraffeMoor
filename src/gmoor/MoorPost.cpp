@@ -11,8 +11,12 @@ MoorPost::~MoorPost()
 {}
 
 
-void MoorPost::AddPlatformCAD(const CADData & cad)
-{
-	m_platform_cads.emplace_back();
-}
 
+CADData* MoorPost::AddVesselCAD()
+{
+	return &this->m_vessel_cads.emplace_back();
+}
+void MoorPost::PushBackVesselCAD()
+{
+	this->m_vessel_cads.emplace_back();
+}

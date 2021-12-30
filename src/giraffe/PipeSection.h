@@ -4,7 +4,7 @@
 class PipeSection
 {
 private:
-	size_t m_number;
+	unsigned int m_id;
 	bool m_is_beam;
 	double m_diameter;
 	double m_rho;
@@ -21,7 +21,7 @@ private:
 
 public:
 	PipeSection();
-	PipeSection(size_t number, bool is_beam, double d, double rho,
+	PipeSection(unsigned int id, bool is_beam, double d, double rho,
 				double EA, double EI, double GJ, double GA,
 				double CDt, double CDn, double CAt, double CAn,
 				double E, double nu);

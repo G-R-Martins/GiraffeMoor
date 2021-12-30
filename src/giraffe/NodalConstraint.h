@@ -5,7 +5,7 @@
 class NodalConstraint : public Constraint
 {
 private:
-	size_t m_node_set;
+	unsigned int m_node_set_id;
 	BoolTable m_UX;
 	BoolTable m_UY;
 	BoolTable m_UZ;
@@ -15,7 +15,7 @@ private:
 
 public:
 	NodalConstraint();
-	NodalConstraint(size_t node_set, const BoolTable& UX, const BoolTable& UY, const BoolTable& UZ,
+	NodalConstraint(unsigned int node_set_id, const BoolTable& UX, const BoolTable& UY, const BoolTable& UZ,
 		const BoolTable& ROTX, const BoolTable& ROTY, const BoolTable& ROTZ);
 	~NodalConstraint();
 
@@ -24,7 +24,7 @@ public:
 	/// SETTERS
 	/// 
 	
-	void SetNodeset(size_t node_set);
+	void SetNodeset(unsigned int node_set_id);
 	void SetUX(const BoolTable& UX);
 	void SetUY(const BoolTable& UY);
 	void SetUZ(const BoolTable& UZ);
@@ -36,7 +36,7 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline size_t GetNodeSet() const		{ return m_node_set; }
+	inline unsigned int GetNodeSet() const		{ return m_node_set_id; }
 	inline const BoolTable& GetUX() const	{ return m_UX; }
 	inline const BoolTable& GetUY() const	{ return m_UY; }
 	inline const BoolTable& GetUZ() const	{ return m_UZ; }

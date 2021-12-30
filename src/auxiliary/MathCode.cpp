@@ -16,7 +16,7 @@ void MathCode::SetStartTime(const double& start)
 	m_start_time = start;
 }
 
-void MathCode::SetEquation(size_t dof, const std::string& eq)
+void MathCode::SetEquation(unsigned int dof, const std::string& eq)
 {
 	m_equations[dof] = eq;
 }
@@ -71,53 +71,4 @@ std::ostream& operator<<(std::ostream& out, MathCode* mcPtr)
 	return out;
 }
 
-std::ifstream& operator>>(std::ifstream& input, MathCode* ptr_math_code)
-{
-	std::unordered_set<std::string_view> DoFs{ "X", "Y", "Z", "ROTX", "ROTY", "ROTZ" };
-	
-	std::string readed;
-	char bracket;
-
-	size_t dof = 0;
-
-	do {
-		// Buffer that will hold the equation
-		std::stringbuf buf;
-
-		input >> readed;
-
-		// Check DoF
-		if (DoFs.count(readed) == 0) 
-		{
-			AuxFunctions::Reading::BackLastWord(input, readed);
-			break;
-		}
-		else
-			DoFs.erase(readed);
-
-		if (readed == "X")			dof = 0;
-		else if (readed == "Y")		dof = 1;
-		else if (readed == "Z")		dof = 2;
-		else if (readed == "ROTX")	dof = 3;
-		else if (readed == "ROTY")	dof = 4;
-		else if (readed == "ROTZ")	dof = 5;
-
-		
-		// Read until initial angular bracket, ...
-		input.get(buf, '{');
-		input >> bracket;
-		if (bracket != '{')
-			std::exit(EXIT_FAILURE);  //TODO: mensagem de erro
-		// ... clear whitspaces before '{' from the buffer ...
-		buf.swap(std::stringbuf(""));
-		// ... read until the next angular bracket, ...
-		input.get(buf, '}');
-		input >> bracket;
-		// ... then, set the equation
-		ptr_math_code->SetEquation(dof, buf.str());
-
-	} while (true);
-
-	return input;
-}
 

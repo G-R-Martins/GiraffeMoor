@@ -1,12 +1,11 @@
 #include "PCH.h"
 #include "Vessel.h"
-#include "Log.h"
 
 
 //Constructors
 Vessel::Vessel()
-	: m_number(0), m_keypoint(0), m_node(0), m_nodeset(0), m_rigid_nodeset(0),
-	m_element(0), m_mass(0.0f), m_inertia_tensor({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f })
+	: m_id(0), m_keypoint_id(0), m_node_id(0), m_nodeset_id(0), m_rigid_nodeset_id(0),
+	m_element_id(0), m_mass(0.0f), m_inertia_tensor({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f })
 {}
 
 //Destructor
@@ -24,30 +23,30 @@ void Vessel::AddNode2RigidNodeset(unsigned int node)
 /// SETTERS
 ///
 
-void Vessel::SetIDNumber(size_t number)
+void Vessel::SetIDNumber(unsigned int id)
 {
-	m_number = number;
+	m_id = id;
 }
 
-void Vessel::SetKeypoint(unsigned int keypoint)
+void Vessel::SetKeypoint(unsigned int keypoint_id)
 {
-	m_keypoint = keypoint;
+	m_keypoint_id = keypoint_id;
 }
-void Vessel::SetNode(unsigned int node)
+void Vessel::SetNode(unsigned int node_id)
 {
-	m_node = node;
+	m_node_id = node_id;
 }
-void Vessel::SetNodeset(unsigned int nodeset)
+void Vessel::SetNodeset(unsigned int nodeset_id)
 {
-	m_nodeset = nodeset;
+	m_nodeset_id = nodeset_id;
 }
-void Vessel::SetRigidNodeset(unsigned int rigid_nodeset)
+void Vessel::SetRigidNodeset(unsigned int rigid_nodeset_id)
 {
-	m_rigid_nodeset = rigid_nodeset;
+	m_rigid_nodeset_id = rigid_nodeset_id;
 }
-void Vessel::SetElement(unsigned int element)
+void Vessel::SetElement(unsigned int element_id)
 {
-	m_element = element;
+	m_element_id = element_id;
 }
 
 void Vessel::SetMass(double mass)
@@ -71,7 +70,7 @@ void Vessel::SetNodesRigidNodeset(const std::unordered_set<unsigned int>& nodes_
 
 bool operator< (Vessel& vessel1, Vessel& vessel2)
 {
-	return vessel1.m_number < vessel2.m_number;
+	return vessel1.m_id < vessel2.m_id;
 }
 bool operator> (Vessel& vessel1, Vessel& vessel2)
 {
@@ -79,7 +78,7 @@ bool operator> (Vessel& vessel1, Vessel& vessel2)
 }
 bool operator== (Vessel& vessel1, Vessel& vessel2)
 {
-	return vessel1.m_number == vessel2.m_number;
+	return vessel1.m_id == vessel2.m_id;
 }
 bool operator!= (Vessel& vessel1, Vessel& vessel2)
 {

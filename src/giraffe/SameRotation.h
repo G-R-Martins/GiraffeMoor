@@ -5,12 +5,12 @@
 class SameRotation : public SpecialConstraint
 {
 private:
-	size_t m_node_A;
-	size_t m_node_B;
+	unsigned int m_nodeA_id;
+	unsigned int m_nodeB_id;
 
 public:
 	SameRotation();
-	SameRotation(size_t node_A, size_t node_B);
+	SameRotation(unsigned int nodeA_id, unsigned int nodeB_id);
 	~SameRotation();
 
 
@@ -18,8 +18,8 @@ public:
 	/// GETTERS
 	/// 
 
-	inline size_t GetNodeA() const { return m_node_A; }
-	inline size_t GetNodeB() const { return m_node_B; }
+	inline unsigned int GetNodeA() const { return m_nodeA_id; }
+	inline unsigned int GetNodeB() const { return m_nodeB_id; }
 
 
 	/// 

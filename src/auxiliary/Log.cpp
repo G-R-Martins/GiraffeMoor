@@ -28,6 +28,10 @@ void Log::SetWarning_Impl(Log::Warning type, std::string_view block, int line, s
 		break;
 
 	case Warning::INVALID_KEYWORD:
+		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": \'" << name << "\' is not a valid option. Please, check the manual for current supported options.";
+		break;
+
+	case Warning::INVALID_OPTION:
 		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": \'" << name << "\' (at line " << line <<
 			") is not a valid keyword or it has been already defined.";
 		break;
@@ -42,8 +46,8 @@ void Log::SetWarning_Impl(Log::Warning type, std::string_view block, int line, s
 	
 	case Warning::UNDEFINED_MANDATORY_BLOCK:
 		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": " << number << " undefined mandatory block(s): ";
-		for (auto keyword : AuxFunctions::Reading::s_mandatory_keywords)
-			m_warning << "\n    - " << keyword;
+		//for (auto keyword : AuxFunctions::Reading::s_mandatory_keywords)
+			//m_warning << "\n    - " << keyword;
 		break;
 
 	case Warning::SOLVING_CATENARY:

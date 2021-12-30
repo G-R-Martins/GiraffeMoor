@@ -45,9 +45,9 @@ void Table::SetLine(const std::array<double, 7>& tab_line)
 //	table.emplace_front(std::array{ time, V1, V2, V3, V4, V5, V6 });
 //}
 
-void Table::SetStartTime(const double& start_time, const size_t& start_line)
+void Table::SetStartTime(const double& start_time, const unsigned int& start_line)
 {
-	for (size_t i = start_line; i < table.size(); i++)
+	for (unsigned int i = start_line; i < (unsigned int)table.size(); i++)
 		table[i][0] += start_time;
 }
 
@@ -73,30 +73,3 @@ std::ostream& operator<<(std::ostream& out, Table* tabPtr)
 	return out;
 }
 
-// Read table
-std::ifstream& operator>>(std::ifstream& input, Table* table)
-{
-	std::string time;
-	size_t cur_line = 0;
-	do 
-	{
-		// Check the first number (TIME)
-		if (!(input >> time) || !std::isdigit(time[0]))
-		{
-			AuxFunctions::Reading::BackLastWord(input, std::string_view(time));
-			break;
-		}
-
-		// Pre-allocates next line with current time ... 
-		table->SetLine(std::stod(time), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-		// ... and read values for all DoFs
-		input >> table->table[cur_line][1] >> table->table[cur_line][2] >> table->table[cur_line][3] 
-			  >> table->table[cur_line][4] >> table->table[cur_line][5] >> table->table[cur_line][6];
-		
-		++cur_line;
-
-	} while (true);
-
-
-	return input;
-}

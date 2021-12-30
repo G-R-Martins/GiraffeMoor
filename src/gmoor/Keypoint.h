@@ -3,7 +3,7 @@
 class Keypoint
 {
 	//Keypoint ID
-	size_t m_number;
+	unsigned int m_id;
 
 	//Coordinates
 	double m_x;
@@ -14,7 +14,7 @@ class Keypoint
 
 public:
 	Keypoint();
-	Keypoint(double x, double y, double z, unsigned int ID=0);
+	Keypoint(double x, double y, double z, unsigned int id=0);
 	~Keypoint();
 
 
@@ -22,7 +22,7 @@ public:
 	/// SETTERS
 	/// 
 	
-	void SetIDNumber(size_t number);
+	void SetIDNumber(unsigned int number);
 	void SetX(double x);
 	void SetY(double y);
 	void SetZ(double z);
@@ -32,7 +32,7 @@ public:
 	/// GETTERS
 	/// 
 	
-	inline const size_t GetIDNumber() const							{ return this->m_number; }
+	inline const unsigned int GetIDNumber() const							{ return this->m_id; }
 	inline const std::array<double, 3> GetAllCoordinates() const	{ return std::array{ m_x, m_y, m_z }; }
 	const double GetCoordinate(char coordinate) const;
 

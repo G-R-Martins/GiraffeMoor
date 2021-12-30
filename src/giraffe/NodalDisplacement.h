@@ -6,9 +6,9 @@
 class NodalDisplacement : public Displacement
 {
 private:
-	size_t m_node_set;
-	size_t m_cs;
-	size_t m_values;  // number of columns
+	unsigned int m_node_set_id;
+	unsigned int m_cs_id;
+	unsigned int m_values;  // number of columns
 	
 	Table* m_table;
 	MathCode* m_math_code;
@@ -22,20 +22,20 @@ public:
 	~NodalDisplacement();
 
 	NodalDisplacement(Table* table);
-	NodalDisplacement(size_t node_set, size_t cs, Table* table);
+	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, Table* table);
 	NodalDisplacement(MathCode* math_code);
-	NodalDisplacement(size_t node_set, size_t cs, MathCode* math_code);
+	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, MathCode* math_code);
 	NodalDisplacement(const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps);
-	NodalDisplacement(size_t node_set, size_t cs, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps);
+	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps);
 
 
 	/// 
 	/// SETTERS
 	/// 
 	
-	void SetNodeSet(size_t node_set);
-	void SetCoordinateSystem(size_t cs);
-	void SetNColumns(size_t values);
+	void SetNodeSet(unsigned int node_set_id);
+	void SetCoordinateSystem(unsigned int cs_id);
+	void SetNColumns(unsigned int values);
 	void SetTable(Table* table);
 	void SetMathCode(MathCode* math_code);
 	void SetFileName(const std::string& file_name);
@@ -47,9 +47,9 @@ public:
 	/// GETTERS
 	/// 
 
-	inline size_t GetNodeset() const				{ return m_node_set; }
-	inline size_t GetCoordinateSystem() const		{ return m_cs; }
-	inline size_t GetNColumns() const				{ return m_values; }
+	inline unsigned int GetNodeset() const				{ return m_node_set_id; }
+	inline unsigned int GetCoordinateSystem() const		{ return m_cs_id; }
+	inline unsigned int GetNColumns() const			{ return m_values; }
 	inline Table const* GetTable() const			{ return m_table; }
 	inline Table* GetTable()						{ return m_table; }
 	inline MathCode const* GetMathCode() const		{ return m_math_code; }

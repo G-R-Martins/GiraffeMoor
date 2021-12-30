@@ -1,10 +1,9 @@
 #include "PCH.h"
 #include "VesselDisplacement.h"
-#include "IO.h" //to get the folder name
 
 VesselDisplacement::VesselDisplacement()
-	: m_vesselID(0), m_solution_step(0),
-	m_is_table(false), m_is_sine_wave(false), m_is_math_code(false), m_is_external_file(false),
+	: m_vessel_id(0), m_solution_step_id(0),
+	m_is_table(false), m_is_math_code(false), m_is_external_file(false),
 	m_file_name("\0"), m_header_lines(0), m_tot_steps(0),
 	m_ptr_time_series(nullptr), m_ptr_math_code(nullptr)
 {}
@@ -18,19 +17,19 @@ VesselDisplacement::~VesselDisplacement()
 }
 
 
-void VesselDisplacement::SetVesselID(size_t vesselID)
+void VesselDisplacement::SetVesselID(unsigned int vessel_id)
 {
-	m_vesselID = vesselID;
+	m_vessel_id = vessel_id;
 }
-void VesselDisplacement::SetSolutionStep(size_t solution_step)
+void VesselDisplacement::SetSolutionStep(unsigned int solution_step_id)
 {
-	m_solution_step = solution_step;
+	m_solution_step_id = solution_step_id;
 }
 void VesselDisplacement::SetStartTime(double start)
 {
 	this->m_ptr_math_code->SetEquationInitialTime(start);
 }
-void VesselDisplacement::SetStartTableTime(double start_time, size_t start_line)
+void VesselDisplacement::SetStartTableTime(double start_time, unsigned int start_line)
 {
 	m_ptr_time_series->SetStartTime(start_time, start_line);
 }
@@ -40,12 +39,11 @@ void VesselDisplacement::SetTimeSeries()
 	m_is_table = true;
 	m_ptr_time_series = new Table();
 }
-void VesselDisplacement::SetTimeSeries(std::ifstream& input)
+void VesselDisplacement::SetTimeSeries(Table* ptr_time_series)
 {
 	m_is_table = true;
 	m_ptr_time_series = new Table();
-
-	input >> m_ptr_time_series;
+	m_ptr_time_series = ptr_time_series;
 }
 void VesselDisplacement::SetMathCode()
 {
@@ -74,7 +72,7 @@ void VesselDisplacement::SetFileNSteps(unsigned int tot_steps)
 
 bool operator<(const VesselDisplacement& obj1, const VesselDisplacement& obj2)
 {
-	return obj1.m_vesselID < obj2.m_vesselID;
+	return obj1.m_vessel_id < obj2.m_vessel_id;
 }
 
 bool operator>(const VesselDisplacement& obj1, const VesselDisplacement& obj2)
@@ -84,7 +82,7 @@ bool operator>(const VesselDisplacement& obj1, const VesselDisplacement& obj2)
 
 bool operator==(const VesselDisplacement& obj1, const VesselDisplacement& obj2)
 {
-	return obj1.m_vesselID == obj2.m_vesselID;
+	return obj1.m_vessel_id == obj2.m_vessel_id;
 }
 
 bool operator!=(const VesselDisplacement& obj1, const VesselDisplacement& obj2)

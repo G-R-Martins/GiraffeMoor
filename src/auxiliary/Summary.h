@@ -36,21 +36,21 @@ class Summary
 	//Data of line(s) extremities
 	struct LineExtremities
 	{
-		size_t node = 0;
-		size_t element = 0;
-		size_t nodeset = 0;
+		unsigned int node = 0;
+		unsigned int element = 0;
+		unsigned int nodeset = 0;
 		double tension = 0.0;
 	};
 
 	//Summary of line(s) data
 	struct SummLines
 	{
-		size_t number = 0;
+		unsigned int number = 0;
 		std::string_view config;
 		bool hasTDP = true;
 		double tdp_pos = 0.0;
 		double len = 0.0;
-		size_t segs = 0;
+		unsigned int segs = 0;
 		std::pair<Summary::LineExtremities, Summary::LineExtremities> extremities;
 	};
 	std::vector<SummLines> lines;
@@ -64,10 +64,10 @@ class Summary
 	void CreateSumFile_Impl(const std::string& name_with_folder, const std::string& version);
 	void CreateSumFile_Impl(const std::string& name_with_folder, std::string_view version);
 	void Append2File_Impl();
-	void AddLine_Impl(const std::array<size_t, 2>& nodes, const std::array<size_t, 2>& elements,
-						 const std::array<size_t, 2>& nodesets, const std::array<double, 2>& tensions,
-						 const size_t& number, const std::string_view& configuration,
-						 bool TDP, const double& x_tdp, const double& total_length, const size_t& segs );
+	void AddLine_Impl(const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
+						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
+						 const unsigned int& number, const std::string_view& configuration,
+						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs );
 	std::vector<std::tuple<double, double, std::string>>& GetSteps_Impl();
 
 	//===========================================================================================================
@@ -96,10 +96,10 @@ public:
 	static void Append2File() { 
 		return getInstance().Append2File_Impl(); }
 	
-	static void AddLine( const std::array<size_t, 2>& nodes, const std::array<size_t, 2>& elements,
-						 const std::array<size_t, 2>& nodesets, const std::array<double, 2>& tensions,
-						 const size_t& number, const std::string_view& configuration,
-						 bool TDP, const double& x_tdp, const double& total_length, const size_t& segs ) {
+	static void AddLine( const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
+						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
+						 const unsigned int& number, const std::string_view& configuration,
+						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs ) {
 		return getInstance().AddLine_Impl(nodes, elements, nodesets, tensions, number, configuration, TDP, x_tdp, total_length, segs); }
 	
 	//[initial time, end time, description]

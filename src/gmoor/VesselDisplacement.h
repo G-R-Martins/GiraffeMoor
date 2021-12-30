@@ -6,12 +6,11 @@ class VesselDisplacement
 {
 private:
 
-	size_t m_vesselID;	
-	size_t m_solution_step; 
+	unsigned int m_vessel_id;
+	unsigned int m_solution_step_id;
 	
 	//Boolean to indicate the type of the displacement
 	bool m_is_table;
-	bool m_is_sine_wave;
 	bool m_is_math_code;
 	bool m_is_external_file;
 
@@ -35,14 +34,16 @@ public:
 	/// SETTERS
 	///
 	
-	void SetVesselID(size_t vesselID);
-	void SetSolutionStep(size_t solution_step);
+	void SetVesselID(unsigned int vessel_id);
+	void SetSolutionStep(unsigned int solution_step_id);
 	void SetStartTime(double start);
-	void SetStartTableTime(double start_time, size_t start_line);
+	
+	void SetStartTableTime(double start_time, unsigned int start_line);
 	void SetTimeSeries();
-	void SetTimeSeries(std::ifstream& input);
-	void SetSineWave();
+	void SetTimeSeries(Table* ptr_time_series);
+	
 	void SetMathCode();
+
 	void SetFileName(const std::string& file_name);
 	void SetFileHeaders(unsigned int header_lines);
 	void SetFileNSteps(unsigned int tot_steps);
@@ -52,22 +53,21 @@ public:
 	/// GETTERS
 	///
 	
-	inline size_t GetVesselID() const					{ return m_vesselID; }
-	inline size_t GetStep() const						{ return m_solution_step; }
+	inline unsigned int GetVesselID() const			{ return m_vessel_id; }
+	inline unsigned int GetStep() const				{ return m_solution_step_id; }
 
-	inline unsigned int GetNHeaderLines() const			{ return m_header_lines; }
-	inline unsigned int GetNSteps() const				{ return m_tot_steps; }
-	inline std::string& GetFileName()					{ return m_file_name; }
+	inline unsigned int GetNHeaderLines() const		{ return m_header_lines; }
+	inline unsigned int GetNSteps() const			{ return m_tot_steps; }
+	inline std::string& GetFileName()				{ return m_file_name; }
 
-	inline Table* GetTimeSeries() const					{ return m_ptr_time_series; }
-	inline Table* GetTimeSeries()						{ return m_ptr_time_series; }
-	inline MathCode* GetMathCode() const				{ return m_ptr_math_code; }
-	inline MathCode* GetMathCode()						{ return m_ptr_math_code; }
+	inline Table* GetTimeSeries() const				{ return m_ptr_time_series; }
+	inline Table* GetTimeSeries()					{ return m_ptr_time_series; }
+	inline MathCode* GetMathCode() const			{ return m_ptr_math_code; }
+	inline MathCode* GetMathCode()					{ return m_ptr_math_code; }
 
-	inline bool IsTable() const							{ return m_is_table; }
-	inline bool IsMathCode() const						{ return m_is_math_code; }
-	inline bool IsSineWave() const						{ return m_is_sine_wave; }
-	inline bool IsExternalFile() const					{ return m_is_external_file; }
+	inline bool IsTable() const						{ return m_is_table; }
+	inline bool IsMathCode() const					{ return m_is_math_code; }
+	inline bool IsExternalFile() const				{ return m_is_external_file; }
 
 
 	/// 

@@ -3,11 +3,11 @@
 
 
 SurfaceSet::SurfaceSet()
-	: m_number(0)
+	: m_id(0)
 {}
 
-SurfaceSet::SurfaceSet(size_t n, const std::vector<size_t>& surfaces)
-	: m_number(n), m_surfaces(surfaces)
+SurfaceSet::SurfaceSet(unsigned int id, const std::vector<unsigned int>& surfaces)
+	: m_id(id), m_surfaces(surfaces)
 {}
 
 
@@ -22,7 +22,7 @@ SurfaceSet::~SurfaceSet()
 
 std::ostream& operator<<(std::ostream& out, const SurfaceSet& obj)
 {
-	out << "\tSurfaceSet " << obj.m_number 
+	out << "\tSurfaceSet " << obj.m_id
 		<< "\tSurfaces " << obj.m_surfaces.size() 
 		<< "\tList ";
 	for (size_t i = 0; i < obj.m_surfaces.size(); ++i)

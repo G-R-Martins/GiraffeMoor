@@ -1,14 +1,13 @@
 #include "PCH.h"
 #include "Keypoint.h"
-#include "Log.h"
 
 
 Keypoint::Keypoint()
-	: m_number(0), m_x(0.0), m_y(0.0), m_z(0.0)
+	: m_id(0), m_x(0.0), m_y(0.0), m_z(0.0)
 {}
 
-Keypoint::Keypoint(double x, double y, double z, unsigned int ID)
-	: m_number(ID), m_x(x), m_y(y), m_z(z)
+Keypoint::Keypoint(double x, double y, double z, unsigned int id)
+	: m_id(id), m_x(x), m_y(y), m_z(z)
 {}
 
 Keypoint::~Keypoint()
@@ -18,9 +17,9 @@ Keypoint::~Keypoint()
 /// 
 /// SETTERS
 /// 
-void Keypoint::SetIDNumber(size_t number)
+void Keypoint::SetIDNumber(unsigned int id)
 {
-	this->m_number = number;
+	this->m_id = id;
 }
 
 void Keypoint::SetX(double x)
@@ -63,7 +62,7 @@ const double Keypoint::GetCoordinate(char coordinate) const
  -------------------*/
 bool operator<(const Keypoint& obj1, const Keypoint& obj2)
 {
-	return obj1.m_number < obj2.m_number;
+	return obj1.m_id < obj2.m_id;
 }
 bool operator>(const Keypoint& obj1, const Keypoint& obj2)
 {
@@ -72,7 +71,7 @@ bool operator>(const Keypoint& obj1, const Keypoint& obj2)
 
 bool operator==(const Keypoint& obj1, const Keypoint& obj2)
 {
-	return obj1.m_number == obj2.m_number;
+	return obj1.m_id == obj2.m_id;
 }
 bool operator!=(const Keypoint& obj1, const Keypoint& obj2)
 {

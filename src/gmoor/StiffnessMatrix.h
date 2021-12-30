@@ -19,7 +19,7 @@ private:
 	double m_rot_init_z;
 
 	// Offsets to calculate numerical stiffness matrix
-	unsigned int m_stiff_matrix_step;	//Stiffness matrix solution -> step
+	unsigned int m_stiff_matrix_step_id;	//Stiffness matrix solution -> step
 	double m_time_matrix;		//Stiffness matrix solution -> time step
 	double m_disp_matrix_x;
 	double m_disp_matrix_y;
@@ -63,7 +63,7 @@ public:
 	// GETTERS
 	// 
 	
-	inline unsigned int GetStep() const { return this->m_stiff_matrix_step; }
+	inline unsigned int GetStep() const { return this->m_stiff_matrix_step_id; }
 	
 	//Check if stiffness matrix is defined
 	inline bool ExistAnalyticalStiffMat() const { return this->m_exist_analytical; }

@@ -1,15 +1,12 @@
 #include "PCH.h"
 #include "StiffnessMatrix.h"
-#include "MooringModel.h"
-#include "AuxFunctions.h"
-#include "Log.h"
 
 
 StiffnessMatrix::StiffnessMatrix()
 	: m_exist_analytical(false), m_exist_numerical(false), 
 	m_time_init(0.0), m_disp_init_x(0.0), m_disp_init_y(0.0), m_disp_init_z(0.0), 
 	m_rot_init_x(0.0), m_rot_init_y(0.0), m_rot_init_z(0.0),
-	m_stiff_matrix_step(0), m_time_matrix(0.0), 
+	m_stiff_matrix_step_id(0), m_time_matrix(0.0),
 	m_disp_matrix_x(0.0), m_disp_matrix_y(0.0), m_disp_matrix_z(0.0),
 	m_rot_matrix_x(0.0), m_rot_matrix_y(0.0), m_rot_matrix_z(0.0),
 	m_time_series(nullptr)

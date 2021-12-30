@@ -3,31 +3,31 @@
 
 
 NodalForce::NodalForce()
-	: m_nodeset(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {}
 NodalForce::NodalForce(Table* time_series)
-	: m_nodeset(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
 {}
-NodalForce::NodalForce(size_t nodeset, Table * time_series)
-	: m_nodeset(nodeset), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
+NodalForce::NodalForce(unsigned int nodeset_id, Table * time_series)
+	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
 {}
 NodalForce::NodalForce(MathCode* math_code)
-	: m_nodeset(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
 	this->SetMathCodeOpt(true);
 }
-NodalForce::NodalForce(size_t nodeset, MathCode* math_code)
-	: m_nodeset(nodeset), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
+NodalForce::NodalForce(unsigned int nodeset_id, MathCode* math_code)
+	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
 	this->SetMathCodeOpt(true);
 }
 NodalForce::NodalForce(const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
-	: m_nodeset(0), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
+	: m_nodeset_id(0), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {
 	this->SetExternalFileOpt(true);
 }
-NodalForce::NodalForce(size_t nodeset, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
-	: m_nodeset(nodeset), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
+NodalForce::NodalForce(unsigned int nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
+	: m_nodeset_id(nodeset_id), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {
 	this->SetExternalFileOpt(true);
 }
@@ -54,8 +54,8 @@ NodalForce::~NodalForce()
 std::ostream& operator<<(std::ostream& out, const NodalForce& obj)
 {
 	out << "\tNodalLoad " << obj.GetNumber()
-		<< "\tNodeSet " << obj.m_nodeset
-		<< "\tCS " << obj.m_cs
+		<< "\tNodeSet " << obj.m_nodeset_id
+		<< "\tCS " << obj.m_cs_id
 		<< "\t";
 
 	if (obj.m_is_math_code)

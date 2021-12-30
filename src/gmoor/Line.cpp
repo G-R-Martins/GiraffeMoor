@@ -1,18 +1,15 @@
 #include "PCH.h"
 #include "Line.h"
-#include "LoopReading.h"
-#include "Log.h"
 
 
 Line::Line()
-	: m_number(0), m_configuration("\0"),
+	: m_id(0), m_configuration("\0"),
 	m_has_anchor(true), m_is_shared(false), m_using_segment_set(false),
-	m_keypoint_A(0), m_keypoint_B(0), m_vesselID({ 0, 0 }),
-	m_segment_set(0), m_seg_TDP(0),
-	m_node_A(0), m_node_B(0), m_tot_nodes(0), 
-	m_nodeset_A(0), m_nodeset_B(0),
-	m_coordinate_system(0), m_total_length(0.0),
-	tdz(nullptr), percent(0.0), anc_tdp(0.0), tdp_fair(0.0) 
+	m_keypointA_id(0), m_keypointB_id(0), m_vessel_id({ 0, 0 }),
+	m_segment_set_id(0), m_seg_TDP_id(0),
+	m_nodeA_id(0), m_nodeB_id(0), m_tot_nodes(0),
+	m_nodesetA_id(0), m_nodesetB_id(0),
+	m_coordinate_system_id(0), m_total_length(0.0)
 {
 	m_segments.reserve(4);
 	m_transition_nodes.reserve(2);
@@ -22,50 +19,39 @@ Line::~Line()
 {}
 
 Line::Line(Line&& other) noexcept
-	: m_number(std::move(other.m_number)), m_configuration("\0"),
+	: m_id(std::move(other.m_id)), m_configuration("\0"),
 	m_has_anchor(std::move(other.m_has_anchor)), m_is_shared(std::move(other.m_is_shared)), m_using_segment_set(std::move(other.m_using_segment_set)), 
-	m_keypoint_A(std::move(other.m_keypoint_A)), m_keypoint_B(std::move(other.m_keypoint_B)), m_vesselID(std::move(other.m_vesselID)), 
-	m_segment_set(std::move(other.m_segment_set)), m_seg_TDP(std::move(other.m_seg_TDP)),
-	m_node_A(std::move(other.m_node_A)), m_node_B(std::move(other.m_node_B)), m_tot_nodes(std::move(other.m_tot_nodes)), 
-	m_nodeset_A(std::move(other.m_nodeset_A)), m_nodeset_B(std::move(other.m_nodeset_B)),
-	m_coordinate_system(std::move(other.m_coordinate_system)), m_total_length(std::move(other.m_total_length)), 
-	m_segments(std::move(other.m_segments)), m_transition_nodes(std::move(other.m_transition_nodes)),
-	//laying_direction(std::move(other.laying_direction)), tdz(std::move(other.tdz)),
-	percent(std::move(other.percent)), anc_tdp(std::move(other.anc_tdp)), tdp_fair(std::move(other.tdp_fair))
-{
-	other.tdz = nullptr;
-}
+	m_keypointA_id(std::move(other.m_keypointA_id)), m_keypointB_id(std::move(other.m_keypointB_id)), m_vessel_id(std::move(other.m_vessel_id)),
+	m_segment_set_id(std::move(other.m_segment_set_id)), m_seg_TDP_id(std::move(other.m_seg_TDP_id)),
+	m_nodeA_id(std::move(other.m_nodeA_id)), m_nodeB_id(std::move(other.m_nodeB_id)), m_tot_nodes(std::move(other.m_tot_nodes)),
+	m_nodesetA_id(std::move(other.m_nodesetA_id)), m_nodesetB_id(std::move(other.m_nodesetB_id)),
+	m_coordinate_system_id(std::move(other.m_coordinate_system_id)), m_total_length(std::move(other.m_total_length)),
+	m_segments(std::move(other.m_segments)), m_transition_nodes(std::move(other.m_transition_nodes))
+{}
 
 Line& Line::operator=(Line&& other) noexcept
 {
 	//if (tdz) delete tdz;
-	m_number = std::move(other.m_number);
-	m_keypoint_A = std::move(other.m_keypoint_A);
-	m_keypoint_B = std::move(other.m_keypoint_B);
-	m_coordinate_system = std::move(other.m_coordinate_system);
-	m_vesselID = std::move(other.m_vesselID);
-	m_node_A = std::move(other.m_node_A);
-	m_node_B = std::move(other.m_node_B);
+	m_id = std::move(other.m_id);
+	m_keypointA_id = std::move(other.m_keypointA_id);
+	m_keypointB_id = std::move(other.m_keypointB_id);
+	m_coordinate_system_id = std::move(other.m_coordinate_system_id);
+	m_vessel_id = std::move(other.m_vessel_id);
+	m_nodeA_id = std::move(other.m_nodeA_id);
+	m_nodeB_id = std::move(other.m_nodeB_id);
 	m_tot_nodes = std::move(other.m_tot_nodes);
-	m_nodeset_A = std::move(other.m_nodeset_A);
-	m_nodeset_B = std::move(other.m_nodeset_B);
+	m_nodesetA_id = std::move(other.m_nodesetA_id);
+	m_nodesetB_id = std::move(other.m_nodesetB_id);
 	m_total_length = std::move(other.m_total_length);
 	m_has_anchor = std::move(other.m_has_anchor);
 	m_is_shared = std::move(other.m_is_shared);
-	m_segment_set = std::move(other.m_segment_set);
+	m_segment_set_id = std::move(other.m_segment_set_id);
 	m_using_segment_set = std::move(other.m_using_segment_set);
 
 	m_segments = std::move(other.m_segments);
 	m_transition_nodes = std::move(other.m_transition_nodes);
 	m_configuration[0] = '\0';
-	//tdz = std::move(other.tdz);
-	percent = std::move(other.percent);
-	anc_tdp = std::move(other.anc_tdp);
-	tdp_fair = std::move(other.tdp_fair);
 
-
-	//TDZ pointer
-	other.tdz = nullptr;
 
 	return *this;
 }
@@ -76,13 +62,13 @@ bool operator< (const Line& line1, const Line& line2)
 {
 	//Both lines with vessels identified and different between them
 	// -> uses the line numbers to compare
-	if (line1.m_vesselID[0] != 0 && line2.m_vesselID[0] != 0 && line1.m_vesselID == line2.m_vesselID)
+	if (line1.m_vessel_id[0] != 0 && line2.m_vessel_id[0] != 0 && line1.m_vessel_id == line2.m_vessel_id)
 	{
-		return line1.m_number < line2.m_number;
+		return line1.m_id < line2.m_id;
 	}
 	//Otherwise -> uses the vessel number to compare
 	else
-		return line1.m_vesselID < line2.m_vesselID;
+		return line1.m_vessel_id < line2.m_vessel_id;
 }
 bool operator> (const Line& line1, const Line& line2)
 {
@@ -92,8 +78,8 @@ bool operator> (const Line& line1, const Line& line2)
 bool operator== (const Line& line1, const Line& line2)
 {
 			/*			same ID number		  ||		same extremeties keypoints*/
-	return ( line1.m_number == line2.m_number || 
-		( line1.m_keypoint_A == line2.m_keypoint_A && line1.m_keypoint_B == line2.m_keypoint_B ) );
+	return ( line1.m_id == line2.m_id ||
+		( line1.m_keypointA_id == line2.m_keypointA_id && line1.m_keypointB_id == line2.m_keypointB_id) );
 }
 bool operator!= (const Line& line1, const Line& line2)
 {
@@ -103,7 +89,7 @@ bool operator!= (const Line& line1, const Line& line2)
 //Comparing line with an ID number
 bool operator== (const Line& line1, const unsigned int& line2)
 {
-	return line1.m_vesselID[0] == line2;
+	return line1.m_vessel_id[0] == line2;
 }
 bool operator!= (const Line& line1, const unsigned int& line2)
 {
@@ -112,7 +98,7 @@ bool operator!= (const Line& line1, const unsigned int& line2)
 
 
 
-void Line::IncrementTotNodes(size_t add_nodes)
+void Line::IncrementTotNodes(unsigned int add_nodes)
 {
 	this->m_tot_nodes += add_nodes;
 }
@@ -135,9 +121,9 @@ void Line::AddSegment(const LineSegment& seg)
 /// SETTERS
 /// 
 
-void Line::SetIDNumber(size_t number)
+void Line::SetIDNumber(unsigned int id)
 {
-	m_number = number;
+	m_id = id;
 }
 void Line::SetConfiguration(const std::string& configuration)
 {
@@ -155,46 +141,46 @@ void Line::SetSegmentSetOpt(bool using_segment_set)
 {
 	m_using_segment_set = using_segment_set;
 }
-void Line::SetKeypointA(size_t keypoint_A)
+void Line::SetKeypointA(unsigned int keypoint_A)
 {
-	m_keypoint_A = keypoint_A;
+	m_keypointA_id = keypoint_A;
 }
-void Line::SetKeypointB(size_t keypoint_B)
+void Line::SetKeypointB(unsigned int keypoint_B)
 {
-	m_keypoint_B = keypoint_B;
+	m_keypointB_id = keypoint_B;
 }
-void Line::SetVesselID(size_t vesselID)
+void Line::SetVesselID(unsigned int vessel_id)
 {
-	m_vesselID[0] = vesselID;
+	m_vessel_id[0] = vessel_id;
 }
-void Line::SetSegmentSet(size_t segment_set)
+void Line::SetSegmentSet(unsigned int segment_set)
 {
-	m_segment_set = segment_set;
+	m_segment_set_id = segment_set;
 	m_using_segment_set = true;
 }
-void Line::SetNodeA(size_t node_A)
+void Line::SetNodeA(unsigned int node_A)
 {
-	m_node_A = node_A;
+	m_nodeA_id = node_A;
 }
-void Line::SetNodeB(size_t node_B)
+void Line::SetNodeB(unsigned int node_B)
 {
-	m_node_B = node_B;
+	m_nodeB_id = node_B;
 }
-void Line::SetTotalNumNodes(size_t tot_nodes)
+void Line::SetTotalNumNodes(unsigned int tot_nodes)
 {
 	m_tot_nodes = tot_nodes;
 }
-void Line::SetNodesetA(size_t nodeset_A)
+void Line::SetNodesetA(unsigned int nodeset_A)
 {
-	m_nodeset_A = nodeset_A;
+	m_nodesetA_id = nodeset_A;
 }
-void Line::SetNodesetB(size_t nodeset_B)
+void Line::SetNodesetB(unsigned int nodeset_B)
 {
-	m_nodeset_B = nodeset_B;
+	m_nodesetB_id = nodeset_B;
 }
-void Line::SetCoordinateSystem(size_t coordinate_system)
+void Line::SetCoordinateSystem(unsigned int coordinate_system)
 {
-	m_coordinate_system = coordinate_system;
+	m_coordinate_system_id = coordinate_system;
 }
 void Line::SetTotalLength(double total_length)
 {
@@ -204,7 +190,7 @@ void Line::SetSegments(std::vector<LineSegment>& segments)
 {
 	m_segments = segments;
 }
-void Line::SetTDPSegment(size_t seg)
+void Line::SetTDPSegment(unsigned int seg)
 {
-	this->m_seg_TDP = seg;
+	this->m_seg_TDP_id = seg;
 }

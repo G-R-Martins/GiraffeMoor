@@ -147,7 +147,7 @@ size_t BoolTable::GetSize() const
 	return data_table.size();
 }
 
-bool BoolTable::GetBoolOption(size_t pos) const
+bool BoolTable::GetBoolOption(unsigned int pos) const
 {
 	return this->data_table[pos];
 }
