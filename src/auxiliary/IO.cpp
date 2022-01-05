@@ -3,6 +3,7 @@
 // Database headers
 #include "MooringModel.h"
 #include "GiraffeModel.h"
+#include "ExternalTimeHistory.h"
 // Auxiliary namespace headers
 #include "AuxFunctions.h"
 #include "Log.h"
@@ -45,14 +46,14 @@ static MAP_FUNC s_mandatory_keys_read_func = {
 
 
 static MAP_FUNC s_optional_keys_read_func = { 
-	//{ "Monitors", &IO::ReadMonitors },
-	//{ "NodalForces", &IO::ReadNodalForces },
+	{ "Monitors", &IO::ReadMonitors },
 	{ "GiraffeSolver", &IO::ReadGiraffeSolver },
 	{ "PostProcessing", &IO::ReadPostProcessing },
 	{ "StiffnessMatrix", &IO::ReadStiffnessMatrix },
+	{ "Constraints", &IO::ReadConstraints },
 	{ "VesselDisplacements", &IO::ReadVesselDisplacements },
-	{ "Constraints", &IO::ReadConstraints }
-	//{ "DisplacementFields", &IO::ReadDisplacementFields }
+	{ "NodalLoads", &IO::ReadNodalLoads },
+	{ "DisplacementFields", &IO::ReadLineDisplacementFields }
 };
 
 
@@ -138,6 +139,7 @@ bool IO::ReadFile()
 		}
  	}
 
+	IO::CheckAllMandatoryKeywords();
 	return true;
 }
 
@@ -900,7 +902,7 @@ bool IO::ReadPostProcessing(std::string& readed)
 				do {
 					std::string_view name = nh.value();
 					if (name == "VesselID")			cad->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
-					else if (name == "FileName")	cad->SetName(aux_read::ReadVariable<std::string>(s_inp));
+					else if (name == "FileName")	cad->SetName(aux_read::ReadDelimitedString(s_inp, std::array{ '\"', '\"' }));
 					
 					// Extract node
 					s_inp >> readed;
@@ -1033,7 +1035,7 @@ bool IO::ReadConstraints(std::string& readed)
 	std::string_view keyword;  // ID identifier
 	
 	// Lambda function to create object and return a reference 
-	MoorConstraint* (*emplace_constraint)(void) {};  //std::function<MoorConstraint* (void)> emplace_constraint;
+	std::function<MoorConstraint* (void)> emplace_constraint;
 
 	// Read first block
 	s_inp >> readed;
@@ -1103,34 +1105,318 @@ bool IO::ReadConstraints(std::string& readed)
 	return true;
 }
 
+bool IO::ReadNodalLoads(std::string& readed)
+{
+	//TODO: retirar 'insert's e melhorar leitura de cada tipo de deslocamento
+
+	std::unordered_set<std::string_view> mandatory_names;
+	std::unordered_set<std::string_view> optional_names;
+	std::unordered_set<std::string_view> descriptions = { "first", "last", "vessel" };
+
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "Node")
+		{
+			// Create a new Keypoint object
+			MoorLoad* load = &mm.moor_loads.emplace_back();
+
+			// valid keywords
+			mandatory_names = { "Step", "MathCode", "File", "TimeSeries", "TimeSeriesData" };
+			optional_names = { "SegmentID", "LineID" };
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+			
+			// Node description and/or ID number
+			s_inp >> readed;
+			if (descriptions.count(readed))
+			{
+				load->SetDescription(readed);
+				if (readed == "vessel")	
+					load->SetNodeID(aux_read::ReadVariable<unsigned int>(s_inp));
+			}
+			else if (std::isdigit(readed[0]))
+				load->SetNodeID(std::stoul(readed));
+
+			// (try to) read first keyword before the do-while block 
+			// because when we have optional keys we check th node handle, not the set with keywords
+			s_inp >> readed;
+			do {
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "NodalLoads", "NodalLoad", mandatory_names, optional_names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK || nh.empty())	break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)			return false;
+
+				std::string_view name = nh.value();
+				if (name == "Step")		load->SetSolutionStep(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "TimeSeries")
+				{
+					mandatory_names.erase("MathCode");
+					mandatory_names.erase("File");
+					mandatory_names.insert("TimeSeriesData");
+					load->SetTimeSeries();
+				}
+				else if (name == "TimeSeriesData")
+				{
+					*load->GetTimeSeries() = aux_read::ReadTable(s_inp);
+				}
+				/*-- External file --*/
+				else if (name == "File")
+				{
+					// Remove other options...
+					mandatory_names.erase("TimeSeries");
+					mandatory_names.erase("TimeSeriesData");
+					mandatory_names.erase("MathCode");
+					//... and insert keywords to read external file
+					mandatory_names.insert({ "FileName", "NTimes", "NHeaders" });
+				}
+				else if (name == "FileName")	load->SetFileName(aux_read::ReadDelimitedString(s_inp, std::array{ '\"', '\"' }));
+				else if (name == "NTimes")		load->SetFileNSteps(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "NHeaders")	load->SetFileHeaders(aux_read::ReadVariable<unsigned int>(s_inp));
+				/*-- MathCode --*/
+				else if (name == "MathCode")
+				{
+					// Remove other options...
+					mandatory_names.erase("TimeSeries");
+					mandatory_names.erase("TimeSeriesData");
+					mandatory_names.erase("File");
+					//... and insert keywords to read MathCode (DOFs)
+					mandatory_names.insert({ "X", "Y", "Z", "ROTX", "ROTY", "ROTZ" });
+
+					load->SetMathCode();
+				}
+				else if (name == "X")			load->GetMathCode()->SetEquation(0, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "Y")			load->GetMathCode()->SetEquation(1, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "Z")			load->GetMathCode()->SetEquation(2, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTX")		load->GetMathCode()->SetEquation(3, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTY")		load->GetMathCode()->SetEquation(4, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "ROTZ")		load->GetMathCode()->SetEquation(5, aux_read::ReadDelimitedString(s_inp, std::array{ '{', '}' }));
+				else if (name == "SegmentID")	load->SetSegment(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "LineID")		load->SetLineID(aux_read::ReadVariable<unsigned int>(s_inp));
+				
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else
+			break;
+	}
+
+	// All OK while reading
+	//aux_read::RemoveDuplicates(mm.moor_loads, "NodalLoad");
+	Log::SetLastValidKeyword("NodalLoads");
+	return true;
+}
+
+bool IO::ReadMonitors(std::string& readed)
+{
+	Monitor* monitors = &gm.monitor;
+
+	std::unordered_set<std::string_view> blocks = { "General", "Elements", "Nodes", "Contacts" };
+	std::unordered_set<std::string_view> names = {
+		"none", "all", "fairleads", "anchors", "vessels",
+		"Sequence", "List"
+	};
+
+	// Read first block
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+		std::string_view key = aux_read::ExtractNodeValue(blocks, readed);
+
+		if (key == "Nodes")
+		{
+			// Setting nodes monitors
+			s_inp >> readed;
+			do {
+				// Check if is other block or is not a valid 'name'
+				if (blocks.count(readed) || names.count(readed) == 0) 
+					break;
+
+				std::string_view name = readed;
+				if (name == "none")
+				{
+					monitors->SetAllNodesFlags(false);
+					break;
+				}
+				else if (name == "all")
+				{
+					monitors->SetAllNodesFlags(false);
+					break;
+				}
+				else if (name == "fairleads")	monitors->SetMonitorFairleadNodesOpt(true);
+				else if (name == "anchors")		monitors->SetMonitorAnchorNodesOpt(true);
+				else if (name == "vessels")		monitors->SetMonitorVesselNodesOpt(true);
+				else if (name == "Sequence")
+				{
+					NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+					auto* seq_ptr = monitors->AddNodesSequence();
+
+					std::unordered_set<std::string_view> keywords = { "NNodes", "Begin", "Increment" };
+					// Setting nodes monitors
+					s_inp >> readed;
+					do {
+						// Extract node
+						auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Monitors", "Nodes", keywords);
+						if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+						else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+						std::string_view name = nh.value();
+						if (name == "NNodes")			seq_ptr->nodes = aux_read::ReadVariable<unsigned int>(s_inp);
+						else if (name == "Begin")		seq_ptr->begin = aux_read::ReadVariable<unsigned int>(s_inp);
+						else if (name == "Increment")	seq_ptr->increment = aux_read::ReadVariable<unsigned int>(s_inp);
+
+					} while (s_inp >> readed && !nh.empty());					
+					continue;  // next word may be another valid Keyword, eg List, anchors, etc
+				}
+				else if (name == "List")
+				{
+					while (s_inp >> readed && std::isdigit(readed[0]))
+						monitors->PushNodeID(std::stoul(readed));
+					continue;  // next word may be another valid Keyword, eg Sequence, fairleads, etc
+				}
+
+				s_inp >> readed;
+			} while (s_inp.good());
+		}
+		else if (key == "Elements")
+		{
+			// Setting element monitors
+			s_inp >> readed;
+			do {
+				// Check if is other block or is not a valid 'name'
+				if (blocks.count(readed) || names.count(readed) == 0)
+					break;
+
+				std::string_view name = readed;
+				if (name == "none")
+				{
+					monitors->SetAllElementsFlags(false);
+					break;
+				}
+				else if (name == "all")
+				{
+					monitors->SetAllElementsFlags(false);
+					break;
+				}
+				else if (name == "fairleads")	monitors->SetMonitorFairleadElementsOpt(true);
+				else if (name == "anchors")		monitors->SetMonitorAnchorElementsOpt(true);
+				else if (name == "vessels")		monitors->SetMonitorVesselElementsOpt(true);
+				else if (name == "Sequence")
+				{
+					NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+					auto* seq_ptr = monitors->AddElementsSequence();
+
+					std::unordered_set<std::string_view> keywords = { "NNodes", "Begin", "Increment" };
+					// Setting nodes monitors
+					s_inp >> readed;
+					do {
+						// Extract node
+						auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Monitors", "Nodes", keywords);
+						if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+						else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+						std::string_view name = nh.value();
+						if (name == "NNodes")		seq_ptr->elements = aux_read::ReadVariable<unsigned int>(s_inp);
+						if (name == "Begin")		seq_ptr->begin = aux_read::ReadVariable<unsigned int>(s_inp);
+						if (name == "Increment")	seq_ptr->increment = aux_read::ReadVariable<unsigned int>(s_inp);
+
+					} while (s_inp >> readed && !nh.empty());
+				}
+				else if (name == "List")
+				{
+					while (s_inp >> readed && std::isdigit(readed[0]))
+						monitors->PushElementID(std::stoul(readed));
+					
+					continue;
+				}
+
+				s_inp >> readed;
+			} while (s_inp.good());
+		}
+		else if (key == "Contacts")
+		{
+			// Setting contact monitors
+			if (s_inp >> readed && readed == "lines|seabed")	monitors->SetMonitorLinesSeabedContactOpt(true);
+			else												break;
+			
+			s_inp >> readed;
+		}
+		else if (key == "General")
+		{
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Setting nodes monitors
+			s_inp >> readed;
+			do {
+				// Extract node
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Monitors", "Nodes", USET_SV{}, USET_SV{ "Sample" });
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
+
+				std::string_view name = nh.value();
+				if (name == "Sample")	monitors->SetSample(aux_read::ReadVariable<unsigned int>(s_inp));
+
+			} while (s_inp >> readed && !nh.empty());
+		}
+		else
+			break;
+	}
 
 
-/*--- ---*/
+	// All OK while reading
+	return true;
+}
 
+bool IO::ReadLineDisplacementFields(std::string& readed)
+{
+	//TODO: retirar 'insert's e melhorar leitura de cada tipo de deslocamento
 
-//bool IO::ReadLineDisplacementFields(std::string& readed)
-//{
-//	// Object pointer
-//	LineDisplacementField* line{};
-//	const std::string_view keyword{ "DispLineID" };
-//
-//	while (true)
-//	{
-//		// Searches for keyword
-//		aux_read::TryCommentAndContinue(s_inp, readed);
-//		if (readed != keyword)
-//			break;
-//
-//		line = &mm.line_disp_fields.emplace_back();
-//
-//		// Displacement data
-//		s_inp >> line;
-//	}
-//
-//	// All OK while reading
-//	return true;
-//}
-//
+	std::unordered_set<std::string_view> names;
+
+	s_inp >> readed;
+	while (s_inp.good())
+	{
+		aux_read::TryCommentAndContinue(s_inp, readed);
+
+		if (readed == "DispLineID")
+		{
+			// Create a new Keypoint object
+			LineDisplacementField* disp = &mm.line_disp_fields.emplace_back();
+			disp->SetIDNumber(aux_read::Try2GetObjectID(s_inp, readed));
+
+			names = { "Step", "Harmonic" };  // valid keywords
+			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+
+			// Setting properties
+			while (s_inp >> readed && !names.empty())
+			{
+				// Extract node (handle) from set with names of the object parameters
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "DisplacementFields", "LineID", names);
+				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK || nh.empty())	break;
+				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)			return false;
+
+				std::string_view name = nh.value();
+				if (name == "Harmonic")
+				{
+					names.insert("Amplitude");
+					names.insert("Mode");
+				}
+				else if (name == "Step")		disp->SetSolutionStep(aux_read::ReadVariable<unsigned int>(s_inp));
+				else if (name == "Amplitude")	disp->SetAmplitude(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Mode")		disp->SetMode(aux_read::ReadVariable<unsigned int>(s_inp));
+			}
+		}
+		else
+			break;
+	}
+
+	// All OK while reading
+	aux_read::RemoveDuplicates(mm.line_disp_fields, "LineDisplacementFields");
+	Log::SetLastValidKeyword("LineDisplacementFields");
+	return true;
+}
 
 
 
@@ -1170,6 +1456,9 @@ bool IO::CheckModel()
 	/// 
 	/// <returns> booleano q indica se o modelo passou por todas as etapas </returns>
 
+
+	//Check if segments must be generated from 'SegmentSet'
+	mm.GenerateSegments();
 
 	std::map<std::string_view, size_t> n_keywords{
 		//Mandatory blocks
@@ -1282,7 +1571,7 @@ bool IO::CheckModel()
 				//Check line number
 				if (load.GetLineID() > n_keywords["Lines"])
 					ss << "\n   + Invalid line number to apply load: " << load.GetLineID();
-				if (unsigned int seg = load.GetSegmentID())
+				if (unsigned int seg = load.GetSegmentID() && load.GetLineID())
 				{
 					//With segment defined (not using SegmentSet)
 					if (mm.lines[load.GetLineID() - 1].GetNSegments() > 0 && seg > n_keywords["SegmentProperties"])

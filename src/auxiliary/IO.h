@@ -60,13 +60,12 @@ public:
 	static bool ReadStiffnessMatrix(std::string& readed);
 	static bool ReadVesselDisplacements(std::string& readed);
 	static bool ReadConstraints(std::string& readed);
-
-	/*
+	static bool ReadNodalLoads(std::string& readed);
+	static bool ReadMonitors(std::string& readed);
 	static bool ReadLineDisplacementFields(std::string& readed);
-	*/
 
 
-	//Reads input file
+	//Reads input file (*.gmr)
 	static bool ReadFile();
 
 	static bool CheckAllMandatoryKeywords();

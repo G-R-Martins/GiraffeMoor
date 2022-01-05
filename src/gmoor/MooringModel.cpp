@@ -41,9 +41,6 @@ MooringModel::~MooringModel()
 
 bool MooringModel::GenerateGiraffeModel()
 {
-	//Check if segments must be generated from 'SegmentSet'
-	GenerateSegments();
-
 	//Computes segment properties from readed data
 	PreCalcSegmentPropertiesData();
 
@@ -735,8 +732,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 							anchor_nodesets_id.push_front(line.GetNodesetA());
 						
 						//Monitors
-						if (gm.monitor.bool_nodes_anchors)		gm.monitor.nodes_id.push_front(cur_node_mesh);
-						if (gm.monitor.bool_elements_anchors)	gm.monitor.elements_id.push_front(cur_elem);
+						if (gm.monitor.MonitorAnchorNodes())	gm.monitor.PushNodeID(cur_node_mesh);
+						if (gm.monitor.MonitorAnchorElements())	gm.monitor.PushElementID(cur_elem);
 					}
 					//Two fairleads
 					else
@@ -745,8 +742,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 						fairlead_nodesets_id.push_front(line.GetNodesetA());
 
 						//Monitors
-						if (gm.monitor.bool_nodes_fairleads)		gm.monitor.nodes_id.push_front(cur_node_mesh);
-						if (gm.monitor.bool_elements_fairleads)		gm.monitor.elements_id.push_front(cur_elem);
+						if (gm.monitor.MonitorFairleadNodes())		gm.monitor.PushNodeID(cur_node_mesh);
+						if (gm.monitor.MonitorFairledElements())		gm.monitor.PushElementID(cur_elem);
 					}	
 
 					//Node and nodeset of the first node (anchor or first fairlead)
@@ -782,8 +779,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 				++cur_node_set;
 
 				//Monitors
-				if (gm.monitor.bool_nodes_fairleads)		gm.monitor.nodes_id.push_front(cur_node_mesh + n - 1);
-				if (gm.monitor.bool_elements_fairleads)		gm.monitor.elements_id.push_front(cur_elem);
+				if (gm.monitor.MonitorFairleadNodes())		gm.monitor.PushNodeID(cur_node_mesh + n - 1);
+				if (gm.monitor.MonitorFairledElements())	gm.monitor.PushElementID(cur_elem);
 
 				//Summary list
 				summ_elem[1] = cur_elem;
@@ -1071,16 +1068,10 @@ void MooringModel::GenerateDynamicRelaxation()
 
 }
 
-inline bool MooringModel::Look4SharedLine()
+bool MooringModel::Look4SharedLine()
 { 
 	return (std::count_if(lines.begin(), lines.end(),
 		[](const Line& line) { return line.IsShared(); }) > 0);
-	// for (Line& line : lines)
-	// {
-	// 	if (line.IsShared())
-	// 		return true;
-	// }
-	// return false;
 }
 
 //Generates vessel (node, element, nodeset and fairleads coupling)
@@ -1140,10 +1131,10 @@ void MooringModel::GenerateVessels()
 		
 
 		//Monitor Vessel
-		if ( gm.monitor.bool_nodes_vessel )
-			gm.monitor.nodes_id.push_front(vessel.GetNode());
-		if ( gm.monitor.bool_elements_vessel )
-			gm.monitor.elements_id.push_front(vessel.GetElement());
+		if ( gm.monitor.MonitorVesselNodes() )
+			gm.monitor.PushNodeID(vessel.GetNode());
+		if ( gm.monitor.MonitorVesselElements() )
+			gm.monitor.PushElementID(vessel.GetElement());
 	}
 
 }
@@ -1228,33 +1219,33 @@ void MooringModel::GeneralSetting()
 	gm.post.SetFlags(std::move(moorpost.GetWritingFlags()));
 
 	//Monitor nodes
-	for (Monitor::SequenceNodes& seq : gm.monitor.seq_nodes)
+	for (auto const& seq : *gm.monitor.GetNodesSequence())
 	{
 		unsigned int temp = seq.begin;
 		for (unsigned int cont = 0; cont < seq.nodes; ++cont)
 		{
-			gm.monitor.nodes_id.emplace_front(temp);
+			gm.monitor.PushNodeID(temp);
 			temp += seq.increment;
 		}
 	}
-	gm.monitor.nodes_id.sort();
-	gm.monitor.nodes_id.unique();
+	gm.monitor.GetNodeIDs().sort();
+	gm.monitor.GetNodeIDs().unique();
 
 	//Monitor elements
-	for (Monitor::SequenceElements& seq : gm.monitor.seq_elements)
+	for (auto const& seq : *gm.monitor.GetElementsSequence())
 	{
 		unsigned int temp = seq.begin;
 		for (unsigned int cont = 0; cont < seq.elements; ++cont)
 		{
-			gm.monitor.elements_id.emplace_front(temp);
+			gm.monitor.PushElementID(temp);
 			temp += seq.increment;
 		}
 	}
-	gm.monitor.elements_id.sort();
-	gm.monitor.elements_id.unique();
+	gm.monitor.GetElementIDs().sort();
+	gm.monitor.GetElementIDs().unique();
 
 	//Monitor contact
-	if (gm.monitor.bool_contact_seabed_moor)	gm.monitor.contacts_id.push_front(1);
+	if (gm.monitor.MonitorLinesSeabedContact())	gm.monitor.PushContactID(1);
 
 
 	/*================*
@@ -1523,23 +1514,23 @@ void MooringModel::GenerateForces()
 		}
 
 		//Matching start time with Giraffe time
-		if (load.GetMathCode())
+		if (load.IsMathCode())
 		{
 			load.GetMathCode()->SetEquationInitialTime(start);
 			gm.GenerateNodalForce(cur_load, nodeset, load.GetMathCode());
 			description2add += " with MathCode";
 		}
-		else if (load.GetFileOption())
+		else if (load.IsExternalFile())
 		{
-			gm.GenerateNodalForce(cur_load, nodeset, load.GetFileName(), load.GetHeaderLines(), load.GetNTimes());
+			gm.GenerateNodalForce(cur_load, nodeset, load.GetFileName(), load.GetNHeaderLines(), load.GetNSteps());
 			description2add += " with data from file \"" + std::string(load.GetFileName()) + "\"";
 		}
 		else //Time series table
 		{
-			for (unsigned int i = 0; i < load.GetTable()->GetNLines(); i++)
-				load.GetTable()->table[i][0] += start;
+			for (unsigned int i = 0; i < load.GetTimeSeries()->GetNLines(); i++)
+				load.GetTimeSeries()->table[i][0] += start;
 
-			gm.GenerateNodalForce(cur_load, nodeset, load.GetTable());
+			gm.GenerateNodalForce(cur_load, nodeset, load.GetTimeSeries());
 			description2add += " with time series data";
 		}
 

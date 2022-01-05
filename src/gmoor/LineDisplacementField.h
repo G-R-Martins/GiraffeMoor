@@ -27,7 +27,7 @@ public:
 	///				 
 	
 	void SetIDNumber(unsigned int number);
-	void SetStep(unsigned int step_id);
+	void SetSolutionStep(unsigned int step_id);
 	void SetAmplitude(double amplitude);
 	void SetMode(unsigned int mode);
 	void SetHarmonicOpt(bool is_harmonic);
@@ -56,8 +56,5 @@ public:
 
 	LineDisplacementField& operator=(const LineDisplacementField&) = default;
 	LineDisplacementField& operator=(LineDisplacementField&&) = default;
-
-	//friend std::ifstream& operator>>(std::ifstream& input, LineDisplacementField* constraint);
-
 };
 
