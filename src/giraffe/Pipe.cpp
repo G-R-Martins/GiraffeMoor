@@ -4,22 +4,26 @@
 
 Pipe::Pipe()
 {
-	nodes.resize(3);
+	m_nodes.resize(3);
 }
 
 
 Pipe::~Pipe()
 {}
 
-void Pipe::WriteGiraffeModelFile(std::ostream& fout) const
+std::ostream& operator<<(std::ostream& out, const Pipe& obj)
 {
-	if ( mark_segment_begin )
-		fout << "\t//Segment begin\n";
-	else if ( !label.empty() )
-		fout << "\t//" << label << "\n";
-	fout << "\tPipe_1 " << number <<
-		"\tPipeSec " << section <<
-		"\tCS " << cs <<
-		"\tNodes " << nodes[0] << " " << nodes[1] << " " << nodes[2] <<
-		"\n";
+	if ( obj.m_mark_segment_begin )
+		out << "\t//Segment begin\n";
+	else if ( !obj.m_label.empty() )
+		out << "\t//" << obj.m_label << "\n";
+
+	out << "\tPipe_1 " << obj.m_id
+		<< "\tPipeSec " << obj.m_section_id
+		<< "\tCS " << obj.m_cs_id
+		<< "\tNodes " << obj.m_nodes[0] << " " << obj.m_nodes[1] << " " << obj.m_nodes[2] 
+		<< "\n";
+
+	return out;
 }
+

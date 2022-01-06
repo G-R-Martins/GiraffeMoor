@@ -4,18 +4,24 @@
 
 RigidBody::RigidBody()
 {
-	nodes.resize(1);
+	m_nodes.resize(1);
 }
 RigidBody::~RigidBody()
 {
 }
 
-void RigidBody::WriteGiraffeModelFile(std::ostream& fout) const
+std::ostream& operator<<(std::ostream& out, const RigidBody& obj)
 {
-	if ( !label.empty() )
-		fout << "\t//" << label << "\n";
-	fout << "\tRigidBody_1 " << number <<
-		"\tRigidBodyData " << material <<
-		"\tCS " << cs << "\tNode " << nodes[0] <<
-		"\n";
+	if ( !obj.m_label.empty() )
+		out << "\t//" << obj.m_label << "\n";
+	
+	out << "\tRigidBody_1 " << obj.m_id
+		<< "\tRigidBodyData " << obj.m_material_id
+		<< "\tCS " << obj.m_cs_id
+		<< "\tNode " << obj.m_nodes[0] 
+		<< "\n";
+
+	return out;
 }
+
+

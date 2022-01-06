@@ -2,31 +2,32 @@
 #include "Load.h"
 
 Load::Load()
-	: number(0), CS(1), isMathCode(false), extFile(false)
+	: m_id(0), m_cs_id(1), m_is_math_code(false), m_is_external_file(false)
 {}
 
 Load::~Load()
 {}
 
 
-//Set functions
-void Load::SetNumber(unsigned int ID)
-{ this->number = ID; }
-void Load::SetCoordinateSystem(unsigned int CS)
-{ this->CS = CS; }
-void Load::DefineMathCodeOption()
-{ this->isMathCode = true; }
-void Load::DefineExternalFileOption()
-{ this->extFile = true; }
 
-//Get functions
-unsigned int Load::GetNumber()
-{ return this->number; }
-unsigned int Load::GetCoordinateSystem()
-{ return this->CS; }
-bool Load::CheckIfIsMathCode()
-{ return this->isMathCode; }
-bool Load::CheckIfIsExternalFile()
-{ return this->extFile; }
+/// 
+/// SETTERS
+/// 
 
+void Load::SetIDNumber(unsigned int id)
+{
+	m_id = id;
+}
+void Load::SetCoordinateSystem(unsigned int cs_id)
+{
+	m_cs_id = cs_id;
+}
+void Load::SetMathCodeOpt(bool option)
+{
+	m_is_math_code = option;
+}
+void Load::SetExternalFileOpt(bool option)
+{
+	m_is_external_file = option;
+}
 

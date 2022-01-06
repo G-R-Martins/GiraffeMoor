@@ -1,260 +1,170 @@
 #include "PCH.h"
 #include "SolutionStep.h"
-#include "Log.h"
+#include "AuxFunctions.h"
 
 
 SolutionStep::SolutionStep()
-	: number(0), isStatic(true), global_start(0.0), end_time(0.0), timestep(0.0), 
-	max_timestep(0.0), min_timestep(0.0), sample(0), beta_new(0.0), gamma_new(0.0), alpha_ray(0.0), beta_ray(0.0)
+	: m_id(0), m_is_static(true), m_is_dynamic(false),	m_global_start_time(0.0), 
+	m_end_time(0.0), m_timestep(0.0), m_min_timestep(0.0), 
+	m_max_timestep(0.0), m_max_timestep_defined(false),
+	m_sample(0), m_beta_new(0.0), m_gamma_new(0.0), m_alpha_ray(0.0), m_beta_ray(0.0)
+{}
+
+SolutionStep::SolutionStep(unsigned int id, bool is_static,
+	double global_start_time, double end_time, double timestep, double min_timestep, 
+	double max_timestep, bool max_timestep_defined, int sample,
+	double beta_new, double gamma_new, double alpha_ray, double beta_ray)
+	: m_id(id), m_is_static(is_static), m_is_dynamic(!is_static),
+	m_global_start_time(global_start_time), m_end_time(end_time),
+	m_timestep(timestep), m_min_timestep(min_timestep),
+	m_max_timestep(max_timestep), m_max_timestep_defined(max_timestep_defined),
+	m_sample(sample), m_beta_new(beta_new), m_gamma_new(gamma_new),
+	m_alpha_ray(alpha_ray), m_beta_ray(beta_ray)
 {}
 
 SolutionStep::~SolutionStep()
 {}
 
+void SolutionStep::CheckAndSetMaxTimeStep()
+{
+	if (!m_max_timestep_defined)
+	{
+		m_max_timestep = m_timestep;
+		m_max_timestep_defined = true;
+	}
+}
 
-//Overloaded operators
+
+/// 
+/// SETTERS
+/// 
+
+void SolutionStep::SetIDNumber(unsigned int id)
+{
+	this->m_id = id;
+}
+
+void SolutionStep::SetStaticOpt(bool is_static)
+{
+	this->m_is_static = is_static;
+	this->m_is_dynamic = !is_static;
+}
+
+void SolutionStep::SetDynamicOpt(bool is_dynamic)
+{
+	this->m_is_dynamic = is_dynamic;
+	this->m_is_static = !is_dynamic;
+}
+
+void SolutionStep::SetGlobalStartTime(double global_start_time)
+{
+	this->m_global_start_time = global_start_time;
+}
+
+void SolutionStep::SetEndTime(double end_time)
+{
+	this->m_end_time = end_time;
+}
+
+void SolutionStep::SetTimestep(double timestep)
+{
+	this->m_timestep = timestep;
+}
+
+void SolutionStep::SetMaxTimestep(double max_timestep)
+{
+	this->m_max_timestep = max_timestep;
+	this->m_max_timestep_defined = true;
+}
+
+void SolutionStep::SetMinTimeStep(double min_timestep)
+{
+	this->m_min_timestep = min_timestep;
+}
+
+void SolutionStep::SetSample(int sample)
+{
+	this->m_sample = sample;
+}
+
+bool SolutionStep::SetNewmarkDamping(std::string_view damping, std::string& readed)
+{
+	if (damping == "null")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.5;
+		return true;
+	}
+	if (damping == "mild")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.505;
+		return true;
+	}
+	if (damping == "moderate")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.52;
+		return true;
+	}
+	if (damping == "high")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.55;
+		return true;
+	}
+	if (damping == "extreme")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.6;
+		return true;
+	}
+
+	// Set last readed word equals to 'damping' because in this case 
+	//each coefficient MUST be defined explicitly
+	readed = damping;
+	return false;
+}
+
+void SolutionStep::SetBetaNewmark(double beta_new)
+{
+	this->m_beta_new = beta_new;
+}
+
+void SolutionStep::SetGammaNewmark(double gamma_new)
+{
+	this->m_gamma_new = gamma_new;
+}
+
+void SolutionStep::SetAlphaRayleigh(double alpha_ray)
+{
+	this->m_alpha_ray = alpha_ray;
+}
+
+void SolutionStep::SetBetaRayleigh(double beta_ray)
+{
+	this->m_beta_ray = beta_ray;
+}
+
+
+
+/// 
+/// Overloaded operators
+///
+
 bool operator<(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return obj1.number < obj2.number;
+	return obj1.m_id < obj2.m_id;
 }
 bool operator>(const SolutionStep& obj1, const SolutionStep& obj2)
 {
 	return !(obj1 < obj2);
 }
-
 bool operator==(const SolutionStep& obj1, const SolutionStep& obj2)
 {
-	return obj1.number == obj2.number;
+	return obj1.m_id == obj2.m_id;
 }
 bool operator!=(const SolutionStep& obj1, const SolutionStep& obj2)
 {
 	return !(obj1 == obj2);
-}
-
-
-//Reads input file
-bool SolutionStep::Read(FILE* f)
-{
-	using namespace std::string_literals;
-
-	char str[200];
-	fpos_t pos;				//variável que salva ponto do stream de leitura
-
-	//Line number
-	if (fscanf(f, "%s", str) && isdigit(str[0]))
-		number = atoi(str);
-	else
-	{
-		Log::AddWarning("\n   + Error reading analysis step number.");
-		return false;
-	}
-
-	//Solution type
-	if (fscanf(f, "%s", str) && !strcmp(str, "static"))	isStatic = true;
-	else if (!strcmp(str, "dynamic"))					isStatic = false;
-	else //ERROR
-	{
-		Log::AddWarning("\n   + Analysis should be \"static\" or \"dynamic\".");
-		return false;
-	}
-
-	//End time
-	if (fscanf(f, "%s %lf", str, &end_time) && !strcmp(str, "Time"));
-	else //ERROR (End time)
-	{
-		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	//Time step
-	if (fscanf(f, "%s %lf", str, &timestep) && !strcmp(str, "TimeStep"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	// OPTIONAL
-	//	Maximum time step
-	fgetpos(f, &pos);
-	if (fscanf(f, "%s %lf", str, &max_timestep) && !strcmp(str, "MaxTimeStep"));
-	else //No maximum time step definition
-	{
-		max_timestep = timestep;
-		fsetpos(f, &pos);
-	}
-
-	//Minimum time step
-	if (fscanf(f, "%s %lf", str, &min_timestep) && !strcmp(str, "MinTimeStep"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	//Sample
-	if (fscanf(f, "%s %d", str, &sample) && !strcmp(str, "Sample"));
-	else //ERROR
-	{
-		std::string w = "\n   + Error reading solution time parameters of the step number " + std::to_string(number);
-		Log::AddWarning(w);
-		return false;
-	}
-
-	///
-	/// Numerical damping for dynamic analysis 
-	///
-	
-	//Check if user has defined numerical damping for the analysis step
-	if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "NumericalDamping"))// && isStatic)
-	//{
-		/*if (fscanf(f, "%s", str) && ( !strcmp(str, "null") || !strcmp(str, "mild") || !strcmp(str, "moderate") || !strcmp(str, "high") || !strcmp(str, "extreme") ))
-		{
-			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
-			Log::AddWarning(w);
-		}*/
-	//}
-	//else if (/*!isStatic && */!strcmp(str, "NumericalDamping"))
-	{
-		//Damping cases:
-		if (fscanf(f, "%s", str) && !strcmp(str, "null"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.5;
-		}
-		else if (!strcmp(str, "mild"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.505;
-		}
-		else if (!strcmp(str, "moderate"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.52;
-		}
-		else if (!strcmp(str, "high"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.55;
-		}
-		else if (!strcmp(str, "extreme"))
-		{
-			beta_new = 0.3;
-			gamma_new = 0.6;
-		}
-		else //ERROR
-		{
-			std::string w = "\n   + Please define one of these keywords for setting numerical damping parameters:\n\n";
-			w = R"(	 ------------------------------
-	|  Keyword   |  Beta |  Gamma  |
-	|------------|-------|---------|
-	|  null      |  0.3  |  0.500  |
-	|  mild      |  0.3  |  0.505  |
-	|  moderate  |  0.3  |  0.520  |
-	|  high      |  0.3  |  0.550  |
-	|  extreme   |  0.3  |  0.600  |
-	 ------------------------------)";
-			Log::AddWarning(w);
-			return false;
-		}
-
-		//Warning for static analysis
-		if ( isStatic )
-		{
-			std::string w = "\n   + There is no need to define numerical damping for the static analysis of the step number " + std::to_string(number);
-			Log::AddWarning(w);
-		}
-	}
-	else if (!isStatic && strcmp(str, "NumericalDamping"))
-	{
-		std::string w = "\n   + Numerical damping was not defined for the dynamic step number " + std::to_string(number) 
-			+ ". Newmark coeficients were set to zero.";
-		Log::AddWarning(w);
-		fsetpos(f, &pos);
-	}
-	else
-		fsetpos(f, &pos);
-
-	//Check if user has defined Rayleigh damping for the analysis step
-	if ( !fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "RayleighDamping") &&
-		fscanf(f, "%s %lf", str, &alpha_ray) && !strcmp(str, "Alpha") && fscanf(f, "%s %lf", str, &beta_ray) && !strcmp(str, "Beta") )
-	{
-		if ( isStatic )
-		{
-			std::string w = "\n   + There is no need to define Rayleigh damping for the static analysis of the step number "
-				+ std::to_string(number);
-			Log::AddWarning(w);
-		}
-	}
-	else
-		fsetpos(f, &pos);
-
-	//All ok while reading
-	return true;
-}
-
-void SolutionStep::SetGlobalStart(double time)
-{ this->global_start = time; }
-
-unsigned int SolutionStep::GetNumber() const
-{
-	return this->number;
-}
-
-double SolutionStep::GetGlobalStart() const
-{
-	return this->global_start;
-}
-
-double SolutionStep::GetEndTime() const
-{
-	return this->end_time;
-}
-
-double SolutionStep::GetTimestep() const
-{
-	return this->timestep;
-}
-
-double SolutionStep::GetMaxTimestep() const
-{
-	return this->max_timestep;
-}
-
-double SolutionStep::GetMinTimestep() const
-{
-	return this->min_timestep;
-}
-
-int SolutionStep::GetSample() const
-{
-	return this->sample;
-}
-
-double SolutionStep::GetBeta_new() const
-{
-	return this->beta_new;
-}
-
-double SolutionStep::GetGamma_new() const
-{
-	return this->gamma_new;
-}
-
-double SolutionStep::GetAlpha_ray() const
-{
-	return this->alpha_ray;
-}
-
-double SolutionStep::GetBeta_ray() const
-{
-	return this->beta_ray;
-}
-
-bool SolutionStep::CheckIfIsStatic() const
-{
-	return this->isStatic;
 }

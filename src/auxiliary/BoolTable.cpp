@@ -38,7 +38,7 @@ BoolTable::BoolTable(const bool& bool_init, const int& bool_init_steps, const bo
 	}
 }
 
-BoolTable::BoolTable(BoolTable &copied)
+BoolTable::BoolTable(const BoolTable &copied)
 {
 	data_table = copied.data_table;
 }
@@ -147,7 +147,7 @@ size_t BoolTable::GetSize() const
 	return data_table.size();
 }
 
-bool BoolTable::GetBoolOption(size_t pos) const
+bool BoolTable::GetBoolOption(unsigned int pos) const
 {
 	return this->data_table[pos];
 }

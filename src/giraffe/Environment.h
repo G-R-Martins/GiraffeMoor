@@ -5,66 +5,58 @@
 
 class Environment
 {
-	double gravity;
-	double rhofluid;
-	double waterdepth;
+private:
+	double m_gravity;
+	double m_rho_fluid;
+	double m_water_depth;
 
-	/*-----
-	Objects
-	------*/
-
-	//Gravity booltable
-	BoolTable bool_g;
-
-	//Sea current booltable
-	BoolTable bool_current;
-		
-	//Vector with sea current data
-	std::vector <SeaCurrent> seacurrent_vector;
+	BoolTable m_bool_g;  //Gravity booltable
+	BoolTable m_bool_current;  //Sea current booltable
+	std::vector<SeaCurrent> m_sea_current_vector;  //sea current data
 	
-	//============================================================================
 public:
 	Environment();
 	~Environment();
 
-	/*-------
-	Functions
-	--------*/
-
-	//Writes input file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
 
 
 	///
-	///  Set/Get functions 
+	///  SETTERS
 	///
 
-	//Set variables
 	void SetGravity(double g);
 	void SetRhoFluid(double rho);
 	void SetWaterDepth(double wd);
-	//Set booltables
+
 	void SetGravityBooltable(const BoolTable& bool_grav);
 	void SetSeaCurrentBooltable(const BoolTable& bool_current);
 
-	//Set vector
 	void SetSeaCurrentVec(const std::vector<SeaCurrent>& current_vec);
 
 
-	//Get variables
-	double GetGravity() const;
-	double GetRhoFluid() const;
-	double GetWaterDepth() const;
+	///
+	///  SETTERS
+	///
 
-	//Get booltables
-	const BoolTable& GetGravityBooltable() const;
-	BoolTable& GetGravityBooltable();
-	const BoolTable& GetSeaCurrentBooltable() const;
-	BoolTable& GetSeaCurrentBooltable();
+	inline double GetGravity() const	{ return m_gravity; }
+	inline double GetRhoFluid() const	{ return m_rho_fluid; }
+	inline double GetWaterDepth() const	{ return m_water_depth; }
 
-	//Get vector
-	const std::vector<SeaCurrent>& GetSeaCurrentVec() const;
-	std::vector<SeaCurrent>& GetSeaCurrentVec();
 
+	inline const BoolTable& GetGravityBooltable() const		{ return m_bool_g; }
+	inline BoolTable& GetGravityBooltable()					{ return m_bool_g; }
+	inline const BoolTable& GetSeaCurrentBooltable() const	{ return m_bool_current; }
+	inline BoolTable& GetSeaCurrentBooltable()				{ return m_bool_current; }
+
+	const std::vector<SeaCurrent>& GetSeaCurrentVec() const { return m_sea_current_vector; }
+	std::vector<SeaCurrent>& GetSeaCurrentVec()				{ return m_sea_current_vector; }
+
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	constexpr Environment& operator=(const Environment&) = default;
+	friend std::ostream& operator<<(std::ostream& out, const Environment& obj);
 };
 

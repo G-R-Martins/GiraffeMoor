@@ -30,6 +30,7 @@ class Log
 
 public:
 	
+	
 	//Create/return Singleton instance
 	static Log& getInstance()
 	{
@@ -43,139 +44,128 @@ public:
 
 	~Log() = default;
 
-
-	//Enumeration class for errors
+	enum class Warning
+	{
+		INVALID_ID = 0,
+		INVALID_KEYWORD,
+		INVALID_OPTION, 
+		REMOVED_OBJECTS,
+		UNDEFINED_PARAMETERS,
+		UNDEFINED_MANDATORY_BLOCK,
+		SOLVING_CATENARY
+	};
 	enum class Error
 	{
-		Reading = -1,
-		FEM_Generation = -2,
-		InputModel = -3
+		OPENING_FILE = -1,
+		READING,
+		FEM_GENERATION,
+		CHECKING_MODEL
 	};
 
 
+	/* =========================================================================================
+	                                    Static functions
+	   ========================================================================================= */
+	
+
 	///
-	/// Static functions 
+	/// SETTERS
 	///
 	
-	//Add error to the string
-	static void AddError(const std::string_view& toAdd) { return getInstance().AddError_Impl(toAdd); }
-	static void AddError(const std::stringstream& toAdd) { return getInstance().AddError_Impl(toAdd); }
-	static void AddError(const std::string& toAdd) { return getInstance().AddError_Impl(toAdd); }
-	static void AddError(const char* toAdd) { return getInstance().AddError_Impl(toAdd); }
-	//Add warning to the string 
-	static void AddWarning(const std::string_view& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	static void AddWarning(const std::stringstream& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	static void AddWarning(const std::string& toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	static void AddWarning(const char* toAdd) { return getInstance().AddWarning_Impl(toAdd); }
-	//Add message to the string 
-	static void AddFinalMessage(const std::string_view& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
-	static void AddFinalMessage(const std::stringstream& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
-	static void AddFinalMessage(const std::string& toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
-	static void AddFinalMessage(const char* toAdd) { return getInstance().AddFinalMessage_Impl(toAdd); }
+	static void SetWarning(Log::Warning type, std::string_view block, int line = 0,
+		std::string_view name = "", int number = 0)			{ getInstance().SetWarning_Impl(type, block, line, name, number); };
+	static void SetWarning(std::string_view msg)			{ getInstance().SetWarning_Impl(msg); }
+	static void SetError(Log::Error error)					{ getInstance().SetError_Impl(error); }
+	static void SetFinalMessage(std::string_view msg)		{ getInstance().SetFinalMessage_Impl(msg); }
+
+	static void SetLastKeyword(std::string_view key)		{ return getInstance().SetLastKeyword_Impl(key); }
+	static void SetLastValidKeyword(std::string_view key)	{ return getInstance().SetLastValidKeyword_Impl(key); }
 	
-	//Functions to check if exist error/warning 
-	static void CheckLogs() { return getInstance().CheckLogs_Impl(); }
-	static bool Check4Errors() { return getInstance().Check4Errors_Impl(); }
-	static bool Check4Warnings() { return getInstance().Check4Warnings_Impl(); }
+
+	///
+	/// GETTERS
+	///
+	
+	static std::string_view GetLastKeyword()		{ return getInstance().GetLastKeyword_Impl(); }
+	static std::string_view GetLastValidKeyword()	{ return getInstance().GetLastValidKeyword_Impl(); }
+	
+	
+	///
+	/// PRINTERS
+	///
+	
 
 	//Functions to print to console
-	static void ShowErrors() { return getInstance().ShowErrors_Impl(); }
-	static void ShowWarnings() { return getInstance().ShowWarnings_Impl(); }
-	static void ShowFinalMessage() { return getInstance().ShowFinalMessage_Impl(); }
+	static void ShowErrors()		{ return getInstance().ShowErrors_Impl(); }
+	static void ShowWarnings()		{ return getInstance().ShowWarnings_Impl(); }
+	static void ShowFinalMessage()	{ return getInstance().ShowFinalMessage_Impl(); }
 
-
-	//Last keyword readed
-	///Any word
-	static void SetLastKeyword(const std::string_view& key) { return getInstance().SetLastKeyword_Impl(key); }
-	static void SetLastKeyword(const char* key) { return getInstance().SetLastKeyword_Impl(key); }
-	static std::string_view& GetLastKeyword() { return getInstance().GetLastKeyword_Impl(); }
-	///Valid keyword
-	static void SetLastValidKeyword(const std::string_view& key) { return getInstance().SetLastValidKeyword_Impl(key); }
-	static void SetLastValidKeyword(const char* key) { return getInstance().SetLastValidKeyword_Impl(key); }
-	static std::string_view& GetLastValidKeyword() { return getInstance().GetLastValidKeyword_Impl(); }
-	
-	//Set error messages for each specific case
-	static void SetError(Log::Error error) { getInstance().SetError_Impl(error); }
+	//Functions to check if exist error/warning 
+	static void CheckLogs()			{ return getInstance().CheckLogs_Impl(); }
+	static bool ExistErrors()		{ return getInstance().ExistErrors_Impl(); }
+	static bool ExistWarnings()		{ return getInstance().ExistWarnings_Impl(); }
 
 	//===========================================================================================================
 
 private:
 
-					/*+-+-+-+-+-+-+-+
-					|               |
-					|   Variables   |
-					|               |
-					+-+-+-+-+-+-+-+-*/
+	int m_warning_ID;
+	int m_tot_warnings;
+	int m_error_ID;
+	int m_tot_errors;
 
-	bool existError, existWarning;
-	unsigned int contErrors,  contWarnings;
+	std::stringstream m_error;
+	std::stringstream m_warning;
+	std::stringstream m_final_message;
 
-	std::string error, warning, final_message;
-	std::string_view last_keyword, last_valid_keyword;
+	std::string m_last_keyword;
+	std::string m_last_valid_keyword;
 
 
-					/*+-+-+-+-+-+-+-+
-					|               |
-					|   Variables   |
-					|               |
-					+-+-+-+-+-+-+-+-*/
+	/* =========================================================================================
+					Implementations of corresponding static functions
+	   ========================================================================================= */
 
-	///				  
-	/// Implementations of corresponding static functions
-	/// 			  
+	
+	///
+	/// SETTERS
+	///
+	
+	void SetWarning_Impl(Log::Warning type, std::string_view block, /*mandatory arguments*/
+		int line, std::string_view name, int number); /*optional arguments*/
+	void SetWarning_Impl(std::string_view msg);
+	void SetError_Impl(Log::Error error);
+	void SetFinalMessage_Impl(std::string_view msg);
 
-	//Add error to the string
-	void AddError_Impl(const std::string_view& toAdd);
-	void AddError_Impl(const std::stringstream& toAdd);
-	void AddError_Impl(const std::string& toAdd);
-	void AddError_Impl(const char* toAdd);
-	//Add warning to the string 
-	void AddWarning_Impl(const std::string_view& toAdd);
-	void AddWarning_Impl(const std::stringstream& toAdd);
-	void AddWarning_Impl(const std::string& toAdd);
-	void AddWarning_Impl(const char* toAdd);
-	//Add message to the string 
-	void AddFinalMessage_Impl(const std::string_view& toAdd);
-	void AddFinalMessage_Impl(const std::stringstream& toAdd);
-	void AddFinalMessage_Impl(const std::string& toAdd);
-	void AddFinalMessage_Impl(const char* toAdd);
+	// Keyword
+	void SetLastKeyword_Impl(std::string_view key);
+	void SetLastValidKeyword_Impl(std::string_view key);
 
-	//Functions to check if exist error/warning 
-	void CheckLogs_Impl();
-	bool Check4Errors_Impl();
-	bool Check4Warnings_Impl();
+	
+	///
+	/// GETTERS
+	///
+	
+	std::string_view GetLastKeyword_Impl();
+	std::string_view GetLastValidKeyword_Impl();
 
-	//Functions to print to console
+
+	///
+	/// Print functions
+	///
+	
 	void ShowErrors_Impl();
 	void ShowWarnings_Impl();
 	void ShowFinalMessage_Impl();
-
-	//Last keyword readed
-	///Any word
-	void SetLastKeyword_Impl(const std::string_view& key);
-	void SetLastKeyword_Impl(const char* key);
-	std::string_view& GetLastKeyword_Impl();
-	///Valid keyword
-	void SetLastValidKeyword_Impl(const std::string_view& key);
-	void SetLastValidKeyword_Impl(const char* key);
-	std::string_view& GetLastValidKeyword_Impl();
-
-	//Set error messages for each specific case
-	void SetError_Impl(Log::Error error);
 
 
 	/// 
 	/// Other functions
 	/// 
-
-	//Get functions
-	std::string& GetError();
-	std::string& GetWarning();
-	std::string& GetFinalMessage();
-
-	//Update counters
-	void UpdateErrorCounter();
-	void UpdateWarningCounter();
+	
+	void CheckLogs_Impl();
+	bool ExistErrors_Impl();
+	bool ExistWarnings_Impl();
 
 };
 

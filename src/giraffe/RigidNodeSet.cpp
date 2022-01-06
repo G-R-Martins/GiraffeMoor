@@ -3,20 +3,30 @@
 
 
 RigidNodeSet::RigidNodeSet()
-	: pilot_node(0), node_set(0), comment("")
+	: m_pilot_node_id(0), m_node_set_id(0), m_comment("")
+{}
+RigidNodeSet::RigidNodeSet(unsigned int pilot_node_id, unsigned int node_set_id, const std::string& comment)
+	: m_pilot_node_id(pilot_node_id), m_node_set_id(node_set_id), m_comment(comment)
 {}
 
 
 RigidNodeSet::~RigidNodeSet()
 {
-	bool_table.Clear();
+	m_booltable.Clear();
 }
 
-void RigidNodeSet::WriteGiraffeModelFile(std::ostream& fout) const
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const RigidNodeSet& obj)
 {
-	if ( !comment.empty() )
-		fout << "\t//" << comment << "\n";
-	fout << "\tRigidNodeSet " << number <<
-		"\tPilotNode " << pilot_node <<
-		"\tNodeSet " << node_set << " " << bool_table;
+	if ( !obj.m_comment.empty() )
+		out << "\t//" << obj.m_comment << "\n";
+	out << "\tRigidNodeSet " << obj.GetIDNumber()
+		<< "\tPilotNode " << obj.m_pilot_node_id
+		<< "\tNodeSet " << obj.m_node_set_id << " " << obj.m_booltable;
+
+	return out;
 }

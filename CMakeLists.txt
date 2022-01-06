@@ -22,7 +22,9 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT G
 ## If true, the computer must have oneMKL installed, 
 # Otherwise, it is assumed that MKL DLLs will be used in .exe 
 # directory or its folder is already added to system path 
-option(USE_oneMKL "installed from Intel oneAPI" ON)
+option(USE_oneMKL "MKL -> oneMKL from Intel oneAPI" ON)
+
+
 #-- Search for oneMKL
 if(USE_oneMKL)
 	find_package(MKL CONFIG REQUIRED)
@@ -40,13 +42,14 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TREE_FILES})
 
 
 ## Include directories
-file(GLOB INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
-list(APPEND INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src )
-list(REMOVE_DUPLICATES INCLUDE_DIR)
-#-- Remove possible headers and source files
-list(FILTER INCLUDE_DIR EXCLUDE REGEX ".h$")
-list(FILTER INCLUDE_DIR EXCLUDE REGEX ".hpp$")
-list(FILTER INCLUDE_DIR EXCLUDE REGEX ".cpp$")
+set(INCLUDE_DIR 
+	${CMAKE_CURRENT_SOURCE_DIR}/src
+	${CMAKE_CURRENT_SOURCE_DIR}/src/auxiliary
+	${CMAKE_CURRENT_SOURCE_DIR}/src/giraffe
+	${CMAKE_CURRENT_SOURCE_DIR}/src/gmoor
+	# External libraries
+	${CMAKE_CURRENT_SOURCE_DIR}/dependencies
+	)
 
 
 ## Configure a header file to pass some of the CMake settings to the source code
@@ -54,9 +57,7 @@ configure_file(${PROJECT_NAME}Config.h.in ${PROJECT_NAME}Config.h)
 
 
 ## Other files to include in Visual Studio solution explorer
-set(FILES_TO_ADD 
-	README.md gen_and_build.bat
-	)
+set(FILES_TO_ADD README.md build.bat)
 
 ## Create the executable
 add_executable(${PROJECT_NAME} ${TREE_FILES} ${FILES_TO_ADD})

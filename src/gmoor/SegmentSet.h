@@ -7,13 +7,13 @@ class SegmentSet
 private:
 
 	// Set ID number
-	size_t ID;
+	unsigned int m_id;
 
 	// Number of segments
-	size_t n_segments;
+	unsigned int m_tot_segments;
 
 	// Vector with line segments
-	std::vector<LineSegment> segments;
+	std::vector<LineSegment> m_segments;
 
 public:
 
@@ -22,26 +22,39 @@ public:
 	~SegmentSet() = default;
 	
 
-	//Read input file
-	bool Read(FILE* f);
+	inline LineSegment* AddSegment();
+	inline void PushBackSegment();
 
-	//Returns the number of 'LineSegment's in the set
-	const size_t& GetSegmentSetSize() const;
+	/// 
+	/// SETTERS
+	/// 
+	
+	void SetIDNumber(unsigned int id);
+	
 
-	const size_t& GetSetID() const;
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline unsigned int GetIDNumber() const { return this->m_id; };
+	inline LineSegment& GetLastSegment() { return this->m_segments.back(); };
+	inline const LineSegment& GetLastSegment() const { return this->m_segments.back(); };
+
+	//Returns the number of 'LineSegment' in the set
+	inline const unsigned int GetSegmentSetSize() const { return (unsigned int)this->m_segments.size(); };
 
 	//Get the container with segments of the set
-	const std::vector<LineSegment>& GetAllSegment() const;
+	inline const std::vector<LineSegment>& GetAllSegment() const { return this->m_segments; };
+	inline std::vector<LineSegment>& GetAllSegment() { return this->m_segments; }
 		
 	//Get a specific segment from the set
-	LineSegment& GetSegment(const size_t& seg);
+	inline LineSegment& GetSegment(const unsigned int& seg) { return this->m_segments[seg]; };
 
 
-	//============================================================================
-
-	/*------------------
-	Overloaded operators
-	-------------------*/
+	
+	/// 
+	/// Overloaded operators
+	/// 
 
 	friend bool operator<(const SegmentSet& segset1, const SegmentSet& segset2);
 	friend bool operator>(const SegmentSet& segset1, const SegmentSet& segset2);
@@ -49,3 +62,13 @@ public:
 	friend bool operator!=(const SegmentSet& segset1, const SegmentSet& segset2);
 };
 
+
+
+LineSegment* SegmentSet::AddSegment()
+{
+	return &this->m_segments.emplace_back();
+}
+void SegmentSet::PushBackSegment()
+{
+	m_segments.emplace_back();
+}

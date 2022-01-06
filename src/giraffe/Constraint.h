@@ -3,11 +3,24 @@
 
 class Constraint
 {
+	unsigned int m_id;
 public:
 	Constraint();
 	virtual ~Constraint();
-	virtual void WriteGiraffeModelFile(std::ostream& fout) const = 0;
 
-	unsigned int number;				//element ID
+	virtual inline std::ofstream& WriteGiraffeFile(std::ofstream& out) = 0;
+
+
+	/// 
+	/// SETTERS
+	/// 
+
+	void SetIDNumber(unsigned int id);
+
+	/// 
+	/// GETTERS
+	/// 
+
+	inline unsigned int GetNumber() const { return m_id; }
 };
 

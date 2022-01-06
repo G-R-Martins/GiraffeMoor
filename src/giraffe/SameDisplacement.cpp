@@ -3,16 +3,27 @@
 
 
 SameDisplacement::SameDisplacement()
-	: node_A(0), node_B(0), initial_load_step(0)
+	: m_nodeA_id(0), m_nodeB_id(0), m_initial_load_step_id(0)
+{}
+SameDisplacement::SameDisplacement(unsigned int nodeA_id, unsigned int nodeB_id, unsigned int initial_load_step_id)
+	: m_nodeA_id(nodeA_id), m_nodeB_id(nodeB_id), m_initial_load_step_id(initial_load_step_id)
 {}
 
 SameDisplacement::~SameDisplacement()
 {
-	bool_table.Clear();
+	m_booltable.Clear();
 }
 
-void SameDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const SameDisplacement& obj)
 {
-	fout << "\tSameDisplacement " << number <<
-		"\tNodes " << node_A << " " << node_B << " " << bool_table;
+	out << "\tSameDisplacement " << obj.GetIDNumber() 
+		<< "\tNodes " << obj.m_nodeA_id << " " << obj.m_nodeB_id << " "
+		<< obj.m_booltable;
+
+	return out;
 }

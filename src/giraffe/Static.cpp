@@ -3,24 +3,29 @@
 
 
 Static::Static()
-	: i_time_step(0), max_time_step(0), min_time_step(0), max_it(0), min_it(0), 
-	conv_increase(0), inc_factor(0), sample(0)
 {}
 
 Static::~Static()
 {}
 
-//Writes output file
-void Static::WriteGiraffeModelFile(std::ostream& fout) const
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ofstream& operator<<(std::ofstream& out, Static const& obj)
 {
-	fout << "\tStatic " << solution_number <<
-		"\tEndTime " << end_time <<
-		"\tTimeStep " << i_time_step <<
-		"\tMaxTimeStep " << max_time_step <<
-		"\tMinTimeStep " << min_time_step <<
-		"\tMaxIt " << max_it << 
-		"\tMinIt " << min_it <<
-		"\tConvIncrease " << conv_increase << 
-		"\tIncFactor " << inc_factor <<
-		"\tSample " << sample << "\n";
+	out << "\tStatic "		<< obj.GetNumber() <<
+		"\tEndTime "		<< obj.GetEndTime() <<
+		"\tTimeStep "		<< obj.GetTimeStep() <<
+		"\tMaxTimeStep "	<< obj.GetMaxTimeStep() <<
+		"\tMinTimeStep "	<< obj.GetMinTimeStep() <<
+		"\tMaxIt "			<< obj.GetMaxIt() <<
+		"\tMinIt "			<< obj.GetMinIt() <<
+		"\tConvIncrease "	<< obj.GetConvergenceCriteria() <<
+		"\tIncFactor "		<< obj.GetIncreaseFactor() <<
+		"\tSample "			<< obj.GetSample() << "\n";
+
+	return out;
 }
+

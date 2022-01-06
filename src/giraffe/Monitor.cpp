@@ -1,194 +1,185 @@
 #include "PCH.h"
 #include "Monitor.h"
-#include "AuxFunctions.h"
-#include "Log.h"
 
 
 Monitor::Monitor()
-	: sample(1), bool_nodes_fairleads(true), bool_nodes_anchors(false), bool_nodes_tdz(false),
-	bool_nodes_vessel(true), bool_elements_fairleads(false), bool_elements_anchors(false),
-	bool_elements_tdz(false), bool_elements_vessel(false), bool_contact_seabed_moor(false)
+	: m_nodes_id{}, m_elements_id{}, m_contacts_id{}, m_node_sets_id{},
+	m_nodes_sequence_hint{}, m_elements_sequence_hint{},
+	m_sample(1), m_nodes_fairleads_opt(true), m_nodes_anchors_opt(false),
+	m_nodes_tdz_opt(false), m_nodes_vessel_opt(false),
+	m_elements_fairleads_opt(false), m_elements_anchors_opt(false),
+	m_elements_tdz_opt(false), m_elements_vessel_opt(false),
+	m_contact_seabed_lines_opt(false)
 {}
 
 Monitor::~Monitor()
 {}
 
-//Reads input file
-bool Monitor::Read(FILE *f)
+void Monitor::PushNodeID(unsigned int node_id)
 {
-	//REading variables
-	char str[200];
-	fpos_t pos;
-	typedef std::unordered_set<std::string_view> uset;
-	
-	//Reads sample
- 	fgetpos(f, &pos);
-	if (fscanf(f, "%s %d", str, &sample) != EOF && strcmp(str, "Sample"))
-	{
-		Log::AddWarning("\n   + Monitors sample was not defined in the input file. The default value (one) is considered");
-		fsetpos(f, &pos);
-	}
+	m_nodes_id.emplace_front(node_id);
+}
 
-	/*-----------------
-	 Parameters reading
-	 -----------------*/
-	
-	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	AuxFunctions::Read::TryComment(f);
+void Monitor::PushElementID(unsigned int element_id)
+{
+	m_elements_id.emplace_front(element_id);
+}
 
-	uset keywords({ "Nodes", "Elements", "Contacts" });
-	uset::iterator it;
+void Monitor::PushContactID(unsigned int contact_id)
+{
+	m_contacts_id.emplace_front(contact_id);
+}
 
-	//Loop to read data
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-	{
-		bool try_comment = true;
+void Monitor::PushNodeSetID(unsigned int node_set_id)
+{
+	m_node_sets_id.emplace_front(node_set_id);
+}
 
-		it = keywords.find(std::string_view(str));
-		if (it != keywords.end())
-		{
-			if (*it == "Nodes")
-			{
-				keywords.erase(*it);
+NodesSequence* Monitor::AddNodesSequence(unsigned int nodes, unsigned int begin, unsigned int increment)
+{
+	this->m_nodes_sequence_hint.emplace_front() = { nodes, begin, increment };
+	return &this->m_nodes_sequence_hint.front();
+}
 
-				//Reset 'true' booleans
-				bool_nodes_fairleads = false; bool_nodes_vessel = false;
+NodesSequence* Monitor::AddNodesSequence()
+{
+	return &this->m_nodes_sequence_hint.emplace_front();
+}
 
-				while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-				{
-					if (!strcmp(str, "none"))				break;
-					else if (!strcmp(str, "fairleads"))		bool_nodes_fairleads = true;
-					else if (!strcmp(str, "anchors"))		bool_nodes_anchors = true;
-					else if (!strcmp(str, "vessels"))		bool_nodes_vessel = true;
-					else if (!strcmp(str, "Sequence"))
-					{
-						if (fscanf(f, "%s", str) == EOF || strcmp(str, "NNodes"))
-						{
-							Log::AddWarning("\n   + Error reading sequence of nodes to monitor\n");
-							return false;
-						}
-						else
-						{
-							seq_nodes.emplace_front();
-							if (fscanf(f, "%d %s %d", &seq_nodes.front().nodes, str, &seq_nodes.front().begin) == EOF || strcmp(str, "Begin")
-								|| fscanf(f, "%s %d", str, &seq_nodes.front().increment) == EOF || strcmp(str, "Increment"))
-							{
-								Log::AddWarning("\n   + Error reading sequence of nodes to monitor\n");
-								return false;
-							}
-						}
-					}
-					else if (!strcmp(str, "List"))
-					{
-						while (!fgetpos(f, &pos) && fscanf(f, "%s", str) && isdigit(str[0]))
-							nodes.emplace_front(atoi(str));
-						fsetpos(f, &pos);
-					}
-					else
-					{
-						fsetpos(f, &pos);
-						try_comment = false;
-						break;
-					}
-				}
-			}
-			else if (*it == "Elements")
-			{
-				keywords.erase(*it);
-				while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-				{
-					if (!strcmp(str, "none"))				break;
-					else if (!strcmp(str, "fairleads"))		bool_elements_fairleads = true;
-					else if (!strcmp(str, "anchors"))		bool_elements_anchors = true;
-					else if (!strcmp(str, "vessels"))		bool_elements_vessel = true;
-					else if (!strcmp(str, "Sequence"))
-					{
-						if (fscanf(f, "%s", str) == EOF || strcmp(str, "NElements"))
-						{
-							Log::AddWarning("\n   + Error reading sequence of elements to monitor\n");
-							return false;
-						}
-						else
-						{
-							seq_elements.emplace_front();
-							if (fscanf(f, "%d %s %d", &seq_elements.front().elements, str, &seq_elements.front().begin) == EOF || strcmp(str, "Begin")
-								|| fscanf(f, "%s %d", str, &seq_elements.front().increment) == EOF || strcmp(str, "Increment"))
-							{
-								Log::AddWarning("\n   + Error reading sequence of elements to monitor\n");
-								return false;
-							}
-						}
-					}
-					else if (!strcmp(str, "List"))
-					{
-						while (!fgetpos(f, &pos) && fscanf(f, "%s", str) && isdigit(str[0]))
-							elements.emplace_front(atoi(str));
-						fsetpos(f, &pos);
-					}
-					else
-					{
-						fsetpos(f, &pos);
-						try_comment = false;
-						break;
-					}
-				}
-			}
-			else if (*it == "Contacts")
-			{
-				keywords.erase(*it);
-				if (fscanf(f, "%s", str) != EOF && !strcmp(str, "seabed&lines"))
-					bool_contact_seabed_moor = true;
-				else
-				{
-					Log::AddWarning("\n   + Error reading contact monitor\n");
-					return false;
-				}
-			}
-		}
-		else if (try_comment && str[0] == '/' && AuxFunctions::Read::Comment(f, str))
-			continue;	//Try to read other keyword after comment
-		//Other word -> backs position go to IO class
-		else
-		{
-			fsetpos(f, &pos);
-			return true;
-		}
-	}
+void Monitor::PushNodesSequence(unsigned int nodes, unsigned int begin, unsigned int increment)
+{
+	this->m_nodes_sequence_hint.emplace_front() = { nodes, begin, increment };
+}
 
-	return true;
+void Monitor::PushNodesSequence()
+{
+	this->m_nodes_sequence_hint.emplace_front();
+}
+
+ElementsSequence* Monitor::AddElementsSequence(unsigned int elements, unsigned int begin, unsigned int increment)
+{
+	this->m_elements_sequence_hint.emplace_front() = { elements, begin, increment };
+	return &this->m_elements_sequence_hint.front();
+}
+
+ElementsSequence* Monitor::AddElementsSequence()
+{
+	return &this->m_elements_sequence_hint.emplace_front();
+}
+
+void Monitor::PushElementsSequence(unsigned int elements, unsigned int begin, unsigned int increment)
+{
+	this->m_elements_sequence_hint.emplace_front() = { elements, begin, increment };	
+}
+
+void Monitor::PushElementsSequence()
+{
+	this->m_elements_sequence_hint.emplace_front();
+}
+
+void Monitor::SetSample(unsigned int sample)
+{
+	this->m_sample = sample;
+}
+
+void Monitor::SetMonitorFairleadNodesOpt(bool nodes_fairleads_opt)
+{
+	this->m_nodes_fairleads_opt = nodes_fairleads_opt;
+}
+
+void Monitor::SetMonitorAnchorNodesOpt(bool nodes_anchors_opt)
+{
+	this->m_nodes_anchors_opt = nodes_anchors_opt;
+}
+
+void Monitor::SetMonitorTDZNodesOpt(bool nodes_tdz_opt)
+{
+	this->m_nodes_tdz_opt = nodes_tdz_opt;
+}
+
+void Monitor::SetMonitorVesselNodesOpt(bool nodes_vessel_opt)
+{
+	this->m_nodes_vessel_opt = nodes_vessel_opt;
+}
+
+void Monitor::SetMonitorFairleadElementsOpt(bool elements_fairleads_opt)
+{
+	this->m_elements_fairleads_opt = elements_fairleads_opt;
+}
+
+void Monitor::SetMonitorAnchorElementsOpt(bool elements_anchors_opt)
+{
+	this->m_elements_anchors_opt = elements_anchors_opt;
+}
+
+void Monitor::SetMonitorTDZElementsOpt(bool elements_tdz_opt)
+{
+	this->m_elements_tdz_opt = elements_tdz_opt;
+}
+
+void Monitor::SetMonitorVesselElementsOpt(bool elements_vessel_opt)
+{
+	this->m_elements_vessel_opt = elements_vessel_opt;
+}
+
+void Monitor::SetMonitorLinesSeabedContactOpt(bool contact_seabed_lines_opt)
+{
+	this->m_contact_seabed_lines_opt = contact_seabed_lines_opt;
+}
+
+void Monitor::SetAllNodesFlags(bool option)
+{
+	m_nodes_anchors_opt = option;
+	m_nodes_fairleads_opt = option;
+	m_nodes_tdz_opt = option;
+	m_nodes_vessel_opt = option;
+}
+
+void Monitor::SetAllElementsFlags(bool option)
+{
+	m_elements_anchors_opt = option;
+	m_elements_fairleads_opt = option;
+	m_elements_tdz_opt = option;
+	m_elements_vessel_opt = option;
 }
 
 
-void Monitor::WriteGiraffeModelFile(std::ostream& fout) const
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const Monitor& obj)
 {
-	fout << "\tSample "<< sample << "\n";
-	if (!nodes.empty())
+	out << "\tSample "<< obj.m_sample << "\n";
+	if (!obj.m_nodes_id.empty())
 	{
-		fout << "\tMonitorNodes\t";
-		for (const int& node : nodes)
-			fout << node << " ";
-		fout << "\n";
+		out << "\tMonitorNodes\t";
+		for (const auto& node : obj.m_nodes_id)
+			out << node << " ";
+		out << "\n";
 	}
-	if (!elements.empty())
+	if (!obj.m_elements_id.empty())
 	{
-		fout << "\tMonitorElements\t";
-		for (const int& elem : elements)
-			fout << elem << " ";
-		fout << "\n";
+		out << "\tMonitorElements\t";
+		for (const auto& elem : obj.m_elements_id)
+			out << elem << " ";
+		out << "\n";
 	}
-	if (!contacts.empty())
+	if (!obj.m_contacts_id.empty())
 	{
-		fout << "\tMonitorContacts\t";
-		for (const int& cont : contacts)
-			fout << cont << " ";
-		fout << "\n";
+		out << "\tMonitorContacts\t";
+		for (const auto& cont : obj.m_contacts_id)
+			out << cont << " ";
+		out << "\n";
 	}
-	if (!node_sets.empty())
+	if (!obj.m_node_sets_id.empty())
 	{
-		fout << "\tMonitorNodeSets\t";
-		for (const int& NS : node_sets)
-			fout << NS << " ";
-		fout << "\n";
+		out << "\tMonitorNodeSets\t";
+		for (const auto& NS : obj.m_node_sets_id)
+			out << NS << " ";
+		out << "\n";
 	}
 	
+	return out;
 }

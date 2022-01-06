@@ -3,48 +3,118 @@
 
 
 NodalDisplacement::NodalDisplacement()
-	: node_set(0), cs(0), n_values(6), 
-	table(nullptr), mathCode(nullptr), file_name("\0"), header_lines(0), n_times(0)
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
+	m_table(nullptr), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {}	
 
-NodalDisplacement::NodalDisplacement(Table* tbl)
-	: node_set(0), cs(0), n_values(6), 
-	table(tbl), mathCode(nullptr), file_name("\0"), header_lines(0), n_times(0)
+NodalDisplacement::NodalDisplacement(Table* table)
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
+	m_table(nullptr), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {}
-NodalDisplacement::NodalDisplacement(MathCode* mc)
-	: node_set(0), cs(0), n_values(6), 
-	table(nullptr), mathCode(mc), file_name("\0"), header_lines(0), n_times(0)
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, Table* table)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
+	m_table(table), m_math_code(nullptr), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
+{}
+
+NodalDisplacement::NodalDisplacement(MathCode* math_code)
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
+	m_table(nullptr), m_math_code(math_code), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
 {
-	isMathCode = true;
+	SetMathCodeOpt(true);
 }
-NodalDisplacement::NodalDisplacement(const std::string& f_name, const unsigned int& h_lines, const unsigned int& ntimes)
-	: node_set(0), cs(0), n_values(6), 
-	table(nullptr), mathCode(nullptr), file_name(f_name), header_lines(h_lines), n_times(ntimes)
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, MathCode* math_code)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
+	m_table(nullptr), m_math_code(math_code), m_file_name("\0"), m_header_lines(0), m_tot_steps(0)
+
 {
-	extFile = true;
+	SetMathCodeOpt(true);
 }
+
+NodalDisplacement::NodalDisplacement(const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps)
+	: m_node_set_id(0), m_cs_id(0), m_values(6),
+	m_table(nullptr), m_math_code(nullptr), m_file_name(file_name), m_header_lines(header_lines), m_tot_steps(tot_steps)
+{
+	SetExternalFileOpt(true);
+}
+NodalDisplacement::NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps)
+	: m_node_set_id(node_set_id), m_cs_id(cs_id), m_values(6),
+	m_table(nullptr), m_math_code(nullptr), m_file_name(file_name), m_header_lines(header_lines), m_tot_steps(tot_steps)
+{
+	SetExternalFileOpt(true);
+}
+
 
 NodalDisplacement::~NodalDisplacement()
 {}
 
-void NodalDisplacement::WriteGiraffeModelFile(std::ostream& fout) const
-{
-	fout << "\tNodalDisplacement " << number << 
-		"\tNodeSet " << node_set << 
-		"\tCS " << cs << "\t";
 
-	if (isMathCode)
+/// 
+/// SETTERS
+/// 
+
+void NodalDisplacement::SetNodeSet(unsigned int node_set_id)
+{
+	m_node_set_id = node_set_id;
+}
+
+void NodalDisplacement::SetCoordinateSystem(unsigned int cs_id)
+{
+	m_cs_id = cs_id;
+}
+
+void NodalDisplacement::SetNColumns(unsigned int values)
+{
+	m_values = values;
+}
+
+void NodalDisplacement::SetTable(Table* table)
+{
+	m_table = table;
+}
+
+void NodalDisplacement::SetMathCode(MathCode* math_code)
+{
+	m_math_code = math_code;
+}
+
+void NodalDisplacement::SetFileName(const std::string& file_name)
+{
+	m_file_name = file_name;
+}
+
+void NodalDisplacement::SetHeaderLines(unsigned int header_lines)
+{
+	m_header_lines = header_lines;
+}
+
+void NodalDisplacement::SetTotSteps(unsigned int tot_steps)
+{
+	m_tot_steps = tot_steps;
+}
+
+
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, NodalDisplacement const& obj)
+{
+	out << "\tNodalDisplacement " << obj.GetNumber()
+		<< "\tNodeSet " << obj.m_node_set_id
+		<< "\tCS " << obj.m_cs_id << "\t";
+
+	if (obj.IsMathCode())
+		out << "MathCode\n" << obj.m_math_code;
+	else if (obj.IsExternalFile())
 	{
-		fout << "MathCode\n" << mathCode;
-	}
-	else if (extFile)
-	{
-		fout << "\n\t\tFile \"" << file_name << "\"" <<
-			"\tHeaderLines " << header_lines << 
-			"\tNTimes " << n_times << "\n";
+		out << "\n\t\tFile \"" << obj.m_file_name << "\""
+			<< "\tHeaderLines " << obj.m_header_lines
+			<< "\tNTimes " << obj.m_tot_steps << "\n";
 	}
 	else
-	{
-		fout << "NTimes " << table->GetLines() << "\n" << table;
-	}
+		out << "NTimes " << obj.m_table->GetNLines() << "\n" << obj.m_table;
+
+
+	return out;
 }

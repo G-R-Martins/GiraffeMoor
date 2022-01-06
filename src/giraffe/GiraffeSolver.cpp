@@ -1,99 +1,76 @@
 #include "PCH.h"
 #include "GiraffeSolver.h"
 #include "Log.h"
-#include "AuxFunctions.h"
 
 
 GiraffeSolver::GiraffeSolver()
-	: nCores(2), isDirect(true), runGiraffe(false)
+	: m_run_Giraffe(false), m_cores(2), m_is_direct(true)
+{}
+
+GiraffeSolver::~GiraffeSolver()
 {}
 
 
-bool GiraffeSolver::Read(FILE* f)
+
+///
+/// SETTERS
+///
+
+void GiraffeSolver::SetRunGiraffeOpt(bool run_opt)
 {
-	char str[200];
-	fpos_t pos;
-
-
-	std::unordered_set<std::string_view> keywords({"Run", "Processors"});
-	std::unordered_set<std::string_view>::iterator it;
-
-	//Searches for comment block before solution parameters (it can be a stretch commented for a previously file, such as "DynamicRelaxation")
-	AuxFunctions::Read::TryComment(f);
-
-	//Loop to read solution parameters
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
+	this->m_run_Giraffe = run_opt;
+}
+void GiraffeSolver::SetCores(unsigned int cores)
+{
+	this->m_cores = cores;
+}
+void GiraffeSolver::SetLinSolverOpt(bool is_direct)
+{
+	this->m_is_direct = is_direct;
+}
+void GiraffeSolver::SetLinSolverOpt(std::string_view type)
+{
+	if (type == "direct")
+		this->m_is_direct = true;
+	else if (type == "iterative")
+		this->m_is_direct = false;
+	else
 	{
-		it = keywords.find(std::string_view(str));
-		if ( it != keywords.end() )
-		{
-			if ( *it == "Run" )
-			{
-				keywords.erase("Run");
-				if ( fscanf(f, "%s", str) == EOF )
-				{
-					Log::AddWarning("\n   + Error reading solver option");
-					return false;
-				}
-				else if ( !strcmp(str, "true") || !strcmp(str, "1") )
-					runGiraffe = true;
-				else if ( !strcmp(str, "false") || !strcmp(str, "0") )
-					runGiraffe = false;
-				else
-				{
-					Log::AddWarning("\n   + Error reading solver option after 'Run' keyword. It must be 'true/false' or '1/0'");
-					return false;
-				}
-			}
-			else if ( *it == "Processors" )
-			{
-				keywords.erase("Processors");
-				if ( fscanf(f, "%s %d", str, &nCores) && !strcmp(str, "Cores") && //reads the number of cores and next keyword
-					fscanf(f, "%s", str) && !strcmp(str, "LinSys") &&			  //checks for 'LinSys' keyword
-					fscanf(f, "%s", str) )										  //reads the 'LinSys' option
-				{
-					if ( !strcmp(str, "direct") )			isDirect = true;
-					else if ( !strcmp(str, "iterative") )	isDirect = false;
-					else
-					{
-						Log::AddWarning("\n   + Error reading solver option after 'LynSys' keyword. It must be 'direct' or 'iterative'");
-						return false;
-					}
-				}
-			}
-		} // end if 'keywords'
-		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
-			continue;	//Other word -> end loop and backs to IO class
-		else
-		{
-			fsetpos(f, &pos);
-			break;
-		}
+		Log::SetWarning(Log::Warning::INVALID_KEYWORD, "SolverOptions", 0, "LinSys");
+		Log::SetWarning("\n  GiraffeMoor will set the default option: \'directive\'");
 	}
-
-
-	//All ok while reading
-	return true;
 }
 
 
-void GiraffeSolver::WriteGiraffeModelFile(std::ostream& fout) const
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& fout, const ConvergenceCriteria& conv_criteria)
 {
-	fout << "\tProcessors " << nCores <<
-		"\tLinSys ";
+	fout <<
+		"\tForceTolerance " << conv_criteria.force_tol <<
+		"\n\tMomentTolerance " << conv_criteria.moment_tol <<
+		"\n\tForceMinimumReference " << conv_criteria.force_min <<
+		"\n\tMomentMinimumReference " << conv_criteria.moment_min <<
+		"\n\tConstraintMinimumReference " << conv_criteria.constraint_min <<
+		"\n\tDisplacementTolerance " << conv_criteria.disp_tol <<
+		"\n\tRotationTolerance " << conv_criteria.rot_tol <<
+		"\n\tLagrangeTolerance " << conv_criteria.lag_tol <<
+		"\n\tDisplacementMinimumReference " << conv_criteria.disp_min <<
+		"\n\tRotationMinimumReference " << conv_criteria.rot_min <<
+		"\n\tLagrangeMinimumReference " << conv_criteria.lag_min <<
+		"\n\tDivergenceReference " << conv_criteria.divergence_ref <<
+		"\n";
 
-	fout << (isDirect ? "Direct\n" : "Iterative\n");
+	return fout;
 }
 
-///
-/// Set/Get functions
-///
 
-void GiraffeSolver::SetSolverOptions(unsigned int cores, bool bool_direct)
-{ 
-	this->nCores = cores;	
-	this->isDirect = bool_direct; 
+std::ostream& operator<<(std::ostream& out, const GiraffeSolver* obj)
+{
+	out << "\tProcessors " << obj->m_cores <<
+		"\tLinSys " << (obj->m_is_direct ? "Direct\n" : "Iterative\n");
+
+	return out;
 }
-
-bool GiraffeSolver::GetRunOption()
-{ return runGiraffe; }

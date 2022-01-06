@@ -2,10 +2,15 @@
 #include "Constraint.h"
 
 Constraint::Constraint()
-	: number(0)
+	: m_id(0)
 {
 }
 
 
 Constraint::~Constraint()
 {}
+
+void Constraint::SetIDNumber(unsigned int id)
+{
+	m_id = id;
+}

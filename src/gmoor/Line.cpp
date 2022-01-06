@@ -1,69 +1,57 @@
 #include "PCH.h"
 #include "Line.h"
-#include "LoopReading.h"
-#include "Log.h"
 
 
 Line::Line()
-	: number(0), keypoint_A(0), keypoint_B(0), cs(0), vessel(0), node_A(0), node_B(0), 
-	tot_nodes(0), nodeset_A(0), nodeset_B(0), total_length(0.0), configuration("\0"),
-	hasAnchor(true), isShared(false), segment_set(0), usingSegmentSet(false),
-	tdz(nullptr), percent(0.0), anc_tdp(0.0), tdp_fair(0.0)
+	: m_id(0), m_configuration("\0"),
+	m_has_anchor(true), m_is_shared(false), m_using_segment_set(false),
+	m_keypointA_id(0), m_keypointB_id(0), m_vessel_id({ 0, 0 }),
+	m_segment_set_id(0), m_seg_TDP_id(0),
+	m_nodeA_id(0), m_nodeB_id(0), m_tot_nodes(0),
+	m_nodesetA_id(0), m_nodesetB_id(0),
+	m_coordinate_system_id(0), m_total_length(0.0)
 {
-	segments.reserve(4);
-	gamma_s.reserve(4);
+	m_segments.reserve(4);
+	m_transition_nodes.reserve(2);
 }
 
 Line::~Line()
-{
-	//if (tdz) delete tdz;
-}
+{}
 
 Line::Line(Line&& other) noexcept
-	: number(std::move(other.number)), keypoint_A(std::move(other.keypoint_A)), keypoint_B(std::move(other.keypoint_B)),
-	cs(std::move(other.cs)), vessel(std::move(other.vessel)), node_A(std::move(other.node_A)), node_B(std::move(other.node_B)),
-	tot_nodes(std::move(other.tot_nodes)), nodeset_A(std::move(other.nodeset_A)), nodeset_B(std::move(other.nodeset_B)),
-	total_length(std::move(other.total_length)), hasAnchor(std::move(other.hasAnchor)), isShared(std::move(other.isShared)),
-	segment_set(std::move(other.segment_set)), usingSegmentSet(std::move(other.usingSegmentSet)), segments(std::move(other.segments)), 
-	gamma_s(std::move(other.gamma_s)), transition_nodes(std::move(other.transition_nodes)), configuration("\0"), vesselIDs(std::move(other.vesselIDs)),
-	//laying_direction(std::move(other.laying_direction)), tdz(std::move(other.tdz)),
-	percent(std::move(other.percent)), anc_tdp(std::move(other.anc_tdp)), tdp_fair(std::move(other.tdp_fair))
-{
-	other.tdz = nullptr;
-}
+	: m_id(std::move(other.m_id)), m_configuration("\0"),
+	m_has_anchor(std::move(other.m_has_anchor)), m_is_shared(std::move(other.m_is_shared)), m_using_segment_set(std::move(other.m_using_segment_set)), 
+	m_keypointA_id(std::move(other.m_keypointA_id)), m_keypointB_id(std::move(other.m_keypointB_id)), m_vessel_id(std::move(other.m_vessel_id)),
+	m_segment_set_id(std::move(other.m_segment_set_id)), m_seg_TDP_id(std::move(other.m_seg_TDP_id)),
+	m_nodeA_id(std::move(other.m_nodeA_id)), m_nodeB_id(std::move(other.m_nodeB_id)), m_tot_nodes(std::move(other.m_tot_nodes)),
+	m_nodesetA_id(std::move(other.m_nodesetA_id)), m_nodesetB_id(std::move(other.m_nodesetB_id)),
+	m_coordinate_system_id(std::move(other.m_coordinate_system_id)), m_total_length(std::move(other.m_total_length)),
+	m_segments(std::move(other.m_segments)), m_transition_nodes(std::move(other.m_transition_nodes))
+{}
 
 Line& Line::operator=(Line&& other) noexcept
 {
 	//if (tdz) delete tdz;
-	number = std::move(other.number);
-	keypoint_A = std::move(other.keypoint_A);
-	keypoint_B = std::move(other.keypoint_B);
-	cs = std::move(other.cs);
-	vessel = std::move(other.vessel);
-	node_A = std::move(other.node_A);
-	node_B = std::move(other.node_B);
-	tot_nodes = std::move(other.tot_nodes);
-	nodeset_A = std::move(other.nodeset_A);
-	nodeset_B = std::move(other.nodeset_B);
-	total_length = std::move(other.total_length);
-	hasAnchor = std::move(other.hasAnchor);
-	isShared = std::move(other.isShared);
-	segment_set = std::move(other.segment_set);
-	usingSegmentSet = std::move(other.usingSegmentSet);
+	m_id = std::move(other.m_id);
+	m_keypointA_id = std::move(other.m_keypointA_id);
+	m_keypointB_id = std::move(other.m_keypointB_id);
+	m_coordinate_system_id = std::move(other.m_coordinate_system_id);
+	m_vessel_id = std::move(other.m_vessel_id);
+	m_nodeA_id = std::move(other.m_nodeA_id);
+	m_nodeB_id = std::move(other.m_nodeB_id);
+	m_tot_nodes = std::move(other.m_tot_nodes);
+	m_nodesetA_id = std::move(other.m_nodesetA_id);
+	m_nodesetB_id = std::move(other.m_nodesetB_id);
+	m_total_length = std::move(other.m_total_length);
+	m_has_anchor = std::move(other.m_has_anchor);
+	m_is_shared = std::move(other.m_is_shared);
+	m_segment_set_id = std::move(other.m_segment_set_id);
+	m_using_segment_set = std::move(other.m_using_segment_set);
 
-	segments = std::move(other.segments);
-	gamma_s = std::move(other.gamma_s);
-	transition_nodes = std::move(other.transition_nodes);
-	configuration[0] = '\0';
-	vesselIDs = std::move(other.vesselIDs);
-	//tdz = std::move(other.tdz);
-	percent = std::move(other.percent);
-	anc_tdp = std::move(other.anc_tdp);
-	tdp_fair = std::move(other.tdp_fair);
+	m_segments = std::move(other.m_segments);
+	m_transition_nodes = std::move(other.m_transition_nodes);
+	m_configuration[0] = '\0';
 
-
-	//TDZ pointer
-	other.tdz = nullptr;
 
 	return *this;
 }
@@ -74,13 +62,13 @@ bool operator< (const Line& line1, const Line& line2)
 {
 	//Both lines with vessels identified and different between them
 	// -> uses the line numbers to compare
-	if (line1.vessel != 0 && line2.vessel != 0 && line1.vessel == line2.vessel)
+	if (line1.m_vessel_id[0] != 0 && line2.m_vessel_id[0] != 0 && line1.m_vessel_id == line2.m_vessel_id)
 	{
-		return line1.number < line2.number;
+		return line1.m_id < line2.m_id;
 	}
 	//Otherwise -> uses the vessel number to compare
 	else
-		return line1.vessel < line2.vessel;
+		return line1.m_vessel_id < line2.m_vessel_id;
 }
 bool operator> (const Line& line1, const Line& line2)
 {
@@ -89,8 +77,9 @@ bool operator> (const Line& line1, const Line& line2)
 
 bool operator== (const Line& line1, const Line& line2)
 {
-		/*			same ID number		  ||		same extremeties keypoints*/
-	return ( line1.number == line2.number || ( line1.keypoint_A == line2.keypoint_A && line1.keypoint_B == line2.keypoint_B ) );
+			/*			same ID number		  ||		same extremeties keypoints*/
+	return ( line1.m_id == line2.m_id ||
+		( line1.m_keypointA_id == line2.m_keypointA_id && line1.m_keypointB_id == line2.m_keypointB_id) );
 }
 bool operator!= (const Line& line1, const Line& line2)
 {
@@ -100,7 +89,7 @@ bool operator!= (const Line& line1, const Line& line2)
 //Comparing line with an ID number
 bool operator== (const Line& line1, const unsigned int& line2)
 {
-	return line1.vessel == line2;
+	return line1.m_vessel_id[0] == line2;
 }
 bool operator!= (const Line& line1, const unsigned int& line2)
 {
@@ -108,144 +97,100 @@ bool operator!= (const Line& line1, const unsigned int& line2)
 }
 
 
-//Reads input file
-bool Line::Read(FILE *f)
+
+void Line::IncrementTotNodes(unsigned int add_nodes)
 {
-
-	char str[500];			//salva palavras-chave lidas e valores lidos
-	fpos_t pos;				//variável que salva ponto do stream de leitura
-	bool readOk = true;
-
-	//Line number
-	if (fscanf(f, "%s", str) && isdigit(str[0]))
-		number = atoi(str);
-	else
-	{
-		Log::AddWarning("\n   + Error reading the ID number of a line");
-		return false;
-	}
-
-	//Boundary nodes
-	if (readOk && fscanf(f, "%s", str) != EOF && !strcmp(str, "Anchor"))
-	{
-		if (fscanf(f, "%d %s %d", &keypoint_A, str, &keypoint_B) == EOF || strcmp(str, "Fairlead"))
-			readOk = false;
-	}
-	//If "Fairlead" was read first, it is a line without an anchor
-	else if (readOk && !strcmp(str, "Fairlead"))
-	{
-		hasAnchor = false;
-
-		if (fscanf(f, "%d %s %d", &keypoint_A, str, &keypoint_B) == EOF || strcmp(str, "Fairlead"))
-			readOk = false;
-	}
-	else
-		readOk = false;
-
-	//Checks vessel number and previously error
-	if (readOk && !fgetpos(f, &pos) && fscanf(f, "%s", str) == EOF)
-		readOk = false;
-	//No specific vessel defined
-	else if (strcmp(str, "VesselID"))
-	{
-		if (hasAnchor)
-		{
-			std::string warning = "\n   + The line number " + std::to_string(number) + " supposed to be addressed to a vessel.";
-			Log::AddWarning(warning);
-			return false;
-		}
-		fsetpos(f, &pos);
-	}
-	//With a vessel
-	else if (!strcmp(str, "VesselID") && fscanf(f, "%s", str) != EOF && isdigit(str[0]))
-	{
-		//Check first vessel number
-		if (hasAnchor)
-			vessel = atoi(str);
-		else
-		{
-			isShared = true;
-			vesselIDs.emplace_back(atoi(str));
-			//Reading loop
-			while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-			{
-				//If is a number (vessel ID)
-				if (isdigit(str[0]))
-					vesselIDs.emplace_back(atoi(str));
-				//Separator between vessels
-				else if (!strcmp(str, ";"))
-					continue;
-				//Otherwise
-				else
-				{
-					fsetpos(f, &pos);
-					break;
-				}
-			}
-		}
-	}
-	//Other word -> ERROR
-	else
-		readOk = false;
-
-
-	if (!readOk)
-	{
-		std::string warning = "\n   + Error reading parameters of line " + std::to_string(number);
-		Log::AddWarning(warning);
-		return false;
-	}
-	
-		
-	//Check if there is a touchdown zone
-	if (!fgetpos(f, &pos) && fscanf(f, "%s", str) && !strcmp(str, "TouchdownZone"))
-	{
-		if (fscanf(f, "%lf %lf %lf", &percent, &anc_tdp, &tdp_fair) == EOF || percent == 0.0 || anc_tdp == 0.0 || tdp_fair == 0.0 ||
-			( !fgetpos(f, &pos) && fscanf(f, "%s", str) == EOF )) //Segment after TDZ
-		{
-			std::string warning = "\n   + Error reading touchdown zone of line number " + std::to_string(number);
-			Log::AddWarning(warning);
-			return false;
-		}
-	}
-
-	//Read segment(s)
-	if (!strcmp(str, "SegmentSet"))
-	{
-		fscanf(f, "%zd", &segment_set);
-		usingSegmentSet = true;
-	}
-	else
-	{
-		//Backs position because it can be a comment, then, try to read 'Length'
-		fsetpos(f, &pos);
-		if (!LoopReading::TryNestedKeyword_UnorderedMultiple(segments,
-															 std::unordered_set<std::string_view>({ "Length" }),
-															 std::unordered_set<std::string_view>({ "Line", "MooringLine", "Cable" }),
-															 f, pos, str))
-		{
-			std::string warning = "\n   + Error reading a segment of the line number " + std::to_string(number);
-			Log::AddWarning(warning);
-			return false;
-		}
-	}
-
-
-	//All OK while reading
-	return true;
+	this->m_tot_nodes += add_nodes;
+}
+void Line::AddLength(double length)
+{
+	this->m_total_length += length;
+}
+void Line::AddTransitionNode(unsigned int node)
+{
+	this->m_transition_nodes.push_back(node);
+}
+void Line::AddSegment(const LineSegment& seg)
+{
+	m_segments.emplace_back(seg);
 }
 
-const unsigned int Line::GetNumber() const
-{
-	return this->number;
-}
 
-const size_t Line::GetNSegments() const
-{
-	return this->segments.size();
-}
 
-const size_t Line::GetSegmentSet() const
+/// 
+/// SETTERS
+/// 
+
+void Line::SetIDNumber(unsigned int id)
 {
-	return this->segment_set;
+	m_id = id;
+}
+void Line::SetConfiguration(const std::string& configuration)
+{
+	m_configuration = configuration;
+}
+void Line::SetAnchorOpt(bool has_anchor)
+{
+	m_has_anchor = has_anchor;
+}
+void Line::SetSharedOpt(bool is_shared)
+{
+	m_is_shared = is_shared;
+}
+void Line::SetSegmentSetOpt(bool using_segment_set)
+{
+	m_using_segment_set = using_segment_set;
+}
+void Line::SetKeypointA(unsigned int keypoint_A)
+{
+	m_keypointA_id = keypoint_A;
+}
+void Line::SetKeypointB(unsigned int keypoint_B)
+{
+	m_keypointB_id = keypoint_B;
+}
+void Line::SetVesselID(unsigned int vessel_id)
+{
+	m_vessel_id[0] = vessel_id;
+}
+void Line::SetSegmentSet(unsigned int segment_set)
+{
+	m_segment_set_id = segment_set;
+	m_using_segment_set = true;
+}
+void Line::SetNodeA(unsigned int node_A)
+{
+	m_nodeA_id = node_A;
+}
+void Line::SetNodeB(unsigned int node_B)
+{
+	m_nodeB_id = node_B;
+}
+void Line::SetTotalNumNodes(unsigned int tot_nodes)
+{
+	m_tot_nodes = tot_nodes;
+}
+void Line::SetNodesetA(unsigned int nodeset_A)
+{
+	m_nodesetA_id = nodeset_A;
+}
+void Line::SetNodesetB(unsigned int nodeset_B)
+{
+	m_nodesetB_id = nodeset_B;
+}
+void Line::SetCoordinateSystem(unsigned int coordinate_system)
+{
+	m_coordinate_system_id = coordinate_system;
+}
+void Line::SetTotalLength(double total_length)
+{
+	m_total_length = total_length;
+}
+void Line::SetSegments(std::vector<LineSegment>& segments)
+{
+	m_segments = segments;
+}
+void Line::SetTDPSegment(unsigned int seg)
+{
+	this->m_seg_TDP_id = seg;
 }

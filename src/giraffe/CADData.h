@@ -3,23 +3,41 @@
 
 class CADData
 {
-	size_t number;
-	std::string name;
+private:
+
+	unsigned int m_id;
+	std::string m_name;
 
 public:
-	CADData() : number(0), name("\0") {};
-	~CADData() = default;
+	CADData();
+	~CADData();
 
-	//IO
-	bool Read(FILE* f);
-	void WriteGiraffeModelFile(std::ostream& fout) const;
-
-	/*-------
-	  Getters
-	 -------*/
-
-	size_t GetNumber() const;
-	const std::string& GetName() const;
 	
+	/// 
+	/// SETTERS
+	/// 
+
+	void SetIDNumber(unsigned int id);
+	void SetName(const std::string& name);
+
+
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline unsigned int GetNumber() const { return m_id; }
+	inline const std::string& GetName() const { return m_name; }
+	
+	
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend bool operator<(const CADData& obj1, const CADData& obj2);
+	friend bool operator>(const CADData& obj1, const CADData& obj2);
+	friend bool operator==(const CADData& obj1, const CADData& obj2);
+	friend bool operator!=(const CADData& obj1, const CADData& obj2);
+
+	friend std::ostream& operator<<(std::ostream& out, const CADData& obj);
 };
 

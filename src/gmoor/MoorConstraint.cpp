@@ -1,89 +1,80 @@
 #include "PCH.h"
 #include "MoorConstraint.h"
-//Auxiliary function to read input file
-#include "LoopReading.h"
+#include "AuxFunctions.h"
 
 
 MoorConstraint::MoorConstraint()
-	: existAnchorConstraint(false), existVesselConstraint(false), existLineConstraint(false)
+	: m_id(0), m_nodeset_id(0), m_constraints(6)
+{}
+
+MoorConstraint::~MoorConstraint()
+{}
+
+
+/// 
+/// SETTERS
+/// 
+
+void MoorConstraint::SetIDNumber(unsigned int id)
 {
-	anchors.reserve(32);
-	vessels.reserve(16);
-	lines.reserve(32);
+	m_id = id;
+}
+void MoorConstraint::SetNodeset(unsigned int nodeset_id)
+{
+	m_nodeset_id = nodeset_id;
 }
 
-
-//Read input file
-bool MoorConstraint::Read(FILE * f)
+void MoorConstraint::SetDof(unsigned int dof_id, const std::list<bool>& constraints)
 {
-	//Saves keywords and values readed
-	char str[500];
-
-	//Saves current position
-	fpos_t pos;
-
-	//Keywords
-	std::unordered_set<std::string_view> keywords({"AnchorConstraints", "VesselConstraints" , "LineConstraints" });
-
-	//Loop to read solution parameters
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-	{
-		if (!strcmp(str, "VesselConstraints"))
-		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(vessels, std::unordered_set<std::string_view>({ "VesselID" }), keywords, f, pos, str))
-				return false;
-			existVesselConstraint = true;
-		}
-		else if (!strcmp(str, "AnchorConstraints"))
-		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(anchors, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
-				return false;
-			existAnchorConstraint = true;
-		}
-		else if (!strcmp(str, "LineConstraints"))
-		{
-			if (!LoopReading::TryNestedKeyword_UnorderedMultiple(lines, std::unordered_set<std::string_view>({ "LineID" }), keywords, f, pos, str))
-				return false;
-			existLineConstraint = true;
-		}
-		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str))
-			continue;
-		//Other word -> end loop and backs to IO class
-		else
-		{
-			fsetpos(f, &pos);
-			break;
-		}
-	}
-
-
-	//All ok while reading
-	return true;
+	m_constraints[dof_id] = constraints;
+}
+void MoorConstraint::PushToDof(unsigned int dof, bool constraint)
+{
+	m_constraints[dof].push_back(constraint);
+}
+void MoorConstraint::PushX(bool constraint)
+{
+	m_constraints[0].push_back(constraint);
+}
+void MoorConstraint::PushY(bool constraint)
+{
+	m_constraints[1].push_back(constraint);
+}
+void MoorConstraint::PushZ(bool constraint)
+{
+	m_constraints[2].push_back(constraint);
+}
+void MoorConstraint::PushRotX(bool constraint)
+{
+	m_constraints[3].push_back(constraint);
+}
+void MoorConstraint::PushRotY(bool constraint)
+{
+	m_constraints[4].push_back(constraint);
+}
+void MoorConstraint::PushRotZ(bool constraint)
+{
+	m_constraints[5].push_back(constraint);
 }
 
 
 /// 
-/// Get functions
+/// Overloaded Operators
 /// 
 
-const std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints() const
-{ return this->anchors; }
-std::vector<AnchorConstraint>& MoorConstraint::GetAnchorConstraints()
-{ return this->anchors; }
-const std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints() const
-{ return this->vessels; }
-std::vector<VesselConstraint>& MoorConstraint::GetVesselConstraints()
-{ return this->vessels; }
-const std::vector<LineConstraint>& MoorConstraint::GetLineConstraints() const
-{ return this->lines; }
-std::vector<LineConstraint>& MoorConstraint::GetLineConstraints()
-{ return this->lines; }
-
-
-
-bool MoorConstraint::ExistAnchorConstraint()
-{ return this->existAnchorConstraint; }
-bool MoorConstraint::ExistLineConstraint()
-{ return this->existLineConstraint; }
-bool MoorConstraint::ExistVesselConstraint()
-{ return this->existVesselConstraint; }
+bool operator<(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return obj1.m_id < obj2.m_id;
+}
+bool operator>(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return !(obj1 < obj2);
+}
+bool operator==(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return obj1.m_id == obj2.m_id;
+}
+bool operator!=(const MoorConstraint& obj1, const MoorConstraint& obj2)
+{
+	return !(obj1 == obj2);
+}

@@ -14,13 +14,11 @@
 #include "Keypoint.h"
 #include "Line.h"
 #include "Vessel.h"
-#include "Platform.h"
 #include "LineDisplacementField.h"
 #include "VesselDisplacement.h"
 #include "StiffnessMatrix.h"
 #include "SegmentSet.h"
 #include "SegmentProperty.h"
-#include "SineWaveDisplacement.h"
 
 #include "MathCode.h"
 
@@ -53,10 +51,10 @@ public:
 	unsigned int cur_load;
 	unsigned int cur_disp;
 	unsigned int cur_rbdata;
-	unsigned int node_set_contact;	//nodes of all lines
-	unsigned int pil_node_set;		//seabed nodeset
-	bool TDZ;
+	unsigned int node_set_contact_id;	//nodes of all lines
+	unsigned int pil_node_set_id;		//seabed nodeset
 	bool existSharedLine;
+	
 
 	/*------------
 	TDP parameters
@@ -74,18 +72,15 @@ public:
 	//Number of elements in the TDZ
 	unsigned int elem_tdp;
 
-	//Segment number that contains the TDZ (if exists).
-	 //The TDZ is restricted to a single segment
-	unsigned int seg_tdp;
-
 	//============================================================================
 
 	/*-----------------------------------
 	Auxiliar tables, matrices and vectors
 	------------------------------------*/
 
-	//Table with values of lines penetration in the seabed 
-	Table* penetration;
+
+	//Tables with values of lines penetration in the seabed 
+	std::forward_list<Table> penetrations;
 	
 	//Auxiliar matrix to mount line mesh
 	std::vector<std::vector<double>> x0_n;
@@ -94,12 +89,13 @@ public:
 	std::array<double, 2> extrem_tensions;
 
 	//Number of nodesets
-	std::forward_list<unsigned int> anchor_nodesets, fairlead_nodesets;
+	std::forward_list<unsigned int> anchor_nodesets_id;
+	std::forward_list<unsigned int> fairlead_nodesets_id;
 
 	// Dynamic relaxation data
-	std::vector<double> rho_eq;	///equivalent specific mass for each  line
-	std::vector<double> area_eq;	///equivalent cross section area for each line
-	double rot_fairlead;			///fairlead rotation
+	std::vector<double> rho_eq;		// equivalent specific mass for each  line
+	std::vector<double> area_eq;	// equivalent cross section area for each line
+	double rot_fairlead;			// fairlead rotation
 
 	//============================================================================
 
@@ -116,48 +112,35 @@ public:
 	MoorEnvironment environment;
 	MoorSolution moorsolution;
 	MoorPost moorpost;
-	MoorConstraint moor_constraint;
-		
+	
 
 	/*-------------
 	Object pointers
 	--------------*/
 
-	//Stiffness matrix object (analytical or numerical)
+	//Stiffness matrix object (analytical and/or numerical)
 	std::unique_ptr<StiffnessMatrix> stiff_matrix;
-	//============================================================================
+	
 
-	/*-----------------------------------------------------
-	Containers with objects composing the programa Database
-	-----------------------------------------------------*/
 
-	//Vector with line objects (before move assignments)
-	std::vector<Line> line_vector;
+			/*--------------------------
+			|                           |
+			|  Containers with objects  |
+			|                           |
+			 ---------------------------*/
 
-	//Vector with vessel objects
-	std::vector<Vessel> vessel_vector;
+	std::vector<Line> lines;
+	std::vector<Vessel> vessels;
+	std::vector<Keypoint> keypoints;
+	std::vector<SegmentProperty> segment_properties;
+	std::deque<MoorLoad> moor_loads;
+	std::deque<VesselDisplacement> vessel_displacements;
+	std::vector<SegmentSet> segment_sets;
+	std::vector<LineDisplacementField> line_disp_fields;
 
-	//Vector with keypoints objects
-	std::vector<Keypoint> keypoint_vector;
-
-	//Vector with segment properties objects
-	std::vector<SegmentProperty> segment_property_vector;
-
-	//Deque with nodal force objects
-	std::deque<MoorLoad> moorload_vector;
-
-	//Vector with platform objects
-	std::vector<Platform> platform_vector;
-
-	//Deque with vessel displacements
-	std::deque<VesselDisplacement> vessel_disp_vector;
-
-	//Vector with segment sets
-	std::vector<SegmentSet> segment_set_vector;
-
-	//Vector with displacement fields
-	std::vector<LineDisplacementField> disp_field_vector;
-
+	std::vector<MoorConstraint> anchor_constraints;
+	std::vector<MoorConstraint> vessel_constraints;
+	std::vector<MoorConstraint> line_constraints;
 
 	//============================================================================
 
@@ -193,40 +176,40 @@ public:
 	  -> 'GenerateCatenary' calls other functions*/
 	bool GenerateCatenary();
 
-	void Catenary_GeneralSetting(Line& line, const unsigned int& n_segs, 
+	void Catenary_GeneralSetting(Line& line,
 								 Matrix& A, Matrix& B, Matrix& Fairleads_StiffnessMatrix);
 
-	bool SolveCatenaryEquations(Line& line, const unsigned int& n_segs, Matrix& A, Matrix& B,
+	bool SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 								double& Hf, double& Vf, Matrix& F, std::vector <double>& FV,
 								Matrix& Fairleads_StiffnessMatrix);
 
-	void SetLinesConfiguration(Line& line, Matrix& F, std::vector <double>& FV, const unsigned int& n_segs);
+	void SetLinesConfiguration(Line& line, Matrix& F, std::vector<double>& FV);
 
-	void GenerateCatenaryTDZ(Line& line, const unsigned int& n_segs, unsigned int& seg_init);
 
-	void CheckSegmentsSize(Line& line, const unsigned int& n_segs, const unsigned int& seg_init);
+	void CheckSegmentsSize(Line& line);
 
-	void SetMeshProperties(Line& line, const unsigned int& n_segs);
+	void SetMeshProperties(Line& line);
 
-	//Gera a malha das linhas
 	void GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, double& Vf);
 
-	void GenerateCatenaryDisplacement(Line& line, const unsigned int& n_segs, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
+	void ImposePenetration(Line& line);
+
+	void GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
 									  std::vector<std::vector<double>>& xcat_n, std::vector<std::vector<double>>& zcat_n, std::vector<std::vector<double>>& roty_n);
 
 
 	//Checks for dummy elements
 	void CheckDummyElements();
 
-	//Generates contact
-	void GenerateContact();
+	//Generates contact between line(s) and seabed
+	void GenerateContacts();
 
 	void GenerateDynamicRelaxation();
 
 	inline bool Look4SharedLine();
 
 	//Generates vessel (node, element, nodeset and fairleads coupling)
-	void GenerateVessel();
+	void GenerateVessels();
 
 	void GenerateRigidNodeSets();
 	void IncludeSharedLinesFaileads(BoolTable& bool_t);
@@ -255,10 +238,6 @@ public:
 	//Generates constraints
 	void GenerateConstraints();
 
-	//Creates platform object(s)
-	void GeneratePlatform();
-
-
-	//Generate segments from 'SegmentSet', if needed
+	//Generate segments from 'SegmentSet'
 	void GenerateSegments();
 };

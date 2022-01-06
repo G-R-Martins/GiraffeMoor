@@ -3,58 +3,72 @@
 
 
 NodalForce::NodalForce()
-	: table(nullptr), mathCode(nullptr), file_name("\0"), header_lines(0),  n_times(0), nodeset(0)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {}
 NodalForce::NodalForce(Table* time_series)
-	: table(time_series), mathCode(nullptr), file_name("\0"), header_lines(0), n_times(0), nodeset(0)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
 {}
-NodalForce::NodalForce(MathCode* mc)
-	: table(nullptr), mathCode(mc), file_name("\0"), header_lines(0), n_times(0), nodeset(0)
+NodalForce::NodalForce(unsigned int nodeset_id, Table * time_series)
+	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
+{}
+NodalForce::NodalForce(MathCode* math_code)
+	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
-	this->DefineMathCodeOption();
+	this->SetMathCodeOpt(true);
 }
-NodalForce::NodalForce(const std::string& f_name, const unsigned int& h_lines, const unsigned int& ntimes)
-	: table(nullptr), mathCode(nullptr),
-	file_name(f_name), header_lines(h_lines), n_times(ntimes), nodeset(0)
+NodalForce::NodalForce(unsigned int nodeset_id, MathCode* math_code)
+	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
-	this->DefineExternalFileOption();
+	this->SetMathCodeOpt(true);
 }
-NodalForce::NodalForce(std::string_view f_name, const unsigned int& h_lines, const unsigned int& ntimes)
-	: table(nullptr), mathCode(nullptr),
-	file_name(f_name), header_lines(h_lines), n_times(ntimes), nodeset(0)
+NodalForce::NodalForce(const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
+	: m_nodeset_id(0), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {
-	this->DefineExternalFileOption();
+	this->SetExternalFileOpt(true);
+}
+NodalForce::NodalForce(unsigned int nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
+	: m_nodeset_id(nodeset_id), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
+{
+	this->SetExternalFileOpt(true);
 }
 
 NodalForce::~NodalForce()
 {
-	if (table)
+	if (m_ptr_table)
 	{
-		table->table.clear();
-		table = nullptr;
+		m_ptr_table->table.clear();
+		m_ptr_table = nullptr;
 	}
-	if (mathCode) 
-		delete mathCode;
+	if (m_ptr_math_code)
+		delete m_ptr_math_code;
 }
 
-//Writes Giraffe input file
-void NodalForce::WriteGiraffeModelFile(std::ostream& fout) const
+
+
+
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const NodalForce& obj)
 {
-	fout << "\tNodalLoad " << number << 
-		"\tNodeSet " << nodeset << 
-		"\tCS " << CS << "\t";
-	if (isMathCode)
+	out << "\tNodalLoad " << obj.GetNumber()
+		<< "\tNodeSet " << obj.m_nodeset_id
+		<< "\tCS " << obj.m_cs_id
+		<< "\t";
+
+	if (obj.m_is_math_code)
+		out << "MathCode\n" << obj.m_ptr_math_code;
+	else if (obj.IsExternalFile())
 	{
-		fout << "MathCode\n" << mathCode;
-	}
-	else if (extFile)
-	{
-		fout << "\n\t\tFile \"" << file_name << "\"" <<
-			"\tHeaderLines " << header_lines << 
-			"\tNTimes " << n_times << "\n";
+		out << "\n\t\tFile \"" << obj.m_file_name << "\"" 
+			<< "\tHeaderLines " << obj.m_header_lines 
+			<< "\tNTimes " << obj.m_steps 
+			<< "\n";
 	}
 	else
-	{
-		fout << "NTimes " << table->GetLines() << "\n" << table;
-	}
+		out << "NTimes " << obj.m_ptr_table->GetNLines() << "\n" << obj.m_ptr_table;
+
+	return out;
 }

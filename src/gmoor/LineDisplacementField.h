@@ -4,54 +4,57 @@
 
 class LineDisplacementField
 {
-	unsigned int number;
-	unsigned int step;
-	bool isHarmonic;
-	double amplitude;
-	unsigned int mode;
-
-	//============================================================================
+private:
+	unsigned int m_number;
+	unsigned int m_step_id;
+	
+	bool m_is_harmonic;
+	double m_amplitude;
+	unsigned int m_mode;
 
 public:
 	
 	/// Constructors and destructor
 	LineDisplacementField();
+	~LineDisplacementField();
 	LineDisplacementField(const LineDisplacementField&) = default;
 	LineDisplacementField(LineDisplacementField&&) = default;
-	~LineDisplacementField() = default;
 
-			/*--------
-			 Functions
- 			 --------*/
-	
-	//Read input file
-	bool Read(FILE* f);
+
 
 	///				 
-	/// Get functions
+	/// SETTERS
+	///				 
+	
+	void SetIDNumber(unsigned int number);
+	void SetSolutionStep(unsigned int step_id);
+	void SetAmplitude(double amplitude);
+	void SetMode(unsigned int mode);
+	void SetHarmonicOpt(bool is_harmonic);
+
+
+	///				 
+	/// GETTERS
 	///				 
 
-	unsigned int GetNumber() const;
-	unsigned int GetStep() const;
-	bool IsHarmonic() const;
-	double GetAmplitude() const;
-	unsigned int GetMode() const;
+	unsigned int GetNumber() const		{ return m_number; }
+	unsigned int GetStep() const			{ return m_step_id; }
+	double GetAmplitude() const		{ return m_amplitude; }
+	unsigned int GetMode() const	{ return m_mode; }
+	bool IsHarmonic() const			{ return m_is_harmonic; }
 
 
-	//============================================================================
 
-	
-	/*------------------
-	Overloaded operators
-	-------------------*/
+	///
+	/// Overloaded operators
+	///
 
 	friend bool operator<(const LineDisplacementField& disp1, const LineDisplacementField& disp2);
 	friend bool operator>(const LineDisplacementField& disp1, const LineDisplacementField& disp2);
 	friend bool operator==(const LineDisplacementField& disp1, const LineDisplacementField& disp2);
 	friend bool operator!=(const LineDisplacementField& disp1, const LineDisplacementField& disp2);
 
-	//Assignment operators (copy and move)
-	LineDisplacementField& operator=(LineDisplacementField&& other) = default;
-	LineDisplacementField& operator=(const LineDisplacementField& other) = default;
+	LineDisplacementField& operator=(const LineDisplacementField&) = default;
+	LineDisplacementField& operator=(LineDisplacementField&&) = default;
 };
 

@@ -60,12 +60,6 @@ class Summary
 	std::vector<std::tuple<double, double, std::string>> steps;
 	
 
-					/*+-+-+-+-+-+-+-+
-					|               |
-					|   Functinos   |
-					|               |
-					+-+-+-+-+-+-+-+-*/
-
 	//Implementations of corresponding static functions
 	void CreateSumFile_Impl(const std::string& name_with_folder, const std::string& version);
 	void CreateSumFile_Impl(const std::string& name_with_folder, std::string_view version);
@@ -105,9 +99,10 @@ public:
 	static void AddLine( const std::array<unsigned int, 2>& nodes, const std::array<unsigned int, 2>& elements,
 						 const std::array<unsigned int, 2>& nodesets, const std::array<double, 2>& tensions,
 						 const unsigned int& number, const std::string_view& configuration,
-						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs ) { 
+						 bool TDP, const double& x_tdp, const double& total_length, const unsigned int& segs ) {
 		return getInstance().AddLine_Impl(nodes, elements, nodesets, tensions, number, configuration, TDP, x_tdp, total_length, segs); }
 	
+	//[initial time, end time, description]
 	static auto& GetSteps() { 
 		return getInstance().GetSteps_Impl(); }
 

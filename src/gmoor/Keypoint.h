@@ -3,26 +3,37 @@
 class Keypoint
 {
 	//Keypoint ID
-	unsigned int number;
+	unsigned int m_id;
 
 	//Coordinates
-	double x, y, z;
+	double m_x;
+	double m_y;
+	double m_z;
 
 	//============================================================================
 
 public:
 	Keypoint();
-	Keypoint(double coord_x, double coord_y, double coord_z, unsigned int ID=0);
+	Keypoint(double x, double y, double z, unsigned int id=0);
 	~Keypoint();
 
-	//Reads input file
-	bool Read(FILE *f);
 
-	//Set functions
+	/// 
+	/// SETTERS
+	/// 
 	
+	void SetIDNumber(unsigned int number);
+	void SetX(double x);
+	void SetY(double y);
+	void SetZ(double z);
 
-	//Get functions
-	const unsigned int GetNumber() const;
+
+	/// 
+	/// GETTERS
+	/// 
+	
+	inline const unsigned int GetIDNumber() const							{ return this->m_id; }
+	inline const std::array<double, 3> GetAllCoordinates() const	{ return std::array{ m_x, m_y, m_z }; }
 	const double GetCoordinate(char coordinate) const;
 
 

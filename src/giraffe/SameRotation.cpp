@@ -3,17 +3,26 @@
 
 
 SameRotation::SameRotation()
-	: node_A(0), node_B(0)
-{
-}
+	: m_nodeA_id(0), m_nodeB_id(0)
+{}
+SameRotation::SameRotation(unsigned int nodeA_id, unsigned int nodeB_id)
+	: m_nodeA_id(nodeA_id), m_nodeB_id(nodeB_id)
+{}
 
 SameRotation::~SameRotation()
 {
-	bool_table.Clear();
+	m_booltable.Clear();
 }
 
-void SameRotation::WriteGiraffeModelFile(std::ostream& fout) const
-{
-	fout << "\tSameRotation " << number <<
-		"\tNodes " << node_A << " " << node_B << " " << bool_table;
+
+/// 
+/// Overloaded operators
+/// 
+
+std::ostream& operator<<(std::ostream& out, const SameRotation& obj) {
+	out << "\tSameRotation " << obj.GetIDNumber() 
+		<< "\tNodes " << obj.m_nodeA_id << " " << obj.m_nodeB_id << " "
+		<< obj.m_booltable;
+
+	return out;
 }

@@ -1,50 +1,63 @@
 #include "PCH.h"
-#include "Log.h"
 #include "CADData.h"
 
 
-bool CADData::Read(FILE* f)
+CADData::CADData()
+	: m_id(0), m_name("\0")
+{}
+
+CADData::~CADData()
+{}
+
+
+
+
+/// 
+/// SETTERS
+/// 
+
+void CADData::SetIDNumber(unsigned int id)
 {
-	//Reading auxiliary variables
-	char str[200], c, temp_name[200];
-
-
-	if (fscanf(f, "%zd %s", &number, str) && !strcmp(str, "Name"))
-	{
-		if (fscanf(f, "%[^\"]*", str) == EOF || fscanf(f, "%c%[^\"]s", &c, temp_name) == EOF || c != '\"'
-			|| fscanf(f, "%s", str) == EOF) //read the last quote
-		{
-
-			std::stringstream ss{ "\n   + Error reading CAD name of the platform number " }; ss << number;
-			Log::AddWarning(ss);
-			return false;
-		}
-		else
-			name = temp_name;
-	}
-	else
-	{
-		Log::AddWarning("\n   + Error reading CAD data");
-		return false;
-	}
-
-
-	//All ok while reading
-	return true;
+	this->m_id = id;
 }
 
-void CADData::WriteGiraffeModelFile(std::ostream& fout) const
+void CADData::SetName(const std::string& name)
 {
-	fout << "\tSTLSurface " << number << "\t" <<name << "\n";
+	this->m_name = name;
 }
 
 
 
-size_t CADData::GetNumber() const
+/// 
+/// Overloaded operators
+/// 
+
+bool operator<(const CADData& obj1, const CADData& obj2)
 {
-	return this->number;
+	return obj1.m_id < obj2.m_id;
 }
-const std::string& CADData::GetName() const
+
+bool operator>(const CADData& obj1, const CADData& obj2)
 {
-	return this->name;
+	return !(obj1 < obj2);
+}
+
+bool operator==(const CADData& obj1, const CADData& obj2)
+{
+	return obj1.m_id == obj2.m_id;
+}
+
+bool operator!=(const CADData& obj1, const CADData& obj2)
+{
+	return !(obj1 == obj2);
+}
+
+
+
+std::ostream& operator<<(std::ostream& out, const CADData& obj)
+{
+	out << "\tSTLSurface " << obj.m_id <<
+		"\t" << obj.m_name << "\n";
+
+	return out;
 }

@@ -4,21 +4,26 @@
 
 Truss::Truss()
 {
-	nodes.resize(2);
+	m_nodes.resize(2);
 }
 
 
 Truss::~Truss()
 {}
 
-void Truss::WriteGiraffeModelFile(std::ostream& fout) const
+std::ostream& operator<<(std::ostream& out, const Truss& obj)
 {
-	if (mark_segment_begin)
-		fout << "\t//Segment begin\n";
-	else if (!label.empty())
-		fout << "\t//" << label << "\n";
-	fout << "\tTruss_1 " << number <<
-		"\tPipeSec " << section <<
-		"\tNodes " << nodes[0] << " " << nodes[1] <<
-		"\n";
+	if (obj.m_mark_segment_begin)
+		out << "\t//Segment begin\n";
+	else if (!obj.m_label.empty())
+		out << "\t//" << obj.m_label << "\n";
+	
+	out << "\tTruss_1 " << obj.m_id
+		<< "\tPipeSec " << obj.m_section_id <<
+		"\tNodes " << obj.m_nodes[0] << " " << obj.m_nodes[1] 
+		<< "\n";
+
+	return out;
 }
+
+

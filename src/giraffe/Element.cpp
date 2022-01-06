@@ -2,13 +2,17 @@
 #include "Element.h"
 
 Element::Element()
-	: material(0), section(0), number(0), n_nodes(0), cs(0), 
-	mark_segment_begin(false)
+	: m_id(0), m_label(""), m_material_id(0), m_section_id(0), m_cs_id(0),
+	m_tot_nodes(0),	m_mark_segment_begin(false)
 {}
-
 Element::Element(const std::string & name)
-	: material(0), section(0), number(0), n_nodes(0), cs(0), 
-	mark_segment_begin(false), label(name)
+	: m_material_id(0), m_section_id(0), m_id(0), m_tot_nodes(0), m_cs_id(0),
+	m_mark_segment_begin(false), m_label(name)
+{}
+Element::Element(unsigned int id, unsigned int material_id, unsigned int section_id, unsigned int cs_id, 
+	unsigned int tot_nodes, std::vector<unsigned int> nodes, bool segment_begin, const std::string& label)
+	: m_id(id), m_label(label), m_material_id(material_id), m_section_id(section_id), m_cs_id(cs_id),
+	m_tot_nodes(tot_nodes), m_mark_segment_begin(segment_begin)
 {}
 
 
@@ -16,82 +20,35 @@ Element::~Element()
 {}
 
 
-/// 
-/// Get functions
-/// 
-std::string const& Element::GetLabel() const
+void Element::SetIDNumber(unsigned int id)
 {
-	return this->label;
+	m_id = id;
 }
-std::string& Element::GetLabel()
+void Element::SetLabel(const std::string& label)
 {
-	return this->label;
+	m_label = label;
 }
-unsigned int Element::GetMaterial() const
+void Element::SetMaterial(unsigned int material_id)
 {
-	return this->material;
+	m_material_id = material_id;
 }
-unsigned int Element::GetSection() const
+void Element::SetSection(unsigned int section_id)
 {
-	return this->section;
+	m_section_id = section_id;
 }
-unsigned int Element::GetNumber() const
+void Element::SetCS(unsigned int cs_id)
 {
-	return this->number;
+	m_cs_id = cs_id;
 }
-unsigned int Element::GetNNodes() const
+void Element::SetTotNodes(unsigned int tot_nodes)
 {
-	return this->n_nodes;
+	m_tot_nodes = tot_nodes;
 }
-unsigned int Element::GetCS() const
+void Element::SetNodes(const std::vector<unsigned int>& nodes)
 {
-	return this->cs;
+	m_nodes = nodes;
 }
-std::vector<unsigned int> const& Element::GetNodes() const
+void Element::SetFirstElementOpt(bool option)
 {
-	return this->nodes;
-}
-std::vector<unsigned int>& Element::GetNodes()
-{
-	return this->nodes;
-}
-bool Element::CheckIfIsFirstElement() const
-{
-	return this->mark_segment_begin;
-}
-
-/// 
-/// Set functions
-/// 
-void Element::SetLabel(const std::string& name)
-{
-	this->label = name;
-}
-void Element::SetMaterial(unsigned int mat)
-{
-	this->material = mat;
-}
-void Element::SetSection(unsigned int sec)
-{
-	this->section = sec;
-}
-void Element::SetNumber(unsigned int num)
-{
-	this->number = num;
-}
-void Element::SetNNodes(unsigned int nnodes)
-{
-	this->n_nodes = nnodes;
-}
-void Element::SetCS(unsigned int coord_sys)
-{
-	this->cs = coord_sys;
-}
-void Element::SetNodes(const std::vector<unsigned int>& n_vec)
-{
-	this->nodes = n_vec;
-}
-void Element::SetFirstElementBool(bool bool_option)
-{
-	this->mark_segment_begin = bool_option;
+	m_mark_segment_begin = option;
 }

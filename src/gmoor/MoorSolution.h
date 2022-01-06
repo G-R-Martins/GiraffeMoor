@@ -1,74 +1,107 @@
 #pragma once
 #include "SolutionStep.h"
 
+
 class MoorSolution
 {
+private:
+	// Before analysis
+	unsigned int m_steps_to_set_model;
+	
+	// Optional step to establish the sea current
+	std::shared_ptr<SolutionStep> m_sea_current_step_ptr;
+	bool m_seacurrent_step_exist;
+
+	// Optional dynamic relaxation step(s)
+	// -> to find lines static configuration and/or to release vessel forces
+	bool m_dyn_relax_exist;
+	
+	// Optional step to search for lines static configuration
+	std::shared_ptr<DynRelaxLinesConfig> m_lines_configuration_ptr;
+	bool m_lines_config_exist;
+	
+	// Analysis steps
+	std::vector<SolutionStep> m_solution_steps;
+
 public:
+
 	MoorSolution();
+	MoorSolution(const MoorSolution&) = default;
+	MoorSolution(MoorSolution&&) noexcept = default;
 	~MoorSolution();
 	
-	//Reads input file
-	bool Read(FILE *f);
-
-	//Returns the vector with all solution (anlysis) steps
-	const std::vector<SolutionStep>& GetStepsVec() const;
-
-	//Returns a specific solution (analysis) step
-	const SolutionStep& GetStep(const size_t& step) const;
-
-	//============================================================================
-
-							/*-------
-							Variables
-							--------*/
-
-	/*---------------------------
-	Dynamic relaxation parameters
-	----------------------------*/
+	/// 
+	/// Shared pointers initializers
+	/// 
+	inline std::shared_ptr<DynRelaxLinesConfig> InitDynRelaxLines();
+	inline std::shared_ptr<SolutionStep> InitStepSeaCurrent();
+	inline std::shared_ptr<SolutionStep> InitDynRelaxVessels();
 	
-	//Boolean to indicate if there is a dynamic relaxations step
-	bool bool_DynamicRelax;
 
-	//Displacement decrement
-	double decrement;
+	///
+	/// SETTERS
+	///
 
-	//Number of periods during the dyn. relax. step
-	unsigned int dyn_relax_periods;
-
-	//Time during the dyn. relax. step (round up)
-	unsigned int TimeRelax;
-
-	//Alpha coefficient to Rayleigh damping during the dyn. relax. step
-	double alpha_relax;
-
-	//Boolean to indicate if there is a dynamic step to release forces at the vessel node
-	bool bool_ReleaseForces;
-
-	//Time step for release forces
-	double release_timestep;
+	void SetStepsBeforeAnalysis(unsigned int steps);
+	void SetDynRelaxExist(bool exist);
+	void SetDynRelax_LinesConfigExist(bool exist);
 
 
-	/*--------------------
-	Sea current parameters
-	---------------------*/
+	SolutionStep* AddSolutionStep();
+	void PushBackSolutionStep();
+
+	///
+	/// GETTERS
+	///
+
+	inline unsigned int GetStepsBeforeAnalysis() const					{ return this->m_steps_to_set_model; }
+
+	// Get dynamic relaxation step to find lines static configuration
+	inline std::shared_ptr<DynRelaxLinesConfig> GetStepDynRelaxLines()	{ return this->m_lines_configuration_ptr; }
 	
-	//Sea current time step
-	double seacurrent_timestep;
-	
-	//Sea current maximum time step
-	double seacurrent_max_timestep;
+	// Get step to establish sea current
+	inline std::shared_ptr<SolutionStep> GetStepSeaCurrent()			{ return this->m_sea_current_step_ptr; }
 
-	//Sea current minimum time step
-	double seacurrent_min_timestep;
-	
-	
-	/*-----------
-	Steps options
-	------------*/
-	//Steps before analysis
-	unsigned int steps_to_set_model;
+	// Get the vector with all solution (anlysis) steps
+	inline const std::vector<SolutionStep>& GetStepsVec() const			{ return this->m_solution_steps; }
+	inline std::vector<SolutionStep>& GetStepsVec()						{ return this->m_solution_steps; }
 
-	//Container with analysis steps
-	std::vector <SolutionStep> solution_steps;
+	// Get a specific solution (analysis) step
+	inline const SolutionStep& GetStep(const unsigned int& step) const		{ return this->m_solution_steps[step]; }
 
+	// Getter-ish -> check booleans
+	bool ExistDynamicRelaxation() const	{ return this->m_dyn_relax_exist; }
+	bool ExistDynRelax_Lines() const	{ return this->m_lines_config_exist; }
+	bool ExistSeaCurrentStep() const	{ return this->m_seacurrent_step_exist; }
+
+
+
+	///
+	/// Overloaded operators
+	///
+
+	MoorSolution& operator=(const MoorSolution&) = default;
+	MoorSolution& operator=(MoorSolution&&) = default;
 };
+
+
+
+
+/// Inline initializer for shared pointers
+std::shared_ptr<DynRelaxLinesConfig> MoorSolution::InitDynRelaxLines() {
+	this->m_lines_configuration_ptr = std::make_shared<DynRelaxLinesConfig>(0.0, 0, 0, 0, false, 0.0, 0.0, 1.0, 1.0e-1, 1.0e-4, 1'000'000,
+		0.0, 0.0, 0.0, 0.0);
+
+	this->m_dyn_relax_exist = true;
+	this->m_lines_config_exist = true;
+
+	return this->m_lines_configuration_ptr;
+}
+std::shared_ptr<SolutionStep> MoorSolution::InitStepSeaCurrent() {
+	this->m_sea_current_step_ptr = std::make_shared<SolutionStep>(0, true, 0.0, 1.0, 1.0, 1.0e-5, 1.0e0, false, 
+		1'000'000, 0.0, 0.0, 0.0, 0.0);
+
+	this->m_seacurrent_step_exist = true;
+
+	return this->m_sea_current_step_ptr;
+}

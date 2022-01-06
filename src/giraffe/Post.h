@@ -1,53 +1,55 @@
 #pragma once
 #include "CADData.h"
-
+#include "WritingFlags.h"
 
 class Post
 {
+private:
+	double m_mag_factor;  //Magnification factor of displacements
+	WritingFlags m_writing_flags;
+
+	std::vector<CADData> m_cad_vector;
+
 public:
 	Post();
 	~Post();
 
-	//============================================================================
 
-					/*-------
-					Functions
-					--------*/
+	// Create VTK files
+	bool CreateSeabedVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
+	bool CreateWaterVTK(std::string& folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
 
-	//Writes Giraffe file
-	void WriteGiraffeModelFile(std::ostream& fout) const;
 
-	// Creates seabed VTK file
 
-	bool CreateSeabedVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y, const double& depth);
+	/// 
+	/// SETTERS
+	/// 
 	
-	//Creates water surface VTK file
-	bool CreateWaterVTK(std::string folder, const std::array<double, 2>& x, const std::array<double, 2>& y);
+	void SetMagFactor(double mag_factor);
+	void SetAllCADs(const std::vector<CADData>& cad_vector);
+	void SetAllCADs(std::vector<CADData>&& cad_vector);
+	void SetFlags(WritingFlags&& flags);
 
+	/// 
+	/// GETTERS
+	/// 
 
-	//============================================================================
+	inline bool GetMagFactor() const { return m_mag_factor; }
 	
-					/*-------
-					Variables
-					--------*/
-	//Magnification factor of displacements
-	double mag_factor;
+	inline const WritingFlags& GetWritingFlags() const { return m_writing_flags; }
+	inline WritingFlags& GetWritingFlags() { return m_writing_flags; }	
 
-	struct WritingOpt
-	{
-		bool mesh_flag;
-		bool renderMesh_flag;
-		bool rigidContactSurfaces_flag;
-		bool flexibleContactSurfaces_flag;
-		bool constraints_flag;
-		bool forces_flag;
-		bool specialConstraints_flag;
-		bool contactForces_flag;
-		bool renderParticles_flag;
-		bool renderRigidBodies_flag;
-	} write;
+	inline const CADData& GetCAD(unsigned int platform) const { return m_cad_vector[platform]; }
+	inline CADData& GetCAD(unsigned int platform) { return m_cad_vector[platform]; }
+	inline const std::vector<CADData>& GetAllCADs() const { return m_cad_vector; }
+	inline std::vector<CADData>& GetAllCADs() { return m_cad_vector; }
 
-	//Vector with CADs for post proessing
-	std::vector<CADData> cads_vector;
+
+
+	/// 
+	/// Overloaded operators
+	/// 
+
+	friend std::ostream& operator<<(std::ostream& out, const Post* obj);
 };
 

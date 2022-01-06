@@ -1,79 +1,24 @@
 #include "PCH.h"
 #include "StiffnessMatrix.h"
-#include "MooringModel.h"
-#include "AuxFunctions.h"
-#include "Log.h"
 
 
 StiffnessMatrix::StiffnessMatrix()
-	: bool_ana(false), bool_num(false), time_init(0.0), stiff_matrix_step(0), time_matrix(0.0), time_series(nullptr),
-	disp_init_x(0.0), disp_init_y(0.0), disp_init_z(0.0), rot_init_x(0.0), rot_init_y(0.0), rot_init_z(0.0),
-	disp_matrix_x(0.0), disp_matrix_y(0.0), disp_matrix_z(0.0),	rot_matrix_x(0.0), rot_matrix_y(0.0), rot_matrix_z(0.0)
+	: m_exist_analytical(false), m_exist_numerical(false), 
+	m_time_init(0.0), m_disp_init_x(0.0), m_disp_init_y(0.0), m_disp_init_z(0.0), 
+	m_rot_init_x(0.0), m_rot_init_y(0.0), m_rot_init_z(0.0),
+	m_stiff_matrix_step_id(0), m_time_matrix(0.0),
+	m_disp_matrix_x(0.0), m_disp_matrix_y(0.0), m_disp_matrix_z(0.0),
+	m_rot_matrix_x(0.0), m_rot_matrix_y(0.0), m_rot_matrix_z(0.0),
+	m_time_series(nullptr)
 {
-	K_tan.alloc(6, 6);
+	m_K_tan.alloc(6, 6);
 }
 
 StiffnessMatrix::~StiffnessMatrix()
 {
-	K_tan.flush();
+	m_K_tan.flush();
 }
 
-bool StiffnessMatrix::Read(FILE *f)
-{
-
-	char str[200];			//salva palavras-chave lidas e valores lidos
-	fpos_t pos;
-
-	while (!fgetpos(f, &pos) && fscanf(f, "%s", str) != EOF)
-	{
-		if (!strcmp(str, "Analytical"))
-		{
-			if (fscanf(f, "%s", str) != EOF && ( !strcmp(str, "true") || !strcmp(str, "1") ))
-				bool_ana = true;
-			else if (!strcmp(str, "false") || !strcmp(str, "0"))
-				/*Do nothing, "false" is the default value*/;
-			else
-			{
-				Log::AddWarning("\n   + Error reading analytical stiffness matrix definition.\n");
-				return false;
-			}
-		}
-		else if (!strcmp(str, "Numerical"))
-		{
-			if (fscanf(f, "%s", str) != EOF && ( !strcmp(str, "true") || !strcmp(str, "1") ))
-			{
-				bool_num = true;
-
-				if (fscanf(f, "%s %lf", str, &time_matrix) == EOF || strcmp(str, "Time") ||
-					fscanf(f, "%s %lf %lf %lf %lf %lf %lf", str, &disp_matrix_x, &disp_matrix_y, &disp_matrix_z,
-						   &rot_matrix_x, &rot_matrix_y, &rot_matrix_z) == EOF || strcmp(str, "Offsets"))
-				{
-					Log::AddWarning("\n   + Error reading numerical stiffness matrix data.\n");
-					return false;
-				}
-			}
-			else if (!strcmp(str, "false") || !strcmp(str, "0"))
-				continue; /*Do nothing, "false" is the default value*/
-			else
-			{
-				fsetpos(f, &pos);
-				return true;
-			}
-		}
-		//Checks for comment
-		else if (str[0] == '/' && AuxFunctions::Read::Comment(f, str));
-		//Other word -> backs position go to IO class
-		else
-		{
-			fsetpos(f, &pos);
-			return true;
-		}
-	}
-
-
-	//All OK while reading
-	return true;
-}
 
 void StiffnessMatrix::calc_Kaux(Matrix& fairlead, const std::vector<double>& eul_ang, const double& hf, const double& vf, const double& alpha, Matrix& Fi, Matrix& Ki)
 {
@@ -305,7 +250,7 @@ void StiffnessMatrix::calc_Kaux(Matrix& fairlead, const std::vector<double>& eul
 	K_aux(5, 4) = krr(2, 1);
 	K_aux(5, 5) = krr(2, 2);
 
-	K_tan = K_tan + K_aux;
+	m_K_tan = m_K_tan + K_aux;
 }
 
 void StiffnessMatrix::check_Ktan()
@@ -314,43 +259,39 @@ void StiffnessMatrix::check_Ktan()
 	{
 		for (int j = 0; j < 6; j++)
 		{
-			if (abs(K_tan(i, j)) < MIN_NON_ZERO)
-				K_tan(i, j) = 0.0;
+			if (abs(m_K_tan(i, j)) < MIN_NON_ZERO)
+				m_K_tan(i, j) = 0.0;
 		}
 	}
 }
 
 void StiffnessMatrix::FprintKtan(const std::string& file)
 {
-	this->K_tan.fprint(file.c_str());
+	this->m_K_tan.fprint(file.c_str());
 }
 
-unsigned int StiffnessMatrix::GetStep() const
+void StiffnessMatrix::SetAnalyticalStiffnessOpt(bool option)
 {
-	return this->stiff_matrix_step;
+	m_exist_analytical = option;
+}
+void StiffnessMatrix::SetNumericalStiffnessOpt(bool option)
+{
+	m_exist_numerical = option;
 }
 
-bool StiffnessMatrix::ExistNumericalStiffMat() const
-{
-	return this->bool_num;
-}
 
-bool StiffnessMatrix::ExistAnalyticalStiffMat() const
-{
-	return this->bool_ana;
-}
 
 
 std::ostream& operator<<(std::ostream& out, const StiffnessMatrix& mat)
 {
 	out << "\n";
-	for (long i = 0; i < mat.K_tan.getLines(); ++i)
+	for (long i = 0; i < mat.m_K_tan.getLines(); ++i)
 	{
 		out << "| ";
-		for ( long j = 0; j < mat.K_tan.getColumns(); ++j )
+		for ( long j = 0; j < mat.m_K_tan.getColumns(); ++j )
 		{
-			if ( mat.K_tan.GetItem(i, j) > 1 || mat.K_tan.GetItem(i, j) < -1 )
-				out << " " << mat.K_tan.GetItem(i, j) << "\t";
+			if ( mat.m_K_tan.GetItem(i, j) > 1 || mat.m_K_tan.GetItem(i, j) < -1 )
+				out << " " << mat.m_K_tan.GetItem(i, j) << "\t";
 			else
 				out << "      0     \t";
 		}
@@ -363,19 +304,19 @@ std::ostream& operator<<(std::ostream& out, const StiffnessMatrix& mat)
 std::ostream& operator<<(std::ostream& out, StiffnessMatrix* mat)
 {
 	out << std::setprecision(5) << "\n";
-	for (long i = 0; i < mat->K_tan.getLines(); ++i)
+	for (long i = 0; i < mat->m_K_tan.getLines(); ++i)
 	{
 		out << "| ";
-		for ( long j = 0; j < mat->K_tan.getColumns(); ++j )
+		for ( long j = 0; j < mat->m_K_tan.getColumns(); ++j )
 		{
-			if ( mat->K_tan.GetItem(i, j) > 1 || mat->K_tan.GetItem(i, j) < -1 )
-				out << " " << mat->K_tan.GetItem(i, j) << "\t";
+			if ( mat->m_K_tan.GetItem(i, j) > 1 || mat->m_K_tan.GetItem(i, j) < -1 )
+				out << " " << mat->m_K_tan.GetItem(i, j) << "\t";
 			else
 				out << "      0     \t";
 		}
 		out << "|\n";
 	}
-	out << std::setprecision(6) << "\n";
+	out << std::setprecision(8) << "\n";
 
 	return out;
 }
