@@ -66,7 +66,7 @@ bool IO::ReadFile()
 	std::cout << "|                        GiraffeMoor                           |\n";
 	std::cout << "|               University of Sao Paulo - Brazil               |\n";
 	std::cout << "|                                                              |\n";
-	std::cout << "|                                                v. " << IO::version << "  |\n";
+	std::cout << "|                                                v. " << IO::version << "   |\n";
 	std::cout << "|______________________________________________________________|\n\n";
 	
 
@@ -126,10 +126,10 @@ bool IO::ReadFile()
 		}
 	}
 
+	s_inp >> std::boolalpha;  // to read 'true'/'false'
+
 	std::string readed;
 	s_inp >> readed;
-
-	s_inp >> std::boolalpha;  // to read 'true'/'false'
 	while (s_inp.good())
 	{
 		if (!aux_read::ReadBlock(s_inp, readed, s_mandatory_keys_read_func, s_optional_keys_read_func))
@@ -210,8 +210,10 @@ bool IO::ReadSegmentSets(std::string& readed)
 				names = { "Length", "Property", "Discretization" };  // Valid keywords
 				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
 
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Try to create a new LineSegment object at the end of 'segmentsets' container
-				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Keypoints", "Keypoint", names);
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "SegmentSets", "Set", USET_SV{}, names);
 				if (nh.empty() || readed == "Set")	break;
 				else								seg = set->AddSegment();
 				
@@ -224,6 +226,7 @@ bool IO::ReadSegmentSets(std::string& readed)
 					else if (name == "Discretization")	seg->SetDiscretization(aux_read::ReadVariable<unsigned int>(s_inp));
 
 					s_inp >> readed;
+
 					// Extract node
 					ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "SegmentSets", "SegmentSet", names);
 					if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
@@ -519,8 +522,10 @@ bool IO::ReadEnvironment(std::string& readed)
 				names = { "Azimuth", "Speed", "Depth" };  // Valid keywords
 				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
 
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Try to create a new SeaCurrent object at the end of 'sea_current' container
-				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "SeaCurrent", names);
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "SeaCurrent", USET_SV{}, names);
 				// If is not a valid keyword or valid block, break loop ...
 				if (nh.empty() || blocks.count(readed) > 0)	break; 
 				// Otherise, append a new object to the container
@@ -625,9 +630,10 @@ bool IO::ReadSolution(std::string& readed)
 				SolutionStep* step;
 				
 				NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
+				aux_read::TryCommentAndContinue(s_inp, readed);
 
-				// Try to create a new SeaCurrent object at the end of 'sea_current' container
-				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", USET_SV{ "Step" });
+				// Try to create a new SolutionStep object at the end of 'solution_steps' container
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Solution", "Analysis", USET_SV{}, USET_SV{ "Step" });
 				// If is not a valid keyword or valid block, break loop ...
 				if (nh.empty() || blocks.count(readed) > 0)	break;
 				// ... otherise, append a new object to the container
@@ -734,7 +740,8 @@ bool IO::ReadSolution(std::string& readed)
 	if (mm.moorsolution.GetStepsVec().size() == 0) 
 		Log::SetWarning(R"(
   No analysis step was defined, thus GiraffeMoor only create the 'setting' models. 
-  You can check the *.sum file and the user's manual for details.)");
+  You can check the *.sum file and the user's manual for details.)"
+		);
 
 	// All OK while reading
 	Log::SetLastValidKeyword("Solution");
@@ -798,6 +805,8 @@ bool IO::ReadGiraffeSolver(std::string& readed)
 			// Setting Convergence criteria 
 			s_inp >> readed;
 			do {
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Extract node
 				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "GiraffeSolver", "ConvergenceCriteria", mandatory_names, optional_names);
 				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
@@ -856,6 +865,8 @@ bool IO::ReadPostProcessing(std::string& readed)
 			// Setting post files options
 			s_inp >> readed;
 			do {
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Extract node
 				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "PostProcessing", "PostFiles", mandatory_names, optional_names);
 				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
@@ -1229,6 +1240,8 @@ bool IO::ReadMonitors(std::string& readed)
 			// Setting nodes monitors
 			s_inp >> readed;
 			do {
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Check if is other block or is not a valid 'name'
 				if (blocks.count(readed) || names.count(readed) == 0) 
 					break;
@@ -1284,6 +1297,8 @@ bool IO::ReadMonitors(std::string& readed)
 			// Setting element monitors
 			s_inp >> readed;
 			do {
+				aux_read::TryCommentAndContinue(s_inp, readed);
+
 				// Check if is other block or is not a valid 'name'
 				if (blocks.count(readed) || names.count(readed) == 0)
 					break;
@@ -1366,6 +1381,7 @@ bool IO::ReadMonitors(std::string& readed)
 
 
 	// All OK while reading
+	Log::SetLastValidKeyword("Monitors");
 	return true;
 }
 

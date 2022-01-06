@@ -22,7 +22,9 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT G
 ## If true, the computer must have oneMKL installed, 
 # Otherwise, it is assumed that MKL DLLs will be used in .exe 
 # directory or its folder is already added to system path 
-option(USE_oneMKL "installed from Intel oneAPI" ON)
+option(USE_oneMKL "MKL -> oneMKL from Intel oneAPI" ON)
+
+
 #-- Search for oneMKL
 if(USE_oneMKL)
 	find_package(MKL CONFIG REQUIRED)

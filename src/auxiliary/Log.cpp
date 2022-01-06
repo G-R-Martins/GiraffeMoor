@@ -24,41 +24,42 @@ void Log::SetWarning_Impl(Log::Warning type, std::string_view block, int line, s
 	switch (type)
 	{
 	case Warning::INVALID_ID:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": Invalid ID number for \'" << name << "\' at line " << line;
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": Invalid ID number for \'" << name << "\' at line " << line;
 		break;
 
 	case Warning::INVALID_KEYWORD:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": \'" << name << "\' is not a valid option. Please, check the manual for current supported options.";
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": \'" << name << "\' is not a valid option. Please, check the manual for current supported options.";
 		break;
 
 	case Warning::INVALID_OPTION:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": \'" << name << "\' (at line " << line <<
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": \'" << name << "\' (at line " << line <<
 			") is not a valid keyword or it has been already defined.";
 		break;
 	
 	case Warning::REMOVED_OBJECTS:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": " << number << " repeated \'" << name << "\' removed";
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": " << number << " repeated \'" << name << "\' removed";
 		break;
 	
 	case Warning::UNDEFINED_PARAMETERS:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": There is(are)" << number << " undefined parameter(s) for " << name;
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": There is(are)" << number << " undefined parameter(s) for " << name;
 		break;
 	
 	case Warning::UNDEFINED_MANDATORY_BLOCK:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": " << number << " undefined mandatory block(s): ";
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": " << number << " undefined mandatory block(s): ";
 		//for (auto keyword : AuxFunctions::Reading::s_mandatory_keywords)
 			//m_warning << "\n    - " << keyword;
 		break;
 
 	case Warning::SOLVING_CATENARY:
-		m_warning << "\n  " << ++m_warning_ID << ")" << block << ": GiraffeMoor has failed to solve the catenary equations for line number " << line;
-
-
+		m_warning << "\n  " << ++m_warning_ID << ") " << block << ": GiraffeMoor has failed to solve the catenary equations for line number " << line;
 	}
+
+	++m_tot_warnings;
 }
 void Log::SetWarning_Impl(std::string_view msg)
 {
 	m_warning << msg;
+	++m_tot_warnings;
 }
 
 void Log::SetError_Impl(Log::Error error)
@@ -72,7 +73,7 @@ Please, check the directory and the input file content.)";
 		break;
 
 	case Error::READING:
-		m_error << "\n Error reading GiraffeMoor input file. Last valid block: " << m_last_keyword;
+		m_error << "\n Error reading GiraffeMoor input file. \n Last valid block: \"" << m_last_valid_keyword << "\"";
 		m_final_message << "\n\n" << R"(GiraffeMoor execution has failed during reading process.
 Please, check your input file with the hint(s) from warning message(s).)";
 		break;
@@ -89,6 +90,8 @@ Please, check your input data.)";
 Please, check your input data.)";
 		break;
 	}
+	
+	++m_tot_errors;
 }
 
 void Log::SetFinalMessage_Impl(std::string_view msg)
@@ -128,10 +131,16 @@ std::string_view Log::GetLastValidKeyword_Impl()
 
 void Log::ShowErrors_Impl()
 {
+	std::cout << "\n\n #========# \n";
+	std::cout << " # ERRORS # \n";
+	std::cout << " #========# \n";
 	std::cout << m_error.str() << "\n";
 }
 void Log::ShowWarnings_Impl()
 {
+	std::cout << "\n\n #==========# \n";
+	std::cout << " # WARNINGS # \n";
+	std::cout << " #==========# \n";
 	std::cout << m_warning.str() << "\n";
 }
 void Log::ShowFinalMessage_Impl()
@@ -146,7 +155,7 @@ void Log::CheckLogs_Impl()
 	//Same final message with or without errors
 	m_final_message << "\nPress enter key to close GiraffeMoor.";
 
-	if (ExistErrors_Impl())	ShowErrors_Impl();
+	if (ExistErrors_Impl())		ShowErrors_Impl();
 	if (ExistWarnings_Impl())	ShowWarnings_Impl();
 
 	//Print final message
