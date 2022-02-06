@@ -11,6 +11,7 @@ private:
 public:
 	SameRotation();
 	SameRotation(unsigned int nodeA_id, unsigned int nodeB_id);
+	SameRotation(unsigned int id, unsigned int nodeA_id, unsigned int nodeB_id, const BoolTable& bool_table);
 	~SameRotation();
 
 

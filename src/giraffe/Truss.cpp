@@ -7,6 +7,27 @@ Truss::Truss()
 	m_nodes.resize(2);
 }
 
+Truss::Truss(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2)
+{
+	m_nodes.resize(2);
+
+	this->SetIDNumber(id);
+	this->SetFirstElementOpt(segment_begin);
+	this->SetSection(section_id);
+	this->SetNodes(std::vector{ node1,node2 });
+}
+
+Truss::Truss(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2, const std::string& comment)
+{
+	m_nodes.resize(2);
+
+	this->SetIDNumber(id);
+	this->SetFirstElementOpt(segment_begin);
+	this->SetSection(section_id);
+	this->SetNodes(std::vector{ node1,node2 });
+	this->SetLabel(comment);
+}
+
 
 Truss::~Truss()
 {}

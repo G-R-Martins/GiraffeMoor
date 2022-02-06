@@ -26,7 +26,8 @@ MooringModel::MooringModel()
 	: cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
 	cur_node_set(1), cur_vessel(0), cur_special_constraint(0), cur_node_set_constraint(1), 
 	cur_constraint(0), cur_load(0), cur_disp(0), cur_rbdata(0), node_set_contact_id(0), pil_node_set_id(0),
-	existSharedLine(false), x_tdp(0.0), x_tdp_ext(0.0), elem_tdp(0), existTDP(true), 
+	existSharedLine(false), last_contact_node_id(0),
+	x_tdp(0.0), x_tdp_ext(0.0), elem_tdp(0), existTDP(true),
 	rot_fairlead(PI / 2.0), extrem_tensions({0.,0.})
 {
 	//Reserving positions for vectors
@@ -774,7 +775,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 				
 				//Node and nodeset of fairlead
 				line.SetNodeB(cur_node_mesh + n - 1);
-				gm.GenerateNodeSet(cur_node_set, (unsigned int)(cur_node_mesh + n - 1), comment.str());
+				last_contact_node_id = cur_node_mesh + n - 1;
+				gm.GenerateNodeSet(cur_node_set, last_contact_node_id, comment.str());
 				fairlead_nodesets_id.push_front(cur_node_set);
 				++cur_node_set;
 
@@ -823,7 +825,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					 (unsigned int)line.GetNumber(), line.GetConfiguration(), existTDP, x_tdp_ext, line.GetTotalLength(), ( unsigned int )line.GetNSegments());
 
 	//Mooring line NodeSet
-	gm.GenerateNodeSet(cur_node_set++, nodes_line, (unsigned int)init_line, 1, std::string{ "Nodes of line " + line.GetNumber() });
+	gm.GenerateNodeSet(cur_node_set++, nodes_line, (unsigned int)init_line, 1, std::string{"Nodes of line "} + std::to_string(line.GetNumber()));
 	++cur_cs;
 }
 
@@ -887,7 +889,8 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vect
 		{
 			std::array<double, 6> disp = { zcat_n[seg][node], 0.0, xcat_n[seg][node] - x0_n[seg][node],
 				0.0, -roty_n[seg][node], 0.0 };
-			static_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(++cur_node, disp);
+			//static_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(++cur_node, disp);
+			static_cast<DisplacementField*>(gm.displacement_vector[cur_disp - 1].get())->InsertDisplacement(++cur_node, disp);
 		}
 	}
 
@@ -974,7 +977,7 @@ void MooringModel::GenerateContacts()
 	//After generate all line nodes, generate vessel and dummy elements elements, 
 	 //must create a nodeset and the contact surface (lines-seabed)
 	node_set_contact_id = cur_node_set++;
-	gm.GenerateNodeSet(node_set_contact_id, (unsigned int)cur_node_mesh - 1, 1, 1, "Nodes to establish contact model");
+	gm.GenerateNodeSet(node_set_contact_id, last_contact_node_id, 1, 1, "Nodes to establish contact model");
 
 	//Contact booltables
 	BoolTable bool_c;
@@ -1287,13 +1290,13 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 	Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1.0, "Applying prescribed displacement field"));
 	start += 1.0;
 
-	//Time step when sea current will be included
-	int seacurrent_booltable = 2;
+	//Solution step to include sea current
+	int seacurrent_booltable = 3;
 
 	//Coupling fairlead(s)
 	if (moorsolution.ExistDynRelax_Lines())
 	{
-		seacurrent_booltable += 2;
+		++seacurrent_booltable;
 
 		//Dynamic relaxation
 		auto relax = moorsolution.GetStepDynRelaxLines();
@@ -1301,7 +1304,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 		gm.GenerateDynamicSolutionStep(++step, start, start + total_duration,
 			relax->GetTimestep(), relax->GetMaxTimestep(), relax->GetMinTimestep(),
 			15, 3, 4, 2, relax->GetSample(),
-			relax->GetAlpha_ray(), relax->GetBeta_ray(), 0, relax->GetGamma_new(), relax->GetBeta_new());
+			relax->GetAlpha_ray(), relax->GetBeta_ray(), 0, relax->GetGamma_new(), relax->GetBeta_new(), true);
 		Summary::GetSteps().emplace_back(std::make_tuple(start, start + total_duration, "Coupling fairleads during a dynamic relaxation"));
 		start += total_duration;
 
@@ -1334,12 +1337,12 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 			// ... otherwise, create the step with default options
 			moorsolution.InitStepSeaCurrent();
 		
-		double timestep = seacurrent_step->GetTimestep();
-		gm.GenerateStaticSolutionStep(++step, start, start + timestep,
-			timestep, seacurrent_step->GetMaxTimestep(), seacurrent_step->GetMinTimestep(),
+		double total_step_time = seacurrent_step->GetEndTime();
+		gm.GenerateStaticSolutionStep(++step, start, start + total_step_time,
+			seacurrent_step->GetTimestep(), seacurrent_step->GetMaxTimestep(), seacurrent_step->GetMinTimestep(),
 			20, 2, 3, 1.5, seacurrent_step->GetSample());
-		Summary::GetSteps().emplace_back(std::make_tuple(start, start + timestep, "Establishing sea current"));
-		start += timestep;
+		Summary::GetSteps().emplace_back(std::make_tuple(start, start + total_step_time, "Establishing sea current"));
+		start += total_step_time;
 	}
 	//Sea current bool table, just for Morison effects
 	else
@@ -1563,7 +1566,8 @@ void MooringModel::GenerateDisplacementFields()
 			unsigned int seg_last_node = line->GetSegment(seg).GetNNodes() - 1;
 
 			for (unsigned int node = seg_first_node; node < seg_last_node; ++node)
-				static_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(
+				//dynamic_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(
+				static_cast<DisplacementField*>(gm.displacement_vector[cur_disp - 1].get())->InsertDisplacement(
 					++global_node,
 					std::array{ 0.0,
 					-disp_field.GetAmplitude() * std::sin(x0_n[seg][node] * PI / line->GetTotalLength() * disp_field.GetMode()),

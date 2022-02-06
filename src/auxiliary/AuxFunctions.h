@@ -63,7 +63,7 @@ namespace AuxFunctions
 		/*--- Read all comments and the next (key)word ---*/
 		static void TryCommentAndContinue(std::ifstream& input, std::string& readed)
 		{
-			while (CheckComment(input, readed))
+			while (CheckComment(input, readed) && input.good())
 				input >> readed;
 		}
 		

@@ -23,13 +23,13 @@ public:
 	NodalForce();
 
 	NodalForce(Table* time_series);
-	NodalForce(unsigned int nodeset_id, Table* time_series);
+	NodalForce(unsigned int id, unsigned int nodeset_id, Table* time_series);
 
 	NodalForce(MathCode* math_code);
-	NodalForce(unsigned int nodeset_id, MathCode* math_code);
+	NodalForce(unsigned int id, unsigned int nodeset_id, MathCode* math_code);
 
-	NodalForce(const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps);
-	NodalForce(unsigned int nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps);
+	NodalForce(std::string& file_name, unsigned int header_lines, unsigned int steps);
+	NodalForce(unsigned int id, unsigned int nodeset_id, std::string& file_name, unsigned int header_lines, unsigned int steps);
 
 	~NodalForce();
 

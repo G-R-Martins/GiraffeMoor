@@ -6,38 +6,7 @@ GiraffeModel::GiraffeModel()
 {}
 
 GiraffeModel::~GiraffeModel()
-{
-	//Cleaning element_vector
-	for (int i = 0; i < (int)element_vector.size(); i++)
-		delete[] element_vector[i];
-	element_vector.clear();
-
-	//Cleaning special_constraint_vector
-	for (int i = 0; i < (int)special_constraint_vector.size(); i++)
-		delete[] special_constraint_vector[i];
-	special_constraint_vector.clear();
-
-	//Cleaning contact_vector
-	for (int i = 0; i < (int)contact_vector.size(); i++)
-		delete[] contact_vector[i];
-	contact_vector.clear();
-
-	//Cleaning constraint_vector
-	for (int i = 0; i < (int)constraint_vector.size(); i++)
-		delete[] constraint_vector[i];
-	constraint_vector.clear();
-
-	//Cleaning displacement_vector
-	for (int i = 0; i < (int)displacement_vector.size(); i++)
-		delete[] displacement_vector[i];
-	displacement_vector.clear(); 
-
-	//Cleaning solution_vector
-	for (int i = 0; i < (int)solution_vector.size(); i++)
-		delete[] solution_vector[i];
-	solution_vector.clear();
-
-}
+{}
 
 void GiraffeModel::GenerateNode(const unsigned int& id, Matrix& pos, const std::string& comment)
 {
@@ -75,64 +44,41 @@ void GiraffeModel::GenerateOscillatorySurf(const unsigned int& id, const double&
 {
 	oscillatory_vector.emplace_back(id, A1, A2, A12, lambda1, lambda2, phi1, phi2, waves1, waves2, cs_id, pilot_node_id);
 }
-void GiraffeModel::GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2)
+void GiraffeModel::GenerateTrussElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2)
 {
-	element_vector.emplace_back(new Truss());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetFirstElementOpt(segment_begin);
-	ptr->SetSection(section_id);
-	ptr->SetNodes(std::vector{node1,node2});
+	element_vector.emplace_back(
+		std::make_unique<Truss>(id, segment_begin, section_id, node1, node2)
+	);
 }
-void GiraffeModel::GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2, const std::string& comment)
+void GiraffeModel::GenerateTrussElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2, const std::string& comment)
 {
-	element_vector.emplace_back(new Truss());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetFirstElementOpt(segment_begin);
-	ptr->SetSection(section_id);
-	ptr->SetNodes(std::vector{node1,node2});
-	ptr->SetLabel(comment);
+	element_vector.emplace_back(
+		std::make_unique<Truss>(id, segment_begin, section_id, node1, node2, comment)
+	);
 }
-void  GiraffeModel::GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node)
+void  GiraffeModel::GenerateRigidBodyElement(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node)
 {
-	element_vector.emplace_back(new RigidBody());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetMaterial(RB_data_material_id);
-	ptr->SetCS(cs_id);
-	ptr->SetNodes(std::vector{node});
+	element_vector.emplace_back(
+		std::make_unique<RigidBody>(id, RB_data_material_id, cs_id, node)
+	);
 }
-void  GiraffeModel::GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node, const std::string& comment)
+void  GiraffeModel::GenerateRigidBodyElement(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node, const std::string& comment)
 {
-	element_vector.emplace_back(new RigidBody());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetMaterial(RB_data_material_id);
-	ptr->SetCS(cs_id);
-	ptr->SetNodes(std::vector{node});
-	ptr->SetLabel(comment);
+	element_vector.emplace_back(
+		std::make_unique<RigidBody>(id, RB_data_material_id, cs_id, node, comment)
+	);
 }
-void GiraffeModel::GeneratePipeElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3)
+void GiraffeModel::GeneratePipeElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int cs_id, unsigned int node1, unsigned int node2, unsigned int node3)
 {
-	element_vector.emplace_back(new Pipe());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetFirstElementOpt(segment_begin);
-	ptr->SetSection(section_id);
-	ptr->SetCS(cs_id);
-	ptr->SetNodes(std::vector{node1,node2,node3});
+	element_vector.emplace_back(
+		std::make_unique<Pipe>(id, segment_begin, section_id, cs_id, std::vector{ node1,node2,node3 })
+	);
 }
-void GiraffeModel::GeneratePipeElement(const unsigned int& id, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment)
+void GiraffeModel::GeneratePipeElement(unsigned int id, unsigned int section_id, unsigned int cs_id, unsigned int node1, unsigned int node2, unsigned int node3, const std::string& comment)
 {
-	element_vector.emplace_back(new Pipe());
-	auto ptr = element_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetFirstElementOpt(false);
-	ptr->SetSection(section_id);
-	ptr->SetCS(cs_id);
-	ptr->SetNodes(std::vector{node1,node2,node3});
-	ptr->SetLabel(comment);
+	element_vector.emplace_back(
+		std::make_unique<Pipe>(id, false, section_id, cs_id, std::vector{ node1,node2,node3 }, comment)
+	);
 }
 void GiraffeModel::GenerateCoordinateSystem(const unsigned int& id, Matrix& E1, Matrix& E3)
 {
@@ -169,75 +115,72 @@ void GiraffeModel::GenerateRigidBodyData(const unsigned int& id, double mass, co
 void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
 	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table)
 {
-	contact_vector.emplace_back(new NSSS(id, nodeset_id, 
-		surface_set_id, mu, epn, cn, ept, ct, pinball, radius, max_interactions, std::move(bool_table)));
+	contact_vector.emplace_back(
+		std::make_unique<NSSS>(
+			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, pinball, radius, 
+			max_interactions, std::move(bool_table)
+		)
+	);
 }
 void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id, 
 	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, 
 	unsigned int max_interactions, BoolTable&& bool_table, const std::string& comment)
 {
-	contact_vector.emplace_back(new NSSS(id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, 
-		pinball, radius, max_interactions, std::move(bool_table), comment));
+	contact_vector.emplace_back(
+		std::make_unique<NSSS>(
+			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, 
+			pinball, radius, max_interactions, std::move(bool_table), comment
+		)
+	);
 }
-void GiraffeModel::GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table)
+void GiraffeModel::GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table)
 {
-	special_constraint_vector.emplace_back(new RigidNodeSet(pilot_node_id, nodeset_id));
-
-	//Pointer to the RigidNodeSet
-	auto ptr = special_constraint_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetBoolTable(bool_table);
+	special_constraint_vector.emplace_back(
+		std::make_unique<RigidNodeSet>(id, pilot_node_id, nodeset_id, bool_table)
+	);
 }
-void GiraffeModel::GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table, const std::string& comment)
+void GiraffeModel::GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table, const std::string& comment)
 {
-	special_constraint_vector.emplace_back(new RigidNodeSet(pilot_node_id, nodeset_id, comment));
-	//Pointer to the RigidNodeSet
-	auto ptr = special_constraint_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetBoolTable(bool_table);
+	special_constraint_vector.emplace_back(
+		std::make_unique<RigidNodeSet>(id, pilot_node_id, nodeset_id, bool_table, comment)
+	);
 }
-void GiraffeModel::GenerateSameDisplacement(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table)
+void GiraffeModel::GenerateSameDisplacement(unsigned int id, unsigned int node_A, unsigned int node_B, const BoolTable& bool_table)
 {
-	special_constraint_vector.emplace_back(new SameDisplacement(node_A,node_B));
-	//Pointer to the SameDisplacement
-	auto ptr = special_constraint_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetBoolTable(bool_table);
+	special_constraint_vector.emplace_back(
+		std::make_unique<SameDisplacement>(id, node_A, node_B, bool_table)
+	);
 }
-void GiraffeModel::GenerateSameRotation(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table)
+void GiraffeModel::GenerateSameRotation(unsigned int id, unsigned int node_A, unsigned int node_B, const BoolTable& bool_table)
 {
-	special_constraint_vector.emplace_back(new SameRotation(node_A, node_B));
-	//Pointer to the SameDisplacement
-	auto ptr = special_constraint_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetBoolTable(bool_table);
+	special_constraint_vector.emplace_back(
+		std::make_unique<SameRotation>(id, node_A, node_B, bool_table)
+	);
 }
-void GiraffeModel::GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, Table* values)
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values)
 {
-	displacement_vector.emplace_back(new NodalDisplacement(nodeset_id, cs_id, values));
-	//Pointer to the NodalDisplacement
-	auto ptr = displacement_vector.back();
-	ptr->SetIDNumber(id);
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, values)
+	);
 }
-void GiraffeModel::GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, MathCode* math_code)
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code)
 {
-	displacement_vector.emplace_back(new NodalDisplacement(nodeset_id, cs_id, math_code));
-	//Pointer to the NodalDisplacement
-	auto ptr = displacement_vector.back();
-	ptr->SetIDNumber(id);
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, math_code)
+	);
 }
-void GiraffeModel::GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id,
-											 const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times)
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id,
+											 const std::string& file_name, unsigned int header_lines, unsigned int n_times)
 {
-	displacement_vector.emplace_back(new NodalDisplacement(nodeset_id, cs_id, file_name, header_lines, n_times));
-	//Pointer to the NodalDisplacement
-	auto ptr = displacement_vector.back();
-	ptr->SetIDNumber(id);
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, file_name, header_lines, n_times)
+	);
 }
-void GiraffeModel::GenerateDisplacementField(const unsigned int& id, const unsigned int& cs_id, const unsigned int& solution_step)
+void GiraffeModel::GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step)
 {
-	displacement_vector.emplace_back(new DisplacementField(cs_id,solution_step));
-	displacement_vector.back()->SetIDNumber(id);
+	displacement_vector.emplace_back(
+		std::make_shared<DisplacementField>(id, cs_id, solution_step)
+	);
 }
 void GiraffeModel::GenerateNodeSet(const unsigned int& id, const std::vector<unsigned int>& list, const std::string& comment)
 {
@@ -267,57 +210,56 @@ void GiraffeModel::GenerateSurfaceSet(const unsigned int& id, const std::vector<
 {
 	surface_set_vector.emplace_back(SurfaceSet(id, list));
 }
-void GiraffeModel::GenerateStaticSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample)
+void GiraffeModel::GenerateStaticSolutionStep(unsigned int id, double start_time, double end_time, double i_time_step, double max_time_step, double min_time_step, unsigned int max_it, unsigned int min_it, unsigned int conv_increase, double inc_factor, unsigned int sample)
 {
-	solution_vector.emplace_back(new Static());
-
-	auto ptr = solution_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetStartTime(start_time);
-	ptr->SetEndTime(end_time);
-	ptr->SetTimeStep(i_time_step, min_time_step, max_time_step);
-	ptr->SetIterations(max_it, min_it);
-	ptr->SetIncrese(conv_increase, inc_factor);
-	ptr->SetSample(sample);
+	solution_vector.emplace_back(
+		std::make_unique<Static>(
+			id, start_time, end_time, i_time_step, min_time_step, max_time_step, 
+			max_it, min_it, conv_increase, inc_factor, sample
+		)
+	);
 }
-void GiraffeModel::GenerateDynamicSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample, const double& alpha, const double& beta, const unsigned int& update, const double& gamma_new, const double& beta_new)
+void GiraffeModel::GenerateDynamicSolutionStep(unsigned int id, double start_time, double end_time, double i_time_step, double max_time_step, double min_time_step, unsigned int max_it, unsigned int min_it, unsigned int conv_increase, double inc_factor, unsigned int sample, 
+	double alpha, double beta, unsigned int update, double gamma_new, double beta_new, bool zero_ic)
 {
-	solution_vector.emplace_back(new Dynamic(alpha, beta, gamma_new, beta_new, update));
-
-	auto ptr = solution_vector.back();
-	ptr->SetIDNumber(id);
-	ptr->SetStartTime(start_time);
-	ptr->SetEndTime(end_time);
-	ptr->SetTimeStep(i_time_step, min_time_step, max_time_step);
-	ptr->SetIterations(max_it, min_it);
-	ptr->SetIncrese(conv_increase, inc_factor);
-	ptr->SetSample(sample);
+	solution_vector.emplace_back(
+		std::make_unique<Dynamic>(
+			id, start_time, end_time, i_time_step, min_time_step, max_time_step, 
+			max_it, min_it, conv_increase, inc_factor, sample, 
+			alpha, beta, gamma_new, beta_new, update, zero_ic
+		)
+	);
 }
-void GiraffeModel::GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, Table* time_series)
+void GiraffeModel::GenerateNodalForce(unsigned int id, unsigned int nodeset_id, Table* time_series)
 {
-	load_vector.emplace_back(new NodalForce(nodeset_id, time_series));
-	load_vector.back()->SetIDNumber(id);
+	load_vector.emplace_back(
+		std::make_unique<NodalForce>(id, nodeset_id, time_series)
+	);
 }
-void GiraffeModel::GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id,
-						  const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times)
+void GiraffeModel::GenerateNodalForce(unsigned int id, unsigned int nodeset_id,
+						  std::string& file_name, unsigned int header_lines, unsigned int n_times)
 {
-	load_vector.emplace_back(new NodalForce(nodeset_id, file_name, header_lines, n_times));
-	load_vector.back()->SetIDNumber(id);
+	load_vector.emplace_back(
+		std::make_unique<NodalForce>(id, nodeset_id, file_name, header_lines, n_times)
+	);
 }
-void GiraffeModel::GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id,
-						  std::string_view file_name, const unsigned int& header_lines, const unsigned int& n_times)
+void GiraffeModel::GenerateNodalForce(unsigned int id, unsigned int nodeset_id,
+						  std::string_view file_name, unsigned int header_lines, unsigned int n_times)
 {
-	load_vector.emplace_back(new NodalForce(nodeset_id, std::string(file_name), header_lines, n_times));
-	load_vector.back()->SetIDNumber(id);
+	load_vector.emplace_back(
+		std::make_unique<NodalForce>(id, nodeset_id, std::string(file_name), header_lines, n_times)
+	);
 }
-void GiraffeModel::GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, MathCode* mathCode)
+void GiraffeModel::GenerateNodalForce(unsigned int id, unsigned int nodeset_id, MathCode* mathCode)
 {
-	load_vector.emplace_back(new NodalForce(nodeset_id, mathCode));
-	load_vector.back()->SetIDNumber(id);
+	load_vector.emplace_back(
+		std::make_unique<NodalForce>(id, nodeset_id, mathCode)
+	);
 }
 void GiraffeModel::GenerateNodalConstraint(unsigned int id, unsigned int nodeset_id, BoolTable const& e_UX, BoolTable const& e_UY, BoolTable const& e_UZ, BoolTable const& e_ROTX, BoolTable const& e_ROTY, BoolTable const& e_ROTZ)
 {
-	constraint_vector.emplace_back(new NodalConstraint(nodeset_id, e_UX, e_UY, e_UZ, e_ROTX, e_ROTY, e_ROTZ));
-	constraint_vector.back()->SetIDNumber(id);
+	constraint_vector.emplace_back(
+		std::make_unique<NodalConstraint>(id, nodeset_id, e_UX, e_UY, e_UZ, e_ROTX, e_ROTY, e_ROTZ)
+	);
 }
 

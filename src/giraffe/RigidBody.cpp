@@ -6,6 +6,28 @@ RigidBody::RigidBody()
 {
 	m_nodes.resize(1);
 }
+
+RigidBody::RigidBody(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node)
+{
+	m_nodes.resize(1);
+
+	this->SetIDNumber(id);
+	this->SetMaterial(RB_data_material_id);
+	this->SetCS(cs_id);
+	this->SetNodes(std::vector{ node });
+}
+
+RigidBody::RigidBody(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node, const std::string& comment)
+{
+	m_nodes.resize(1);
+
+	this->SetIDNumber(id);
+	this->SetMaterial(RB_data_material_id);
+	this->SetCS(cs_id);
+	this->SetNodes(std::vector{ node });
+	this->SetLabel(comment);
+}
+
 RigidBody::~RigidBody()
 {
 }

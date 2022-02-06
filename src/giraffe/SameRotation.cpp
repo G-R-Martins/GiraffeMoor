@@ -9,6 +9,13 @@ SameRotation::SameRotation(unsigned int nodeA_id, unsigned int nodeB_id)
 	: m_nodeA_id(nodeA_id), m_nodeB_id(nodeB_id)
 {}
 
+SameRotation::SameRotation(unsigned int id, unsigned int nodeA_id, unsigned int nodeB_id, const BoolTable & bool_table)
+	: m_nodeA_id(nodeA_id), m_nodeB_id(nodeB_id)
+{
+	this->SetIDNumber(id);
+	this->SetBoolTable(bool_table);
+}
+
 SameRotation::~SameRotation()
 {
 	m_booltable.Clear();

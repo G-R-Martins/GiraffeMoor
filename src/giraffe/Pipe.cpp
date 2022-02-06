@@ -7,6 +7,28 @@ Pipe::Pipe()
 	m_nodes.resize(3);
 }
 
+Pipe::Pipe(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int cs_id, std::vector<unsigned int> nodes)
+{
+	m_nodes.resize(3);
+
+	this->SetIDNumber(id);
+	this->SetFirstElementOpt(segment_begin);
+	this->SetSection(section_id);
+	this->SetCS(cs_id);
+	this->SetNodes(nodes);
+}
+
+Pipe::Pipe(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int cs_id, std::vector<unsigned int> nodes, const std::string& comment)
+{
+	m_nodes.resize(3);
+
+	this->SetIDNumber(id);
+	this->SetFirstElementOpt(segment_begin);
+	this->SetSection(section_id);
+	this->SetCS(cs_id);
+	this->SetNodes(nodes);
+	this->SetLabel(comment);
+}
 
 Pipe::~Pipe()
 {}

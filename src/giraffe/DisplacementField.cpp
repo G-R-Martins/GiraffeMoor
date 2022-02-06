@@ -10,6 +10,12 @@ DisplacementField::DisplacementField(unsigned int cs_id, unsigned int solution_s
 	: m_cs_id(cs_id), m_solution_step_id(solution_step_id), m_disp_data{}
 {}
 
+DisplacementField::DisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step_id)
+	: m_cs_id(cs_id), m_solution_step_id(solution_step_id), m_disp_data{}
+{
+	this->SetIDNumber(id);
+}
+
 DisplacementField::~DisplacementField()
 {}
 

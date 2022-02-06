@@ -44,6 +44,7 @@ void MoorEnvironment::SetSeaCurrentOption(bool sea_current_exist)
 
 SeaCurrent* MoorEnvironment::AddSeaCurrent()
 {
+	this->m_sea_current_exist = true;
 	return &this->m_sea_current_vector.emplace_back();
 }
 void MoorEnvironment::PushBackSeaCurrent()

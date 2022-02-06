@@ -8,28 +8,32 @@ NodalForce::NodalForce()
 NodalForce::NodalForce(Table* time_series)
 	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
 {}
-NodalForce::NodalForce(unsigned int nodeset_id, Table * time_series)
+NodalForce::NodalForce(unsigned int id, unsigned int nodeset_id, Table * time_series)
 	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(time_series), m_ptr_math_code(nullptr)
-{}
+{
+	this->SetIDNumber(id);
+}
 NodalForce::NodalForce(MathCode* math_code)
 	: m_nodeset_id(0), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
 	this->SetMathCodeOpt(true);
 }
-NodalForce::NodalForce(unsigned int nodeset_id, MathCode* math_code)
+NodalForce::NodalForce(unsigned int id, unsigned int nodeset_id, MathCode* math_code)
 	: m_nodeset_id(nodeset_id), m_file_name("\0"), m_header_lines(0), m_steps(0), m_ptr_table(nullptr), m_ptr_math_code(math_code)
 {
 	this->SetMathCodeOpt(true);
+	this->SetIDNumber(id);
 }
-NodalForce::NodalForce(const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
+NodalForce::NodalForce(std::string& file_name, unsigned int header_lines, unsigned int steps)
 	: m_nodeset_id(0), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {
 	this->SetExternalFileOpt(true);
 }
-NodalForce::NodalForce(unsigned int nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& steps)
+NodalForce::NodalForce(unsigned int id, unsigned int nodeset_id, std::string& file_name, unsigned int header_lines, unsigned int steps)
 	: m_nodeset_id(nodeset_id), m_file_name(file_name), m_header_lines(header_lines), m_steps(steps), m_ptr_table(nullptr), m_ptr_math_code(nullptr)
 {
 	this->SetExternalFileOpt(true);
+	this->SetIDNumber(id);
 }
 
 NodalForce::~NodalForce()

@@ -54,7 +54,7 @@ public:
 	unsigned int node_set_contact_id;	//nodes of all lines
 	unsigned int pil_node_set_id;		//seabed nodeset
 	bool existSharedLine;
-	
+	unsigned int last_contact_node_id; //last line node used to establish contact with seabed
 
 	/*------------
 	TDP parameters

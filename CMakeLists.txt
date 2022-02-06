@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
 ## Project name and version
-project(GiraffeMoor VERSION 0.03.04 LANGUAGES CXX)
+project(GiraffeMoor VERSION 0.03.06 LANGUAGES CXX)
 
 ## Change startup project to GiraffeMoor
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GiraffeMoor)
@@ -48,7 +48,7 @@ set(INCLUDE_DIR
 	${CMAKE_CURRENT_SOURCE_DIR}/src/giraffe
 	${CMAKE_CURRENT_SOURCE_DIR}/src/gmoor
 	# External libraries
-	${CMAKE_CURRENT_SOURCE_DIR}/dependencies
+	# ${CMAKE_CURRENT_SOURCE_DIR}/dependencies
 	)
 
 
