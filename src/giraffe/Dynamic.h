@@ -13,9 +13,13 @@ private:
 
 	int m_update;
 
+	bool m_zero_ic;  //zero initial conditions
 public:
 	Dynamic();
 	Dynamic(double alpha_ray, double beta_ray, double gamma_new, double beta_new, int update);
+	Dynamic(unsigned int id, double start_time, double end_time, double i_time_step, double min_time_step, double max_time_step,
+		unsigned int max_it, unsigned int min_it, unsigned int conv_increase, double inc_factor, unsigned int sample, 
+		double alpha_ray, double beta_ray, double gamma_new, double beta_new, int update, bool zero_ic=false);
 	~Dynamic();
 	
 
@@ -30,7 +34,8 @@ public:
 	void SetNewmarkGamma(double gamma_new);
 	void SetNewmarkBeta(double beta_new);
 	void SetUpdate(int update);
-	
+	void SetZeroIC(bool zero_ic);
+
 
 	/// 
 	/// GETTERS
@@ -41,6 +46,8 @@ public:
 	inline double GetNewmarkGamma() const	{ return m_gamma_new; }
 	inline double GetNewmarkBeta() const	{ return m_beta_new; }
 	inline int GetUpdate() const			{ return m_update; }
+	inline int GetZeroIC() const			{ return m_zero_ic; }
+
 
 	/// 
 	/// Overloaded operators

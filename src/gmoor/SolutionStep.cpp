@@ -126,6 +126,41 @@ bool SolutionStep::SetNewmarkDamping(std::string_view damping, std::string& read
 	return false;
 }
 
+void SolutionStep::SetNewmarkDamping(std::string_view damping)
+{
+	if (damping == "null")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.5;
+		return;
+	}
+	if (damping == "mild")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.505;
+		return;
+	}
+	if (damping == "moderate")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.52;
+		return;
+	}
+	if (damping == "high")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.55;
+		return;
+	}
+	if (damping == "extreme")
+	{
+		m_beta_new = 0.3;
+		m_gamma_new = 0.6;
+		return;
+	}
+}
+
+
 void SolutionStep::SetBetaNewmark(double beta_new)
 {
 	this->m_beta_new = beta_new;

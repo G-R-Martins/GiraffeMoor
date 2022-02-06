@@ -20,6 +20,7 @@ private:
 public:
 	DisplacementField();
 	DisplacementField(unsigned int cs_id, unsigned int solution_step_id);
+	DisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step_id);
 	~DisplacementField();
 
 	//============================================================================

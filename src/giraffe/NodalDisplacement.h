@@ -22,11 +22,15 @@ public:
 	~NodalDisplacement();
 
 	NodalDisplacement(Table* table);
-	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, Table* table);
+	NodalDisplacement(unsigned int nodeset_id, unsigned int cs_id, Table* table);
+	NodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* table);
 	NodalDisplacement(MathCode* math_code);
-	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, MathCode* math_code);
-	NodalDisplacement(const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps);
-	NodalDisplacement(unsigned int node_set_id, unsigned int cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& tot_steps);
+	NodalDisplacement(unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code);
+	NodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code);
+	NodalDisplacement(const std::string& file_name, unsigned int header_lines, unsigned int tot_steps);
+	NodalDisplacement(unsigned int id, const std::string& file_name, unsigned int header_lines, unsigned int tot_steps);
+	NodalDisplacement(unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int tot_steps);
+	NodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int tot_steps);
 
 
 	/// 

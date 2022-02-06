@@ -12,6 +12,7 @@ private:
 public:
 	SameDisplacement();
 	SameDisplacement(unsigned int nodeA_id, unsigned int nodeB_id, unsigned int initial_load_step_id = 0);
+	SameDisplacement(unsigned int id, unsigned int nodeA_id, unsigned int nodeB_id, const BoolTable& bool_table, unsigned int initial_load_step_id = 0);
 	~SameDisplacement();
 
 

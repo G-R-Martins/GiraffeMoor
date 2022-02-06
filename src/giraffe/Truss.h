@@ -6,6 +6,8 @@ class Truss : public Element
 {
 public:
 	Truss();
+	Truss(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2);
+	Truss(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2, const std::string& comment);
 	~Truss();
 
 

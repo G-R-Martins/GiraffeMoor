@@ -60,6 +60,7 @@ public:
 	void SetSample(int sample);
 	
 	bool SetNewmarkDamping(std::string_view damping, std::string& readed);
+	void SetNewmarkDamping(std::string_view damping);
 	void SetBetaNewmark(double beta_new);
 	void SetGammaNewmark(double gamma_new);
 	void SetAlphaRayleigh(double alpha_ray);

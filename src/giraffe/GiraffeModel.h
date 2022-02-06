@@ -91,13 +91,13 @@ public:
 	Containers with object pointers
 	------------------------------*/
 	
-	std::vector <Displacement*> displacement_vector;
-	std::vector <Constraint*> constraint_vector;
-	std::vector <Element*> element_vector;
-	std::vector <SpecialConstraint*> special_constraint_vector;
-	std::vector <Contact*> contact_vector;
-	std::vector <Solution*> solution_vector;
-	std::vector <Load*> load_vector;
+	std::vector <std::shared_ptr<Displacement>> displacement_vector;
+	std::vector <std::unique_ptr<Constraint>> constraint_vector;
+	std::vector <std::unique_ptr<Element>> element_vector;
+	std::vector <std::unique_ptr<SpecialConstraint>> special_constraint_vector;
+	std::vector <std::unique_ptr<Contact>> contact_vector;
+	std::vector <std::unique_ptr<Solution>> solution_vector;
+	std::vector < std::unique_ptr<Load>> load_vector;
 
 	//==========================================================================================================================
 	//==========================================================================================================================
@@ -127,12 +127,12 @@ public:
 	Elements
 	-------*/
 
-	void GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2);
-	void GenerateTrussElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& node1, const unsigned int& node2, const std::string& comment);
-	void GeneratePipeElement(const unsigned int& id, const bool& segment_begin, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3);
-	void GeneratePipeElement(const unsigned int& id, const unsigned int& section_id, const unsigned int& cs_id, const unsigned int& node1, const unsigned int& node2, const unsigned int& node3, std::string& comment);
-	void GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node);
-	void GenerateRigidBodyElement(const unsigned int& id, const unsigned int& RB_data_material_id, const unsigned int& cs_id, const unsigned int& node, const std::string& comment);
+	void GenerateTrussElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2);
+	void GenerateTrussElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int node1, unsigned int node2, const std::string& comment);
+	void GeneratePipeElement(unsigned int id, bool segment_begin, unsigned int section_id, unsigned int cs_id, unsigned int node1, unsigned int node2, unsigned int node3);
+	void GeneratePipeElement(unsigned int id, unsigned int section_id, unsigned int cs_id, unsigned int node1, unsigned int node2, unsigned int node3, const std::string& comment);
+	void GenerateRigidBodyElement(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node);
+	void GenerateRigidBodyElement(unsigned int id, unsigned int RB_data_material_id, unsigned int cs_id, unsigned int node, const std::string& comment);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -141,19 +141,21 @@ public:
 	----------*/
 
 	void GenerateNodalConstraint(unsigned int id, unsigned int nodeset_id, BoolTable const& e_UX, BoolTable const& e_UY, BoolTable const& e_UZ, BoolTable const& e_ROTX, BoolTable const& e_ROTY, BoolTable const& e_ROTZ);
-	void GenerateSameDisplacement(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
-	void GenerateSameRotation(const unsigned int& id, const unsigned int& node_A, const unsigned int& node_B, BoolTable& bool_table);
-	
+	void GenerateSameDisplacement(unsigned int id, unsigned int node_A, unsigned int node_B, const BoolTable& bool_table);
+	void GenerateSameRotation(unsigned int id, unsigned int node_A, unsigned int node_B, const BoolTable& bool_table);
+	void GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table);
+	void GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table, const std::string& comment);
+
 	//--------------------------------------------------------------------------------------------------------------------------
 
 	/*-----------
 	Displacements
 	------------*/
 	
-	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, Table* values);
-	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, MathCode* math_code);
-	void GenerateNodalDisplacement(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& cs_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateDisplacementField(const unsigned int& id, const unsigned int& cs_id, const unsigned int& solution_step);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times);
+	void GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -165,9 +167,7 @@ public:
 	void GenerateNodeSet(const unsigned int& id, const std::unordered_set<unsigned int>& list, const std::string& comment);
 	void GenerateNodeSet(const unsigned int& id, unsigned int node, const std::string& comment);
 	void GenerateNodeSet(const unsigned int& id, unsigned int tot_nodes, unsigned int node_init, unsigned int increment, const std::string& comment);
-	void GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table);
-	void GenerateRigidNodeSet(const unsigned int& id, const unsigned int& pilot_node_id, const unsigned int& nodeset_id, BoolTable& bool_table, const std::string& comment);
-
+	
 	//--------------------------------------------------------------------------------------------------------------------------
 
 	/*------------------
@@ -187,8 +187,9 @@ public:
 	Solution
 	-------*/
 
-	void GenerateStaticSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample);
-	void GenerateDynamicSolutionStep(const unsigned int& id, const double& start_time, const double& end_time, const double& i_time_step, const double& max_time_step, const double& min_time_step, const unsigned int& max_it, const unsigned int& min_it, const unsigned int& conv_increase, const double& inc_factor, const unsigned int& sample, const double& alpha, const double& beta, const unsigned int& update, const double& gamma_new, const double& beta_new);
+	void GenerateStaticSolutionStep(unsigned int id, double start_time, double end_time, double i_time_step, double max_time_step, double min_time_step, unsigned int max_it, unsigned int min_it, unsigned int conv_increase, double inc_factor, unsigned int sample);
+	void GenerateDynamicSolutionStep(unsigned int id, double start_time, double end_time, double i_time_step, double max_time_step, double min_time_step, unsigned int max_it, unsigned int min_it, unsigned int conv_increase, double inc_factor, unsigned int sample, 
+		double alpha, double beta, unsigned int update, double gamma_new, double beta_new, bool zero_ic=false);
 
 	//--------------------------------------------------------------------------------------------------------------------------
 
@@ -196,10 +197,10 @@ public:
 	Forces
 	-----*/
 
-	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, Table* time_series);
-	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, const std::string& file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, std::string_view file_name, const unsigned int& header_lines, const unsigned int& n_times);
-	void GenerateNodalForce(const unsigned int& id, const unsigned int& nodeset_id, MathCode* mathCode);
+	void GenerateNodalForce(unsigned int id, unsigned int nodeset_id, Table* time_series);
+	void GenerateNodalForce(unsigned int id, unsigned int nodeset_id, std::string& file_name, unsigned int header_lines, unsigned int n_times);
+	void GenerateNodalForce(unsigned int id, unsigned int nodeset_id, std::string_view file_name, unsigned int header_lines, unsigned int n_times);
+	void GenerateNodalForce(unsigned int id, unsigned int nodeset_id, MathCode* mathCode);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
 

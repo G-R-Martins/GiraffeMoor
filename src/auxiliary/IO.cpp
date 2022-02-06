@@ -595,6 +595,7 @@ bool IO::ReadSolution(std::string& readed)
 				else if (name == "Sample")				step->SetSample(aux_read::ReadVariable<int>(s_inp));
 			} while (s_inp >> readed && !nh.empty());
 			step->CheckAndSetMaxTimeStep();
+			step->SetNewmarkDamping("extreme");
 		}
 		else if (key == "SeaCurrentStep")
 		{
@@ -1674,8 +1675,7 @@ void IO::WriteGiraffeModelFile()
 	fgir << std::setprecision(8);			//Default precision for float points
 
 	fgir << "\nSolutionSteps\t" << gm.solution_vector.size() << "\n";
-	
-	for (Solution* sol: gm.solution_vector)
+	for (auto&& sol: gm.solution_vector)
 		sol->WriteGiraffeFile(fgir);
 
 	fgir << "\nMonitor\n" << gm.monitor 
@@ -1705,13 +1705,13 @@ void IO::WriteGiraffeModelFile()
 	}
 
 	fgir << "\nConstraints\t" << gm.constraint_vector.size() << "\n";
-	for (Constraint* constraint : gm.constraint_vector)
+	for (auto&& constraint : gm.constraint_vector)
 		constraint->WriteGiraffeFile(fgir);
 
 	fgir << "\nEnvironment\n" << gm.environment;
 
 	fgir << "\nContacts\t" << gm.contact_vector.size() << "\n";
-	for (Contact* contact : gm.contact_vector)
+	for (auto&& contact : gm.contact_vector)
 		contact->WriteGiraffeFile(fgir);
 
 	fgir << "\nSurfaces\t" << gm.oscillatory_vector.size() << "\n";
@@ -1727,11 +1727,11 @@ void IO::WriteGiraffeModelFile()
 		fgir << coord_system;
 
 	fgir << "\nSpecialConstraints\t" << gm.special_constraint_vector.size() << "\n";
-	for (SpecialConstraint* special_constraint : gm.special_constraint_vector )
+	for (auto&& special_constraint : gm.special_constraint_vector )
 		special_constraint->WriteGiraffeFile(fgir);
 
 	fgir << "\nElements\t" << gm.element_vector.size() << "\n";
-	for (Element* element : gm.element_vector)
+	for (auto&& element : gm.element_vector)
 		element->WriteGiraffeFile(fgir);
 	
 	fgir << "\nNodes\t" << gm.node_vector.size() << "\n";
@@ -1742,13 +1742,13 @@ void IO::WriteGiraffeModelFile()
 	fgir << std::setprecision(16);
 
 	fgir << "\nDisplacements\t" << gm.displacement_vector.size() << "\n";
-	for (Displacement* disp : gm.displacement_vector)
+	for (auto&& disp : gm.displacement_vector)
 		disp->WriteGiraffeFile(fgir);
 
 	if ( !gm.load_vector.empty() )
 	{
 		fgir << "\nLoads\t" << gm.load_vector.size() << "\n";
-		for (Load* load : gm.load_vector)
+		for (auto&& load : gm.load_vector)
 			load->WriteGiraffeFile(fgir);
 	}
 

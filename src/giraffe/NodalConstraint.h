@@ -17,6 +17,8 @@ public:
 	NodalConstraint();
 	NodalConstraint(unsigned int node_set_id, const BoolTable& UX, const BoolTable& UY, const BoolTable& UZ,
 		const BoolTable& ROTX, const BoolTable& ROTY, const BoolTable& ROTZ);
+	NodalConstraint(unsigned int id, unsigned int node_set_id, const BoolTable& UX, const BoolTable& UY, const BoolTable& UZ,
+		const BoolTable& ROTX, const BoolTable& ROTY, const BoolTable& ROTZ);
 	~NodalConstraint();
 
 	

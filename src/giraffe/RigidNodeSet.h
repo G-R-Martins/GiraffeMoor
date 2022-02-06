@@ -11,7 +11,9 @@ private:
 
 public:
 	RigidNodeSet();
-	RigidNodeSet(unsigned int pilot_node_id, unsigned int node_set_id, const std::string& comment = "");
+	RigidNodeSet(unsigned int pilot_node_id, unsigned int nodeset_id, const std::string& comment = "");
+	RigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id,
+		const BoolTable& bool_table, const std::string& comment = "");
 	~RigidNodeSet();
 
 

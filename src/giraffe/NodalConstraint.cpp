@@ -9,6 +9,12 @@ NodalConstraint::NodalConstraint(unsigned int node_set_id, const BoolTable & UX,
 	: m_node_set_id(node_set_id), m_UX(UX), m_UY(UY), m_UZ(UZ), m_ROTX(ROTX), m_ROTY(ROTY), m_ROTZ(ROTZ)
 {}
 
+NodalConstraint::NodalConstraint(unsigned int id, unsigned int node_set_id, const BoolTable & UX, const BoolTable & UY, const BoolTable & UZ, const BoolTable & ROTX, const BoolTable & ROTY, const BoolTable & ROTZ)
+	: m_node_set_id(node_set_id), m_UX(UX), m_UY(UY), m_UZ(UZ), m_ROTX(ROTX), m_ROTY(ROTY), m_ROTZ(ROTZ)
+{
+	this->SetIDNumber(id);
+}
+
 NodalConstraint::~NodalConstraint()
 {}
 
