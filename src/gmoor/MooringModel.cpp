@@ -12,15 +12,16 @@
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
 
+// Map solution only for debug mode
+#ifndef NDEBUG
 #define MAP_SOLUTION_ITERATIONS
-
+#endif
 
 //Global object
 extern GiraffeModel gm;
  
 //Constants variables
 constexpr auto PI = 3.1415926535897932384626433832795;
-static double g;
 
 MooringModel::MooringModel()
 	: cur_line(0), tot_elem(0), cur_node_mesh(1), cur_elem(1), cur_cs(2), 
@@ -131,12 +132,9 @@ void MooringModel::CopyData()
 	/*	MoorEnvironment -> Environment	*/
 
 	//Gravity
-	g = MoorEnvironment::GetGravity();
-	gm.environment.SetGravity(g);
+	gm.environment.SetGravity(environment.GetGravity());
 	
-	BoolTable bool_g; //Gravity bootable
-	bool_g.Set(1, true);
-	gm.environment.SetGravityBooltable(bool_g);
+	gm.environment.SetGravityBooltable(BoolTable{ true });
 
 	gm.environment.SetRhoFluid (environment.GetRhoFluid());
 	gm.environment.SetSeaCurrentVec(environment.GetSeaCurrentVec());
@@ -249,8 +247,8 @@ void MooringModel::Catenary_GeneralSetting(Line& line, Matrix& A, Matrix& B, Mat
 	for (LineSegment& seg : line.GetAllSegments())
 	{
 		line.AddLength(seg.GetLength());
-		seg.SetGamma(g * segment_properties[seg.GetProperty() - 1].GetMass() 
-			- g * environment.GetRhoFluid() * PI * pow(segment_properties[seg.GetProperty() - 1].GetDiameter(), 2) / 4.0);
+		seg.SetGamma(environment.GetGravity() * segment_properties[seg.GetProperty() - 1].GetMass()
+			- environment.GetGravity() * environment.GetRhoFluid() * PI * pow(segment_properties[seg.GetProperty() - 1].GetDiameter(), 2) / 4.0);
 	}
 
 	//Anchor and fairlead nodes ID
@@ -456,7 +454,7 @@ bool MooringModel::SolveCatenaryEquations(Line& line, Matrix& A, Matrix& B,
 
 				//Reset the vertical point
 				B(2, 0) = keypoints[line.GetKeypointB() - 1].GetCoordinate('z') +
-					(prop_ptr->GetMass() * g) / (environment.GetSeabed().GetStiffness() * prop_ptr->GetContactDiameter());
+					(prop_ptr->GetMass() * environment.GetGravity()) / (environment.GetSeabed().GetStiffness() * prop_ptr->GetContactDiameter());
 			}
 			else  break;
 		}
@@ -500,9 +498,9 @@ void MooringModel::ImposePenetration(Line& line)
 
 		//Set penetration
 		penetrations.emplace_front(std::array{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-		penetrations.front().SetLine(std::array{ 1.0, 0.0, 0.0, -( prop_ptr->GetMass() * g ) / ( k_lin ), 0.0, 0.0, 0.0 });
+		penetrations.front().SetLine(std::array{ 1.0, 0.0, 0.0, -( prop_ptr->GetMass() * environment.GetGravity()) / ( k_lin ), 0.0, 0.0, 0.0 });
 		//penetrations.back().SetLine(std::array{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-		gm.GenerateNodalDisplacement(++cur_disp, seg_ptr->GetNodeSet(), 1, &penetrations.front());
+		gm.GenerateNodalDisplacement(++cur_disp, seg_ptr->GetNodeSet(), 1, &penetrations.front(), BoolTable(true, 1, false));
 		
 		//Save the penetration of the first segment
 		if ( seg == 0 ) dz0 = penetrations.front().GetValue(1, 3);
@@ -514,13 +512,10 @@ void MooringModel::ImposePenetration(Line& line)
 		//If there is no TDP, starts at segment 0, otherwise; at the next segment after TDP
 		unsigned int seg = existTDP ? lim_seg + 1 : 0;
 
-		////Get a pointer to the penetration of the first segment of the line
-		//Table* dz_ptr = &penetrations[penetrations.size() - ( unsigned int )lim_seg - 1];
-
 		for ( ; seg < line.GetNSegments(); ++seg )
 		{
 			line.GetSegment(seg).SetEpsilon(line.GetSegment(0).GetEpsilon());
-			gm.GenerateNodalDisplacement(++cur_disp, line.GetSegment(seg).GetNodeSet(), 1, &penetrations.front());
+			gm.GenerateNodalDisplacement(++cur_disp, line.GetSegment(seg).GetNodeSet(), 1, &penetrations.front(), BoolTable(true, 1, false));
 		}
 	}
 }
@@ -889,7 +884,6 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vect
 		{
 			std::array<double, 6> disp = { zcat_n[seg][node], 0.0, xcat_n[seg][node] - x0_n[seg][node],
 				0.0, -roty_n[seg][node], 0.0 };
-			//static_cast< DisplacementField* >( gm.displacement_vector[cur_disp - 1] )->InsertDisplacement(++cur_node, disp);
 			static_cast<DisplacementField*>(gm.displacement_vector[cur_disp - 1].get())->InsertDisplacement(++cur_node, disp);
 		}
 	}
@@ -904,8 +898,7 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vect
 void MooringModel::CheckDummyElements()
 {
 	//BoolTable
-	BoolTable bool_t;
-	bool_t.Clear();
+	BoolTable constraint_booltable(true);
 
 	//Check if dummy elements are required and create them
 	unsigned int dummy_element = 1;	//count dummy elements
@@ -943,28 +936,18 @@ void MooringModel::CheckDummyElements()
 	
 					//Create dummy element node set
 					gm.GenerateNodeSet(cur_node_set, (unsigned int)cur_node_mesh - 3, std::string{ "Dummy element " + dummy_element });
-					bool_t.Set(1, true);
-	
+					
 					//Create dummy element under the seabed
 					gm.GeneratePipeElement(cur_elem, false, (int)segment_properties.size(), 1, (unsigned int)cur_node_mesh - 1, (unsigned int)cur_node_mesh - 2, (unsigned int)cur_node_mesh - 3);
 					++cur_elem;
 					++dummy_element;
 	
 					//Create same rotation constraint
-					bool_t.Set(1, true);
-					gm.GenerateSameRotation(++cur_special_constraint, cur_node_mesh - 1, lines[cur_line].GetTransitionNode(dummy_element - 2), bool_t);
+					gm.GenerateSameRotation(++cur_special_constraint, cur_node_mesh - 1, lines[cur_line].GetTransitionNode(dummy_element - 2), constraint_booltable);
 					
 					//Dummy element - fixed
-					BoolTable UX, UY, UZ, ROTX, ROTY, ROTZ;
-					UX.Set(1, true);
-					UY.Set(1, true);
-					UZ.Set(1, true);
-					ROTX.Set(1, true);
-					ROTY.Set(1, true);
-					ROTZ.Set(1, true);
-	
-					gm.GenerateNodalConstraint(++cur_constraint, cur_node_set, UX, UY, UZ, ROTX, ROTY, ROTZ);
-					++cur_node_set;
+					gm.GenerateNodalConstraint(++cur_constraint, cur_node_set++, 
+						constraint_booltable, constraint_booltable, constraint_booltable, constraint_booltable, constraint_booltable, constraint_booltable);
 				}
 			}
 		}
@@ -980,9 +963,8 @@ void MooringModel::GenerateContacts()
 	gm.GenerateNodeSet(node_set_contact_id, last_contact_node_id, 1, 1, "Nodes to establish contact model");
 
 	//Contact booltables
-	BoolTable bool_c;
+	BoolTable bool_c(true);
 	
-	bool_c.Set(1, true);
 	unsigned int NSSS_ID = 0;
 	for (Line& line : lines)
 	{
@@ -1050,7 +1032,7 @@ void MooringModel::GenerateDynamicRelaxation()
 		+ 6.46725 * exp(-0.820751 * rot_fairlead);
 
 	//double fi = 8.25 - 11.42 * rot_fairlead + 8.56 * pow(rot_fairlead, 2) - 2.53 * pow(rot_fairlead, 3);
-	double w_n = fi * sqrt(( m_m - m_a ) / ( ( m_m + m_a ) ) * ( g / L_s ));
+	double w_n = fi * sqrt(( m_m - m_a ) / ( ( m_m + m_a ) ) * (environment.GetGravity() / L_s ));
 
 	dyn_relax->SetAlphaRayleigh(zeta * 2.0 * w_n);
 	dyn_relax->SetDuration(static_cast<unsigned int>(ceil(2.0 * PI / w_n)));
@@ -1116,7 +1098,7 @@ void MooringModel::GenerateVessels()
 		gm.GenerateRigidBodyElement(cur_elem++, cur_rbdata, 1, (unsigned int)cur_node_mesh++);
 
 		//Coupling fairleads to vessel -> SameDisplacement (GIRAFFE special constraint)
-		BoolTable bool_t(false, 2);
+		BoolTable constraint_booltable(false, 2, true);
 
 		//Searchs for the first line with the current vessel
 		auto it = std::find(lines.begin(), lines.end(), num);
@@ -1126,7 +1108,7 @@ void MooringModel::GenerateVessels()
 			gm.GenerateNode(cur_node_mesh, keypoints[it->GetKeypointB() - 1].GetCoordinate('x'), 
 							keypoints[it->GetKeypointB() - 1].GetCoordinate('y'), 
 							keypoints[it->GetKeypointB() - 1].GetCoordinate('z'));
-			gm.GenerateSameDisplacement(++cur_special_constraint, cur_node_mesh++, it->GetNodeB(), bool_t);
+			gm.GenerateSameDisplacement(++cur_special_constraint, cur_node_mesh++, it->GetNodeB(), constraint_booltable);
 			
 			++it;
 		}
@@ -1144,19 +1126,20 @@ void MooringModel::GenerateVessels()
 
 void MooringModel::GenerateRigidNodeSets()
 {
-	BoolTable bool_t(false, 2);
+	BoolTable constraint_booltable(false, 2, true);
 
 	/*If exist shared line(s), must check if the fairleads
 		must be included to some rigid node set */
 	if (existSharedLine)
-		IncludeSharedLinesFaileads(bool_t);
+		IncludeSharedLinesFaileads(constraint_booltable);
 
 	//Generate rigid nodesets
-	bool_t.Set(1, true);
+	constraint_booltable.Clear();
+	constraint_booltable.Push_Back(true);
 	for (Vessel& vessel : vessels)
 	{
 		gm.GenerateNodeSet(vessel.GetRigidNodeset(), vessel.GetNodesRigidNodeset(), "Vessel Rigid Node Set");
-		gm.GenerateRigidNodeSet(++cur_special_constraint, vessel.GetNode(), vessel.GetRigidNodeset(), bool_t);
+		gm.GenerateRigidNodeSet(++cur_special_constraint, vessel.GetNode(), vessel.GetRigidNodeset(), constraint_booltable);
 	}
 	
 }
@@ -1291,12 +1274,12 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 	start += 1.0;
 
 	//Solution step to include sea current
-	int seacurrent_booltable = 3;
+	size_t steps_before_seacurrent = 3;
 
 	//Coupling fairlead(s)
 	if (moorsolution.ExistDynRelax_Lines())
 	{
-		++seacurrent_booltable;
+		++steps_before_seacurrent;
 
 		//Dynamic relaxation
 		auto relax = moorsolution.GetStepDynRelaxLines();
@@ -1326,8 +1309,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 	if (environment.ExistSeaCurrent())
 	{
 		//BoolTable
-		for (int cont = 0; cont < seacurrent_booltable; cont++)
-			gm.environment.GetSeaCurrentBooltable().Push_Back(false);
+		gm.environment.GetSeaCurrentBooltable().Multiple_Push_Back(false, steps_before_seacurrent);
 		gm.environment.GetSeaCurrentBooltable().Push_Back(true);
 
 		//Solution step
@@ -1346,7 +1328,7 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 	}
 	//Sea current bool table, just for Morison effects
 	else
-		gm.environment.GetSeaCurrentBooltable().Set(3, false, false, true);
+		gm.environment.GetSeaCurrentBooltable().Multiple_Push_Back(std::vector{ false, false, true });
 
 	moorsolution.SetStepsBeforeAnalysis(step);
 }
@@ -1677,19 +1659,15 @@ void MooringModel::GenerateSeabed()
 void MooringModel::GenerateConstraints()
 {
 	//Bool tables
-	BoolTable U, ROT, ROTZ;
-	U.Clear();
-	ROT.Clear();
-
-	//Lines (contact)
-	U.Set(3, true, true, false);
-	ROT.Set(3, true, true, false);
+	BoolTable U(true, 2, false), ROT(true, 2, false);
+	
 	gm.GenerateNodalConstraint(++cur_constraint, node_set_contact_id, U, U, U, ROT, ROT, ROT);
 
 	//Anchors
-	U.Set(3, true, true, true);
-	ROT.Set(2, true, true);
-	ROTZ.Set(2, true, false);
+	U.Reset(true, 3);
+	ROT.Reset(true, 2);
+	
+	BoolTable ROTZ(true, 1, false);
 
 	//With different constraint definitions
 	for (const MoorConstraint& anchor : anchor_constraints)
@@ -1711,18 +1689,17 @@ void MooringModel::GenerateConstraints()
 	for (const unsigned int& nodeset : anchor_nodesets_id)
 		gm.GenerateNodalConstraint(++cur_constraint, nodeset, U, U, U, ROT, ROT, ROTZ);
 
-
 	//Fairleads
-	U.Set(4, true, true, true, false);
-	ROT.Set(4, false, true, true, false);
-	for (const unsigned int& nodeset : fairlead_nodesets_id)
+	U.Reset(std::vector{ true, true, true, false });
+	ROT.Reset(std::vector{ false, true, false });
+	for (auto nodeset : fairlead_nodesets_id)
 		gm.GenerateNodalConstraint(++cur_constraint, nodeset, U, U, U, ROT, ROT, ROT);
 
 	//Lines
 	if (!line_constraints.empty())
 	{
 		//Default conditions (steps to set the FE model)
-		std::list bool_list = {true, true, false};
+		std::vector<bool> bool_list = { true, true, false };
 		//Check for other steps after coupling fairleads
 		if ( moorsolution.GetStepsBeforeAnalysis() > 3 )
 		{
@@ -1772,8 +1749,8 @@ void MooringModel::GenerateConstraints()
 	if (vessel_constraints.empty())
 	{
 		//Vessel - fixed
-		U.Set(1, true);
-		ROT.Set(1, true);
+		U.Reset(true, 1);
+		ROT.Reset(true, 1);
 		for (Vessel& vessel : vessels)
 			gm.GenerateNodalConstraint(++cur_constraint, vessel.GetNodeset(), U, U, U, ROT, ROT, ROT);
 	}
@@ -1828,8 +1805,8 @@ void MooringModel::GenerateConstraints()
 		if (constrainted_vessels.size() != vessels.size())
 		{
 			//Vessel - fixed
-			U.Set(1, true);
-			ROT.Set(1, true);
+			U.Reset(true, 1);
+			ROT.Reset(true, 1);
 			for (Vessel& vessel : vessels)
 			{
 				if (constrainted_vessels.find(vessel.GetNumber()) != constrainted_vessels.end())
@@ -1845,12 +1822,11 @@ void MooringModel::GenerateConstraints()
 
 
 	//Seabed - fixed
-	U.Set(1, true);
-	ROT.Set(1, true);
+	U.Reset(true, 1);
+	ROT.Reset(true, 1);
 	gm.GenerateNodalConstraint(++cur_constraint, pil_node_set_id, U, U, U, ROT, ROT, ROT);
 }
 
-//Creates platform object(s)
 
 //Create segments for lines with 'SegmentSet' defined 
 void MooringModel::GenerateSegments()

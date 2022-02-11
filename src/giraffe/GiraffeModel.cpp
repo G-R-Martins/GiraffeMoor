@@ -163,10 +163,22 @@ void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodes
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, values)
 	);
 }
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, values, booltable)
+	);
+}
 void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code)
 {
 	displacement_vector.emplace_back(
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, math_code)
+	);
+}
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, math_code, booltable)
 	);
 }
 void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id,
@@ -174,6 +186,12 @@ void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodes
 {
 	displacement_vector.emplace_back(
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, file_name, header_lines, n_times)
+	);
+}
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, file_name, header_lines, n_times, booltable)
 	);
 }
 void GiraffeModel::GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step)

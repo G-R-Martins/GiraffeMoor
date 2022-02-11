@@ -1,11 +1,10 @@
 #include "PCH.h"
 #include "MoorEnvironment.h"
 
-double MoorEnvironment::s_gravity;
 
 
 MoorEnvironment::MoorEnvironment()
-	: m_rho_fluid(0.0), m_water_depth(0.0), 
+	: m_gravity(9.81), m_rho_fluid(0.0), m_water_depth(0.0), 
 	m_sea_current_exist(false), m_sea_current_is_constant(true)
 {
 	m_sea_current_vector.reserve(10);
@@ -22,7 +21,7 @@ MoorEnvironment::~MoorEnvironment()
 
 void MoorEnvironment::SetGravity(double g)
 {
-	MoorEnvironment::s_gravity = g;
+	this->m_gravity = g;
 }
 void MoorEnvironment::SetRhoFluid(double rho_fluid)
 {

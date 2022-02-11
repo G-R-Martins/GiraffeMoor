@@ -35,7 +35,6 @@ public:
 	/// 
 	inline std::shared_ptr<DynRelaxLinesConfig> InitDynRelaxLines();
 	inline std::shared_ptr<SolutionStep> InitStepSeaCurrent();
-	inline std::shared_ptr<SolutionStep> InitDynRelaxVessels();
 	
 
 	///

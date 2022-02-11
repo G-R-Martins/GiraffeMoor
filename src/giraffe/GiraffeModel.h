@@ -153,8 +153,11 @@ public:
 	------------*/
 	
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values, const BoolTable& booltable);
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code, const BoolTable& booltable);
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times, const BoolTable& booltable);
 	void GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
