@@ -187,13 +187,13 @@ std::ostream& operator<<(std::ostream& out, NodalDisplacement const& obj)
 {
 	out << "\tNodalDisplacement " << obj.GetNumber()
 		<< "\tNodeSet " << obj.m_node_set_id
-		<< "\tCS " << obj.m_cs_id << "\t";
+		<< "\tCS " << obj.m_cs_id;
 
 	if (obj.m_set_booltable)
 		out << "\t" << obj.GetBoolTable();
 
 	if (obj.IsMathCode())
-		out << "MathCode\n" << obj.m_math_code;
+		out << "\tMathCode\n" << obj.m_math_code;
 	else if (obj.IsExternalFile())
 	{
 		out << "\n\t\tFile \"" << obj.m_file_name << "\""
@@ -201,7 +201,7 @@ std::ostream& operator<<(std::ostream& out, NodalDisplacement const& obj)
 			<< "\tNTimes " << obj.m_tot_steps << "\n";
 	}
 	else
-		out << "NTimes " << obj.m_table->GetNLines() << "\n" << obj.m_table;
+		out << "\tNTimes " << obj.m_table->GetNLines() << "\n" << obj.m_table;
 
 	return out;
 }

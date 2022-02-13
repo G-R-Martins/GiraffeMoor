@@ -47,7 +47,8 @@ std::ostream& operator<<(std::ostream& out, const NSSS& obj)
 		<< "\tPinball "			<< obj.m_pinball 
 		<< "\tRadius "			<< obj.m_radius 
 		<< "\tMaxPointwiseInt " << obj.m_max_interactions 
-		<< " "					<< obj.m_booltable;
+		<< " "					<< obj.m_booltable
+		<< "\n";
 
 	return out;
 }

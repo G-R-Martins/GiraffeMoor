@@ -827,6 +827,12 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 void MooringModel::GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vector <double>& FV, unsigned int& cur_node, 
 												std::vector<std::vector<double>>& xcat_n, std::vector<std::vector<double>>& zcat_n, std::vector<std::vector<double>>& roty_n)
 {
+
+#ifdef MAP_SOLUTION_ITERATIONS
+	std::cout << "----------------------------------------\n";
+	std::cout << "\nStatic tension along the length \n\n" << std::setprecision(10);
+#endif
+
 	double sum_len = 0.0;
 	for (unsigned int seg = 0; seg < line.GetNSegments(); seg++)
 	{
@@ -869,7 +875,9 @@ void MooringModel::GenerateCatenaryDisplacement(Line& line, Matrix& F, std::vect
 					- sqrt(pow(FV[seg], 2) + pow(F(0, 0), 2)) ) + 1.0 / ( 2.0 * line.GetSegment(seg).GetGamma() * EA_n ) * ( pow(FV_s, 2) - pow(FV[seg], 2) );
 				roty_n[seg][node] = -atan(FV_s / F(0, 0));
 
-				std::cout << std::setprecision(10) << sqrt(pow(FV_s, 2) + pow(F(0, 0), 2)) << "\n";
+#ifdef MAP_SOLUTION_ITERATIONS
+				std::cout << s << "m \t" << sqrt(pow(FV_s, 2) + pow(F(0, 0), 2)) << " N\n";
+#endif
 			}
 		}
 	}
@@ -964,14 +972,14 @@ void MooringModel::GenerateContacts()
 
 	//Contact booltables
 	BoolTable bool_c(true);
-	
+	double stiff_tang_factor = environment.GetSeabed().GetStiffnessTangentialFactor();
 	unsigned int NSSS_ID = 0;
 	for (Line& line : lines)
 	{
 		unsigned int segID = 0;
 		for ( LineSegment& seg : line.GetAllSegments() )
 			gm.GenerateNSSSContact(++NSSS_ID, seg.GetNodeSet(), 1, environment.GetSeabed().GetFrictionCoefficient(),
-								   seg.GetEpsilon(), environment.GetSeabed().GetDamping(), seg.GetEpsilon() * 0.1, 0.0,
+								   seg.GetEpsilon(), environment.GetSeabed().GetDamping(), seg.GetEpsilon() * stiff_tang_factor, 0.0,
 								   environment.GetSeabed().GetPinball(), 0, 1, std::move(bool_c), 
 								   std::string("Segment number ") + std::to_string(++segID) + " of the line number " + std::to_string(line.GetNumber())
 			);
@@ -1035,7 +1043,10 @@ void MooringModel::GenerateDynamicRelaxation()
 	double w_n = fi * sqrt(( m_m - m_a ) / ( ( m_m + m_a ) ) * (environment.GetGravity() / L_s ));
 
 	dyn_relax->SetAlphaRayleigh(zeta * 2.0 * w_n);
-	dyn_relax->SetDuration(static_cast<unsigned int>(ceil(2.0 * PI / w_n)));
+	if (dyn_relax->GetPeriodsDefinedOpt())
+		dyn_relax->SetEndTime(ceil(2.0 * PI / w_n) * dyn_relax->GetPeriods());
+	else
+		dyn_relax->SetEndTime(dyn_relax->GetEndTime());
 
 #ifdef MAP_SOLUTION_ITERATIONS
 	std::cout << "\n ============================================= \n";
@@ -1264,12 +1275,12 @@ void MooringModel::GeneralSetting()
 void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 {
 	//Enforcing penetration
-	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 100);
+	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 1'000'000);
 	Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1.0, "Enforcing penetration"));
 	start += 1.0;
 
 	//Applying prescribed displacements
-	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 100);
+	gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.0001, 20, 2, 4, 1.5, 1'000'000);
 	Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1.0, "Applying prescribed displacement field"));
 	start += 1.0;
 
@@ -1283,23 +1294,24 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 
 		//Dynamic relaxation
 		auto relax = moorsolution.GetStepDynRelaxLines();
-		double total_duration = (double)relax->GetDuration() * (double)relax->GetPeriods();
+		double total_duration = relax->GetEndTime();
 		gm.GenerateDynamicSolutionStep(++step, start, start + total_duration,
 			relax->GetTimestep(), relax->GetMaxTimestep(), relax->GetMinTimestep(),
 			15, 3, 4, 2, relax->GetSample(),
-			relax->GetAlpha_ray(), relax->GetBeta_ray(), 0, relax->GetGamma_new(), relax->GetBeta_new(), true);
+			relax->GetAlpha_ray(), relax->GetBeta_ray(), 0, relax->GetGamma_new(), relax->GetBeta_new(), true
+		);
 		Summary::GetSteps().emplace_back(std::make_tuple(start, start + total_duration, "Coupling fairleads during a dynamic relaxation"));
 		start += total_duration;
 
 		//Static step
-		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 100);
+		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 1'000'000);
 		Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1., "Static step after dynamic relaxation"));
 		start += 1.;
 	}
 	else
 	{
 		//Static step
-		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 100);
+		gm.GenerateStaticSolutionStep(++step, start, start + 1., 1., 1., 0.00001, 20, 2, 4, 1.5, 1'000'000);
 		Summary::GetSteps().emplace_back(std::make_tuple(start, start + 1., "Coupling fairleads statically"));
 		start += 1.;
 	}
@@ -1770,8 +1782,8 @@ void MooringModel::GenerateConstraints()
 			++step0;
 
 		//Creates booltables
-		BoolTable boolX(true, step0, false), boolY(true, step0, false), boolZ(true, step0, false),
-			boolROTX(true, step0, false), boolROTY(true, step0, false), boolROTZ(true, step0, false);
+		BoolTable boolX(true, step0), boolY(true, step0), boolZ(true, step0),
+			boolROTX(true, step0), boolROTY(true, step0), boolROTZ(true, step0);
 
 		
 		//Vessels with constraint defined

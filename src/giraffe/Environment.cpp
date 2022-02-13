@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& out, const Environment& obj)
 	out << "\tGravityData\tG " << 0.0 << " " << 0.0 << " " << -obj.m_gravity << " " << obj.m_bool_g
 		<< "\tOceanData\tRhoFluid " << obj.m_rho_fluid
 		<< "\tSurfacePosition " << 0.0 << " " << 0.0 << " " << 0.0
-		<< "\n\tSeaCurrent\tN " << obj.m_sea_current_vector.size() << " " << obj.m_bool_current;
+		<< "\n\tSeaCurrent\tN " << obj.m_sea_current_vector.size() << " " << obj.m_bool_current << "\n";
 
 	for (const SeaCurrent& sc : obj.GetSeaCurrentVec())
 	{

@@ -88,7 +88,7 @@ public:
 
 /// Inline initializer for shared pointers
 std::shared_ptr<DynRelaxLinesConfig> MoorSolution::InitDynRelaxLines() {
-	this->m_lines_configuration_ptr = std::make_shared<DynRelaxLinesConfig>(0.0, 0, 0, 0, false, 0.0, 0.0, 1.0, 1.0e-1, 1.0e-4, 1'000'000,
+	this->m_lines_configuration_ptr = std::make_shared<DynRelaxLinesConfig>(0.0, 0, 0, false, 0.0, 0.0, 1.0, 1.0e-1, 1.0e-4, 1'000'000,
 		0.0, 0.0, 0.0, 0.0);
 
 	this->m_dyn_relax_exist = true;

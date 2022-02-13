@@ -18,7 +18,6 @@ private:
 	bool m_sea_current_exist; 
 	bool m_sea_current_is_constant;
 	
-	//============================================================================
 
 public:
 

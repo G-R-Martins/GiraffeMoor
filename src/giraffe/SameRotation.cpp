@@ -29,7 +29,7 @@ SameRotation::~SameRotation()
 std::ostream& operator<<(std::ostream& out, const SameRotation& obj) {
 	out << "\tSameRotation " << obj.GetIDNumber() 
 		<< "\tNodes " << obj.m_nodeA_id << " " << obj.m_nodeB_id << " "
-		<< obj.m_booltable;
+		<< obj.m_booltable << "\n";
 
 	return out;
 }

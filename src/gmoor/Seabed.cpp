@@ -4,8 +4,8 @@
 
 Seabed::Seabed()
 	: m_is_flat(true), m_pilot_node_id(0), m_nodeset_id(0),
-	m_stiffness(0.0), m_damping(0.0), m_mu(0.0),
-	m_pinball(0.0), m_radius(0.0)
+	m_stiffness(0.0), m_stiffness_tangential_factor(0.1), 
+	m_damping(0.0), m_mu(0.0), m_pinball(0.0), m_radius(0.0)
 {}
 
 Seabed::~Seabed()
@@ -31,6 +31,10 @@ void Seabed::SetNodeset(unsigned int nodeset_id)
 void Seabed::SetStiffness(double stiffness)
 {
 	this->m_stiffness = stiffness;
+}
+void Seabed::SetStiffnessTangentialFactor(double factor)
+{
+	this->m_stiffness_tangential_factor = factor;
 }
 void Seabed::SetDamping(double damping)
 {
