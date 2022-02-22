@@ -589,7 +589,7 @@ void MooringModel::CheckSegmentsSize(Line& line)
 	}
 
 	//Exclude transitions between segments
-	line.IncrementTotNodes(1 - (unsigned int)lines[line.GetNumber() - 1].GetNSegments());
+	line.IncrementTotNodes(1 - lines[line.GetNumber() - 1].GetNSegments());
 }
 
 
@@ -678,7 +678,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 		unsigned int n_elem = seg_ptr->GetNElements() * n;
 		unsigned int addFirstNode = seg == 0 ? 1 : 0; //If is the first segment, the anchor node must be included
 		
-		gm.GenerateNodeSet(cur_node_set++, n_elem + addFirstNode, (unsigned int)cur_node_mesh, 1, 
+		gm.GenerateNodeSet(cur_node_set++, n_elem + addFirstNode, cur_node_mesh, 1, 
 			std::string("Nodes of the segment ") + std::to_string(seg + 1) + " of the line " + std::to_string(line.GetNumber())
 		);
 		
@@ -691,7 +691,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 		if ( seg > 0 && line.GetNSegments() >= 2 &&
 			segment_properties[line.GetSegment(seg - 1).GetProperty() - 1].IsTruss() &&
 			segment_properties[line.GetSegment(seg).GetProperty() - 1].IsBeam() )
-			line.AddTransitionNode((unsigned int)cur_node_mesh - 1);
+			line.AddTransitionNode(cur_node_mesh - 1);
 
 		//Generate nodes, nodesets and elements
 		for (unsigned int cur_elem_seg = 1; cur_elem_seg <= seg_ptr->GetNElements(); cur_elem_seg++)
@@ -745,7 +745,7 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 					//Node and nodeset of the first node (anchor or first fairlead)
 					gm.GenerateNode(cur_node_mesh, A, comment.str());
 					line.SetNodeA(cur_node_mesh);
-					gm.GenerateNodeSet(line.GetNodesetA(), (unsigned int)cur_node_mesh, comment.str());
+					gm.GenerateNodeSet(line.GetNodesetA(), cur_node_mesh, comment.str());
 
 					//Summary list
 					summ_elem[0] = cur_elem;
@@ -806,8 +806,8 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 			comment.str("");  //reset stringstream
 
 			//Generate elements
-			if (!isBeam)	gm.GenerateTrussElement(cur_elem, bool_first_element, seg_ptr->GetProperty(), (unsigned int)cur_node_mesh - 2, (unsigned int)cur_node_mesh - 1);
-			else			gm.GeneratePipeElement(cur_elem, bool_first_element, seg_ptr->GetProperty(), cur_cs, (unsigned int)cur_node_mesh - 3, (unsigned int)cur_node_mesh - 2, (unsigned int)cur_node_mesh - 1);
+			if (!isBeam)	gm.GenerateTrussElement(cur_elem, bool_first_element, seg_ptr->GetProperty(), cur_node_mesh - 2, cur_node_mesh - 1);
+			else			gm.GeneratePipeElement(cur_elem, bool_first_element, seg_ptr->GetProperty(), cur_cs, cur_node_mesh - 3, cur_node_mesh - 2, cur_node_mesh - 1);
 			++cur_elem;
 		}	
 	}
@@ -817,10 +817,10 @@ void MooringModel::GenerateMesh(Line& line, Matrix& A, Matrix& F, double& Hf, do
 
 	//Summary file
 	Summary::AddLine({ line.GetNodeA(), line.GetNodeB() }, summ_elem, summ_nodesets, extrem_tensions,
-					 (unsigned int)line.GetNumber(), line.GetConfiguration(), existTDP, x_tdp_ext, line.GetTotalLength(), ( unsigned int )line.GetNSegments());
+					 line.GetNumber(), line.GetConfiguration(), existTDP, x_tdp_ext, line.GetTotalLength(), line.GetNSegments());
 
 	//Mooring line NodeSet
-	gm.GenerateNodeSet(cur_node_set++, nodes_line, (unsigned int)init_line, 1, std::string{"Nodes of line "} + std::to_string(line.GetNumber()));
+	gm.GenerateNodeSet(cur_node_set++, nodes_line, init_line, 1, std::string{"Nodes of line "} + std::to_string(line.GetNumber()));
 	++cur_cs;
 }
 
@@ -910,7 +910,7 @@ void MooringModel::CheckDummyElements()
 
 	//Check if dummy elements are required and create them
 	unsigned int dummy_element = 1;	//count dummy elements
-	Matrix dummy_nodes(3, 1);	//matrix to generate nodes  
+	std::array<double, 3> dummy_nodes;	//matrix to generate nodes  
 	double dummy_z = environment.GetWaterDepth(); //depth -> dummy elements are generated under the seabead
 	
 	for (Line& line : lines)
@@ -930,28 +930,25 @@ void MooringModel::CheckDummyElements()
 					//Create dummy element nodes
 					for (int i : { 1, 2, 3 })
 					{
-						dummy_nodes(0, 0) = 0;
-						dummy_nodes(1, 0) = 0;
-						dummy_nodes(2, 0) = dummy_z;
+						dummy_nodes = { 0, 0, dummy_z };
 						--dummy_z;
 						if (i == 1)
 							gm.GenerateNode(cur_node_mesh, dummy_nodes, std::string{ "Dummy element " + dummy_element});
 						else
 							gm.GenerateNode(cur_node_mesh, dummy_nodes);
 						++cur_node_mesh;
-						dummy_nodes.clear();
 					}
 	
 					//Create dummy element node set
-					gm.GenerateNodeSet(cur_node_set, (unsigned int)cur_node_mesh - 3, std::string{ "Dummy element " + dummy_element });
+					gm.GenerateNodeSet(cur_node_set, cur_node_mesh - 3, std::string{ "Dummy element " + dummy_element });
 					
 					//Create dummy element under the seabed
-					gm.GeneratePipeElement(cur_elem, false, (int)segment_properties.size(), 1, (unsigned int)cur_node_mesh - 1, (unsigned int)cur_node_mesh - 2, (unsigned int)cur_node_mesh - 3);
+					gm.GeneratePipeElement(cur_elem, false, (unsigned int)segment_properties.size(), 1, cur_node_mesh - 1, cur_node_mesh - 2, cur_node_mesh - 3);
 					++cur_elem;
 					++dummy_element;
 	
 					//Create same rotation constraint
-					gm.GenerateSameRotation(++cur_special_constraint, cur_node_mesh - 1, lines[cur_line].GetTransitionNode(dummy_element - 2), constraint_booltable);
+					gm.GenerateSameRotation(++cur_special_constraint, cur_node_mesh - 1, lines[cur_line].GetTransitionNode(dummy_element - 2), BoolTable(std::vector{false, false, true}));
 					
 					//Dummy element - fixed
 					gm.GenerateNodalConstraint(++cur_constraint, cur_node_set++, 
@@ -971,18 +968,26 @@ void MooringModel::GenerateContacts()
 	gm.GenerateNodeSet(node_set_contact_id, last_contact_node_id, 1, 1, "Nodes to establish contact model");
 
 	//Contact booltables
-	BoolTable bool_c(true);
+	BoolTable bt_with_friction(std::vector{ false, false, true });
+	BoolTable bt_no_friction(std::vector{ true, true, false });
+
 	double stiff_tang_factor = environment.GetSeabed().GetStiffnessTangentialFactor();
 	unsigned int NSSS_ID = 0;
 	for (Line& line : lines)
 	{
 		unsigned int segID = 0;
-		for ( LineSegment& seg : line.GetAllSegments() )
-			gm.GenerateNSSSContact(++NSSS_ID, seg.GetNodeSet(), 1, environment.GetSeabed().GetFrictionCoefficient(),
-								   seg.GetEpsilon(), environment.GetSeabed().GetDamping(), seg.GetEpsilon() * stiff_tang_factor, 0.0,
-								   environment.GetSeabed().GetPinball(), 0, 1, std::move(bool_c), 
-								   std::string("Segment number ") + std::to_string(++segID) + " of the line number " + std::to_string(line.GetNumber())
+		for (LineSegment& seg : line.GetAllSegments())
+		{
+			gm.GenerateNSSSContact(++NSSS_ID, seg.GetNodeSet(), 1, 0.0,
+				seg.GetEpsilon(), environment.GetSeabed().GetDamping(), seg.GetEpsilon() * stiff_tang_factor, 0.0,
+				environment.GetSeabed().GetPinball(), 0, 1, bt_no_friction,
+				std::string("Segment number ") + std::to_string(++segID) + " of the line number " + std::to_string(line.GetNumber())
 			);
+			gm.GenerateNSSSContact(++NSSS_ID, seg.GetNodeSet(), 1, environment.GetSeabed().GetFrictionCoefficient(),
+				seg.GetEpsilon(), environment.GetSeabed().GetDamping(), seg.GetEpsilon() * stiff_tang_factor, 0.0,
+				environment.GetSeabed().GetPinball(), 0, 1, bt_with_friction
+			);
+		}
 	}
 }
 
@@ -1087,7 +1092,7 @@ void MooringModel::GenerateVessels()
 
 		//Node Set (vessel)
 		vessel.SetNodeset(cur_node_set);
-		gm.GenerateNodeSet(vessel.GetNodeset(), (unsigned int)cur_node_mesh, comment);
+		gm.GenerateNodeSet(vessel.GetNodeset(), cur_node_mesh, comment);
 		++cur_node_set;
 
 		//Vessels 
@@ -1106,7 +1111,7 @@ void MooringModel::GenerateVessels()
 		
 		//Rigid body element
 		vessel.SetElement(cur_elem);
-		gm.GenerateRigidBodyElement(cur_elem++, cur_rbdata, 1, (unsigned int)cur_node_mesh++);
+		gm.GenerateRigidBodyElement(cur_elem++, cur_rbdata, 1, cur_node_mesh++);
 
 		//Coupling fairleads to vessel -> SameDisplacement (GIRAFFE special constraint)
 		BoolTable constraint_booltable(false, 2, true);
@@ -1186,7 +1191,7 @@ void MooringModel::IncludeSharedLinesFaileads(BoolTable& bool_t)
 			}
 
 			//Second node												**not found**
-			if (std::find(rigid_NS.cbegin(), rigid_NS.cend(), line_it->GetNodeB()) == rigid_NS.cend())
+			else if (std::find(rigid_NS.cbegin(), rigid_NS.cend(), line_it->GetNodeB()) == rigid_NS.cend())
 			{
 				//Check if must be included
 				if (line_it->GetVesselAt(1) == vessel.GetNumber())
@@ -1340,8 +1345,10 @@ void MooringModel::SettingModelSteps(unsigned int& step, double& start)
 	}
 	//Sea current bool table, just for Morison effects
 	else
+	{
 		gm.environment.GetSeaCurrentBooltable().Multiple_Push_Back(std::vector{ false, false, true });
-
+		gm.environment.SetNullSeaCurrent();
+	}
 	moorsolution.SetStepsBeforeAnalysis(step);
 }
 
@@ -1423,7 +1430,7 @@ void MooringModel::GenerateVesselDisplacements()
 		{
 			auto time_series = disp.GetTimeSeries();
 
-			for (size_t i = 1; i < time_series->table.size(); i++)
+			for (size_t i = 0; i < time_series->table.size(); i++)
 				time_series->table[i][0] += start;
 
 			//Generate displacement
@@ -1477,7 +1484,7 @@ void MooringModel::GenerateForces()
 		// If is not a vessel or fairlead node, a new nodeset must be created
 		else
 		{
-			unsigned int temp_node = (unsigned int)lines[line].GetNodeA() - 1; //first node
+			unsigned int temp_node = lines[line].GetNodeA() - 1; //first node
 			unsigned int add_nodes;
 
 			for (unsigned int seg = 0; seg < segID; ++seg)
@@ -1493,7 +1500,7 @@ void MooringModel::GenerateForces()
 						          //Is even ? calculation for an even number of nodes : calculation for an odd number of nodes;
 						add_nodes = ( nodes_seg & 1 ) == 0 ? nodes_seg / 2 : ( unsigned int )floor(nodes_seg / 2) + 1;
 					else
-						add_nodes = (unsigned int)load.GetNodeID();
+						add_nodes = load.GetNodeID();
 				}
 				//Is not this segment yet
 				else
@@ -1551,7 +1558,7 @@ void MooringModel::GenerateDisplacementFields()
 		std::string description2add = std::string("\n\t\t- Applying harmonic displacement field at the line number ") + std::to_string(line->GetNumber());
 
 		//Generate harmonic displacement field for the current line
-		gm.GenerateDisplacementField(++cur_disp, line->GetCoordinateSystem(), global_step + 1);// , (unsigned int)line->GetTotalNumNodes());
+		gm.GenerateDisplacementField(++cur_disp, line->GetCoordinateSystem(), global_step + 1);
 
 		unsigned int global_node = line->GetNodeA();
 		for (unsigned int seg = 0; seg < line->GetNSegments(); ++seg)

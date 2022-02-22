@@ -112,27 +112,33 @@ void GiraffeModel::GenerateRigidBodyData(const unsigned int& id, double mass, co
 {
 	rbdata_vector.emplace_back(id, mass, J_G, G, cadID, comment);
 }
-void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
-	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table)
+void GiraffeModel::GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id,
+	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable const& bool_table)
 {
 	contact_vector.emplace_back(
 		std::make_unique<NSSS>(
 			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, pinball, radius, 
-			max_interactions, std::move(bool_table)
+			max_interactions, bool_table
 		)
 	);
 }
-void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id, 
+void GiraffeModel::GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id, 
 	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, 
-	unsigned int max_interactions, BoolTable&& bool_table, const std::string& comment)
+	unsigned int max_interactions, BoolTable const& bool_table, const std::string& comment)
 {
 	contact_vector.emplace_back(
 		std::make_unique<NSSS>(
 			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, 
-			pinball, radius, max_interactions, std::move(bool_table), comment
+			pinball, radius, max_interactions, bool_table, comment
 		)
 	);
 }
+
+void GiraffeModel::GenerateNSSSContact(const NSSS& nsss, double mu)
+{
+	contact_vector.emplace_back(std::make_unique<NSSS>(nsss, mu));
+}
+
 void GiraffeModel::GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table)
 {
 	special_constraint_vector.emplace_back(

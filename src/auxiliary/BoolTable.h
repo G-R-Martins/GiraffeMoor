@@ -11,7 +11,7 @@ public:
 	BoolTable(bool init_opt, size_t init_n_times, bool end_opt, size_t end_n_times = 1);
 	BoolTable(bool init_opt, size_t init_n_times, bool mid_opt, size_t mid_n_times, bool end_opt, size_t end_n_times = 1);
 	
-	BoolTable(const std::list <bool>& bool_list);
+	BoolTable(const std::list<bool>& bool_list);
 	BoolTable(const std::forward_list<bool>& bool_list);
 	BoolTable(const std::vector<bool>& bool_vec);
 

@@ -18,24 +18,41 @@ Environment::~Environment()
 /// 
 
 void Environment::SetGravity(double g)
-{ this->m_gravity = g; }
+{
+	this->m_gravity = g;
+}
 
 void Environment::SetRhoFluid(double rho)
-{ this->m_rho_fluid = rho; }
+{
+	this->m_rho_fluid = rho;
+}
 
 void Environment::SetWaterDepth(double wd)
-{ this->m_water_depth = wd; }
+{
+	this->m_water_depth = wd;
+}
 
 void Environment::SetGravityBooltable(const BoolTable & bool_grav)
-{ this->m_bool_g = bool_grav; }
+{
+	this->m_bool_g = bool_grav;
+}
 
 void Environment::SetSeaCurrentBooltable(const BoolTable & bool_current)
-{ this->m_bool_current = bool_current; }
+{
+	this->m_bool_current = bool_current;
+}
 
 void Environment::SetSeaCurrentVec(const std::vector<SeaCurrent>& current_vec)
-{ this->m_sea_current_vector = current_vec; }
+{
+	this->m_sea_current_vector = current_vec;
+}
 
 
+void Environment::SetNullSeaCurrent()
+{
+	m_sea_current_vector.emplace_back(0.0, 0.0, 0.0);
+	m_sea_current_vector.emplace_back(m_water_depth, 0.0, 0.0);
+}
 
 /// 
 /// Overloaded operators
