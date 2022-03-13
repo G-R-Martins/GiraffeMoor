@@ -114,15 +114,15 @@ class DynRelaxLinesConfig : public SolutionStep
 private:
 	double m_decrement;
 	double m_periods;
-	int m_duration;
+	bool m_periods_defined;  // false when time step defined!
 
 public:
-	DynRelaxLinesConfig(double decrement, double periods, int duration,
+	DynRelaxLinesConfig(double decrement, double periods, 
 		unsigned int id, bool is_static,
 		double global_start_time, double end_time, double timestep,
 		double max_timestep, double min_timestep, int sample,
 		double beta_new, double gamma_new, double alpha_ray, double beta_ray)
-		: m_decrement(decrement), m_periods(periods), m_duration(duration)
+		: m_decrement(decrement), m_periods(periods), m_periods_defined(false)
 	{
 		m_id = id;
 		m_is_static = is_static;
@@ -148,12 +148,11 @@ public:
 
 	// SETTERS
 	void SetDecrement(double decrement) { m_decrement = decrement; }
-	void SetPeriods(double periods) { m_periods = periods; }
-	void SetDuration(int duration) { m_duration = duration; }
+	void SetPeriods(double periods) { m_periods = periods; m_periods_defined = true; }
 
 	// GETTERS
 	inline double GetDecrement() const { return m_decrement; }
 	inline double GetPeriods() const { return m_periods; }
-	inline int GetDuration() const { return m_duration; }
+	inline bool GetPeriodsDefinedOpt() const { return m_periods_defined; }
 };
 

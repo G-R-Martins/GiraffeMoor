@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& out, const SameDisplacement& obj)
 {
 	out << "\tSameDisplacement " << obj.GetIDNumber() 
 		<< "\tNodes " << obj.m_nodeA_id << " " << obj.m_nodeB_id << " "
-		<< obj.m_booltable;
+		<< obj.m_booltable << "\n";
 
 	return out;
 }

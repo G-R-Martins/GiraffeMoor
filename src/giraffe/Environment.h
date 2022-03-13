@@ -33,9 +33,11 @@ public:
 
 	void SetSeaCurrentVec(const std::vector<SeaCurrent>& current_vec);
 
+	void SetNullSeaCurrent();
+
 
 	///
-	///  SETTERS
+	///  GETTERS
 	///
 
 	inline double GetGravity() const	{ return m_gravity; }

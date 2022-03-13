@@ -448,7 +448,7 @@ bool IO::ReadSegmentProperties(std::string& readed)
 
 bool IO::ReadEnvironment(std::string& readed)
 {
-	std::unordered_set<std::string_view> names;
+	std::unordered_set<std::string_view> names, optional_names;
 	std::unordered_set<std::string_view> blocks = { "General", "Seabed", "SeaCurrent" };
 
 	// Read first block
@@ -486,6 +486,7 @@ bool IO::ReadEnvironment(std::string& readed)
 			Seabed* seabed = &mm.environment.GetSeabed();
 
 			names = { "Stiffness", "Damping", "FrictionCoefficient" };  // valid keywords
+			optional_names = { "StiffnessTangentialFactor" };
 			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
 
 			// Read seabed type (for now, it MUST be "flat")
@@ -499,10 +500,10 @@ bool IO::ReadEnvironment(std::string& readed)
 			}
 
 			// Read keywords
-			while (s_inp >> readed && !names.empty())
-			{
+			s_inp >> readed;
+			do {
 				// Extract node (handle) from set with names of the object parameters
-				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "Seabed", names);
+				auto ret = aux_read::ExtractNodeHandle(s_inp, nh, readed, "Environment", "Seabed", names, optional_names);
 				if (ret == aux_read::NODE_EXTRACTION_STATUS::BREAK)			break;
 				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
 
@@ -510,7 +511,8 @@ bool IO::ReadEnvironment(std::string& readed)
 				if (name == "Stiffness")				seabed->SetStiffness(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "Damping")				seabed->SetDamping(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "FrictionCoefficient")	seabed->SetFrictionCoefficient(aux_read::ReadVariable<double>(s_inp));
-			}
+				else if (name == "StiffnessTangentialFactor")	seabed->SetStiffnessTangentialFactor(aux_read::ReadVariable<double>(s_inp));
+			} while (s_inp >> readed && !nh.empty());
 		}
 		else if (key == "SeaCurrent")
 		{
@@ -574,8 +576,8 @@ bool IO::ReadSolution(std::string& readed)
 
 			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
 
-			mandatory_names = { "Decrement", "Periods" };
-			optional_names = { "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
+			mandatory_names = { "Decrement" };
+			optional_names = { "Duration", "Periods", "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
 				
 			// Setting solution properties
 			s_inp >> readed;
@@ -588,7 +590,7 @@ bool IO::ReadSolution(std::string& readed)
 				std::string_view name = nh.value();
 				if (name == "Decrement")				step->SetDecrement(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "Periods")				step->SetPeriods(aux_read::ReadVariable<double>(s_inp));
-				else if (name == "Time")				step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+				else if (name == "Duration")				step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
@@ -603,7 +605,7 @@ bool IO::ReadSolution(std::string& readed)
 
 			NODE_HANDLE_USET_SV nh;  // node handle -> check if is a valid keyword
 
-			mandatory_names = { "Time" };
+			mandatory_names = { "Duration" };
 			optional_names = { "TimeStep", "MaxTimeStep", "MinTimeStep", "Sample" };
 
 			// Setting solution properties
@@ -615,7 +617,7 @@ bool IO::ReadSolution(std::string& readed)
 				else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
 
 				std::string_view name = nh.value();
-				if (name == "Time")						step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+				if (name == "Duration")						step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
 				else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
@@ -646,13 +648,13 @@ bool IO::ReadSolution(std::string& readed)
 				if (readed == "static")
 				{
 					step->SetStaticOpt(true);
-					mandatory_names = { "Time", "TimeStep", "MinTimeStep", "Sample"};
+					mandatory_names = { "Duration", "TimeStep", "MinTimeStep", "Sample"};
 					optional_names = { "MaxTimeStep" };
 				}
 				else if (readed == "dynamic")
 				{
 					step->SetDynamicOpt(true);
-					mandatory_names = { "Time", "TimeStep", "MinTimeStep", "Sample", "NumericalDamping" };
+					mandatory_names = { "Duration", "TimeStep", "MinTimeStep", "Sample", "NumericalDamping" };
 					optional_names = { "MaxTimeStep", "RayleighDamping" };
 				}
 				else
@@ -670,7 +672,7 @@ bool IO::ReadSolution(std::string& readed)
 					else if (ret == aux_read::NODE_EXTRACTION_STATUS::FALSE)	return false;
 
 					std::string_view name = nh.value();
-					if (name == "Time")						step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
+					if (name == "Duration")					step->SetEndTime(aux_read::ReadVariable<double>(s_inp));
 					else if (name == "TimeStep")			step->SetTimestep(aux_read::ReadVariable<double>(s_inp));
 					else if (name == "MaxTimeStep")			step->SetMaxTimestep(aux_read::ReadVariable<double>(s_inp));
 					else if (name == "MinTimeStep")			step->SetMinTimeStep(aux_read::ReadVariable<double>(s_inp));
@@ -815,7 +817,7 @@ bool IO::ReadGiraffeSolver(std::string& readed)
 
 				std::string_view name = nh.value();
 				if (name == "ForceTolerance")						conv_criteria->force_tol = aux_read::ReadVariable<double>(s_inp);
-				else if (name == "MomentTolerance")					conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "MomentTolerance")					conv_criteria->moment_tol = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "ForceMinimumReference")			conv_criteria->force_min = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "MomentMinimumReference")			conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "ConstraintMinimumReference")		conv_criteria->constraint_min = aux_read::ReadVariable<double>(s_inp);
@@ -1730,7 +1732,7 @@ void IO::WriteGiraffeModelFile()
 	for (auto&& special_constraint : gm.special_constraint_vector )
 		special_constraint->WriteGiraffeFile(fgir);
 
-	fgir << "\nElements\t" << gm.element_vector.size() << "\n";
+	fgir << "\n\nElements\t" << gm.element_vector.size() << "\n";
 	for (auto&& element : gm.element_vector)
 		element->WriteGiraffeFile(fgir);
 	

@@ -112,27 +112,33 @@ void GiraffeModel::GenerateRigidBodyData(const unsigned int& id, double mass, co
 {
 	rbdata_vector.emplace_back(id, mass, J_G, G, cadID, comment);
 }
-void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
-	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table)
+void GiraffeModel::GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id,
+	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable const& bool_table)
 {
 	contact_vector.emplace_back(
 		std::make_unique<NSSS>(
 			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, pinball, radius, 
-			max_interactions, std::move(bool_table)
+			max_interactions, bool_table
 		)
 	);
 }
-void GiraffeModel::GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id, 
+void GiraffeModel::GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id, 
 	double mu, double epn, double cn, double ept, double ct, double pinball, double radius, 
-	unsigned int max_interactions, BoolTable&& bool_table, const std::string& comment)
+	unsigned int max_interactions, BoolTable const& bool_table, const std::string& comment)
 {
 	contact_vector.emplace_back(
 		std::make_unique<NSSS>(
 			id, nodeset_id, surface_set_id, mu, epn, cn, ept, ct, 
-			pinball, radius, max_interactions, std::move(bool_table), comment
+			pinball, radius, max_interactions, bool_table, comment
 		)
 	);
 }
+
+void GiraffeModel::GenerateNSSSContact(const NSSS& nsss, double mu)
+{
+	contact_vector.emplace_back(std::make_unique<NSSS>(nsss, mu));
+}
+
 void GiraffeModel::GenerateRigidNodeSet(unsigned int id, unsigned int pilot_node_id, unsigned int nodeset_id, const BoolTable& bool_table)
 {
 	special_constraint_vector.emplace_back(
@@ -163,10 +169,22 @@ void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodes
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, values)
 	);
 }
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, values, booltable)
+	);
+}
 void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code)
 {
 	displacement_vector.emplace_back(
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, math_code)
+	);
+}
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, math_code, booltable)
 	);
 }
 void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id,
@@ -174,6 +192,12 @@ void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodes
 {
 	displacement_vector.emplace_back(
 		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, file_name, header_lines, n_times)
+	);
+}
+void GiraffeModel::GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times, const BoolTable& booltable)
+{
+	displacement_vector.emplace_back(
+		std::make_shared<NodalDisplacement>(id, nodeset_id, cs_id, file_name, header_lines, n_times, booltable)
 	);
 }
 void GiraffeModel::GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step)

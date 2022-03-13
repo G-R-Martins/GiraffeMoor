@@ -7,7 +7,7 @@ class MoorEnvironment
 {
 private:
 	// General environment variables
-	static double s_gravity;
+	double m_gravity;
 	double m_rho_fluid;
 	double m_water_depth;
 	
@@ -18,7 +18,6 @@ private:
 	bool m_sea_current_exist; 
 	bool m_sea_current_is_constant;
 	
-	//============================================================================
 
 public:
 
@@ -30,7 +29,7 @@ public:
 	/// SETTERS
 	///
 	
-	static void SetGravity(double g);
+	void SetGravity(double g);
 	void SetRhoFluid(double rho_fluid);
 	void SetWaterDepth(double water_depth);
 	void SetBoolConstantSeaCurrent(bool is_constant);
@@ -43,7 +42,7 @@ public:
 	/// GETTERS
 	///
 	
-	inline static double GetGravity()		{ return MoorEnvironment::s_gravity; }
+	inline double GetGravity()				{ return this->m_gravity; }
 	inline double GetRhoFluid() const		{ return this->m_rho_fluid; }
 	inline double GetWaterDepth() const		{ return this->m_water_depth; }
 

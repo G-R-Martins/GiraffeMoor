@@ -13,12 +13,30 @@ NSSS::NSSS()
 NSSS::NSSS(const unsigned int& id, const unsigned int& node_set_id, const unsigned int& surface_set_id,
 	double mu, double epn, double cn, double ept, double ct, 
 	double pinball, double radius, unsigned int max_interactions, 
-	BoolTable&& booltable, const std::string& comment)
+	BoolTable const& booltable, const std::string& comment)
 	: m_id(id), m_node_set_id(node_set_id), m_surface_set_id(surface_set_id),
 		m_mu(mu), m_epn(epn), m_cn(cn), m_ept(ept), m_ct(ct),
 		m_pinball(pinball), m_radius(radius), m_max_interactions(max_interactions),
 		m_booltable(booltable), m_comment(comment)
 {}
+
+
+NSSS::NSSS(const NSSS& copied, double mu)
+{
+	m_node_set_id = copied.m_node_set_id;
+	m_surface_set_id = copied.m_surface_set_id;
+	m_mu = mu;
+	m_epn = copied.m_epn;
+	m_cn = copied.m_cn;
+	m_ept = copied.m_ept;
+	m_ct = copied.m_ct;
+	m_pinball = copied.m_pinball;
+	m_radius = copied.m_radius;
+	m_max_interactions = copied.m_max_interactions;
+	m_booltable = copied.m_booltable;
+	m_comment = copied.m_comment;
+}
+
 
 NSSS::~NSSS()
 {
@@ -47,7 +65,8 @@ std::ostream& operator<<(std::ostream& out, const NSSS& obj)
 		<< "\tPinball "			<< obj.m_pinball 
 		<< "\tRadius "			<< obj.m_radius 
 		<< "\tMaxPointwiseInt " << obj.m_max_interactions 
-		<< " "					<< obj.m_booltable;
+		<< " "					<< obj.m_booltable
+		<< "\n";
 
 	return out;
 }

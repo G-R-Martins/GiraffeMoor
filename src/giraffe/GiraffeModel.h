@@ -153,8 +153,11 @@ public:
 	------------*/
 	
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, Table* values, const BoolTable& booltable);
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, MathCode* math_code, const BoolTable& booltable);
 	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times);
+	void GenerateNodalDisplacement(unsigned int id, unsigned int nodeset_id, unsigned int cs_id, const std::string& file_name, unsigned int header_lines, unsigned int n_times, const BoolTable& booltable);
 	void GenerateDisplacementField(unsigned int id, unsigned int cs_id, unsigned int solution_step);
 	
 	//--------------------------------------------------------------------------------------------------------------------------
@@ -176,11 +179,14 @@ public:
 
 	void GenerateOscillatorySurf(const unsigned int& id, const double& A1, const double& A2, const double& A12, const double& lambda1, const double& lambda2, const double& phi1, const double& phi2, const double& waves1, const double& waves2, const unsigned int& cs_id, const unsigned int& pilot_node_id);
 	void GenerateSurfaceSet(const unsigned int& id, const std::vector<unsigned int>& list);
-	void GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
-		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table);
-	void GenerateNSSSContact(const unsigned int& id, const unsigned int& nodeset_id, const unsigned int& surface_set_id,
-		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, unsigned int max_interactions, BoolTable&& bool_table, const std::string& comment);
-	
+	void GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id, 
+		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, 
+		unsigned int max_interactions, BoolTable const& bool_table);
+	void GenerateNSSSContact(unsigned int id, unsigned int nodeset_id, unsigned int surface_set_id, 
+		double mu, double epn, double cn, double ept, double ct, double pinball, double radius, 
+		unsigned int max_interactions, BoolTable const& bool_table, const std::string& comment);
+	void GenerateNSSSContact(const NSSS& nsss, double mu);
+
 	//--------------------------------------------------------------------------------------------------------------------------
 
 	/*------

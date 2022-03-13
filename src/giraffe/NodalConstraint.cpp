@@ -27,14 +27,14 @@ std::ostream& operator<<(std::ostream& out, NodalConstraint const& obj)
 {
 	out << "\tNodalConstraint " << obj.GetNumber()
 		<< "\tNodeSet "			<< obj.m_node_set_id
-		<< "\n"
-		<< "\t\tUX\t\t"			<< obj.m_UX
-		<< "\t\tUY\t\t"			<< obj.m_UY
-		<< "\t\tUZ\t\t"			<< obj.m_UZ
-		<< "\t\tROTY\t"			<< obj.m_ROTY
-		<< "\t\tROTX\t"			<< obj.m_ROTX
-		<< "\t\tROTZ\t"			<< obj.m_ROTZ;
-	
+		<< "\n\t\tUX\t\t"		<< obj.m_UX
+		<< "\n\t\tUY\t\t"		<< obj.m_UY
+		<< "\n\t\tUZ\t\t"		<< obj.m_UZ
+		<< "\n\t\tROTY\t"		<< obj.m_ROTY
+		<< "\n\t\tROTX\t"		<< obj.m_ROTX
+		<< "\n\t\tROTZ\t"		<< obj.m_ROTZ
+		<< "\n";
+
 	return out;
 }
 
