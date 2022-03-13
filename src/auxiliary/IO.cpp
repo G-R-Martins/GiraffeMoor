@@ -817,7 +817,7 @@ bool IO::ReadGiraffeSolver(std::string& readed)
 
 				std::string_view name = nh.value();
 				if (name == "ForceTolerance")						conv_criteria->force_tol = aux_read::ReadVariable<double>(s_inp);
-				else if (name == "MomentTolerance")					conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
+				else if (name == "MomentTolerance")					conv_criteria->moment_tol = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "ForceMinimumReference")			conv_criteria->force_min = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "MomentMinimumReference")			conv_criteria->moment_min = aux_read::ReadVariable<double>(s_inp);
 				else if (name == "ConstraintMinimumReference")		conv_criteria->constraint_min = aux_read::ReadVariable<double>(s_inp);
