@@ -17,4 +17,3 @@ echo.
 :: Build GiraffeMoor
 cmake --build . --config Release
 
-exit
